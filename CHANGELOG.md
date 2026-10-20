@@ -7,6 +7,7 @@
 ## 未发布
 
 ### 文档
+- 新增 AI 助手协作规范 `AGENTS.md`（Claude Code 通过 `CLAUDE.md` 读取同一份内容）。
 - 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，版本记录移入本文件。
 - AE 手动验证脚本移至 `tests/ae/`。
 

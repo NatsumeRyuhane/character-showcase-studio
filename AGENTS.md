@@ -1,0 +1,147 @@
+# Agent guide
+
+This file is for AI coding agents (Codex, Claude Code and others) working in this repository. Read it fully before you change anything. Human contributors should read [CONTRIBUTING.md](CONTRIBUTING.md), which is in Chinese.
+
+## The project
+
+Character Showcase Studio is a browser editor for animated character showcase screens. It exports a standalone HTML page, OBS browser-source packages, and editable After Effects templates. It is one self-contained HTML page built by a dependency-free Node script, with no framework, package manager or backend. It is live at https://nekokaii.com/showcase-generator.
+
+| Read | When |
+| --- | --- |
+| [docs/dev/architecture.md](docs/dev/architecture.md) | Before any code change. Runtime layers, build pipeline, module map, **invariants** |
+| [docs/dev/state-and-timing.md](docs/dev/state-and-timing.md) | Touching settings, persistence, the timeline, intro/outro, post-processing |
+| [docs/dev/export.md](docs/dev/export.md) | Touching HTML / OBS / AE export |
+| [docs/dev/build-and-test.md](docs/dev/build-and-test.md) | Building, testing, adding modules or tests |
+| [docs/dev/deploy.md](docs/dev/deploy.md) | Anything about the live site |
+| [docs/user/](docs/user/) | What users see and are told (Chinese) |
+
+## Who you are working for
+
+The repository owner is **nekokaii**, who designs the product but **does not have a software background** and may not know how git or GitHub work. Other collaborators, such as NatsumeRyuhane, are developers.
+
+When the person you are working for may be the owner, or you are not sure:
+
+- **Speak plain Chinese.** Explain git and GitHub steps in everyday terms: what will happen, what it affects, how to undo it. Do not assume they know words like branch, commit, push, merge or PR; explain each the first time.
+- **Ask before any outward-facing or hard-to-undo step:** pushing, opening or merging a PR, deploying, deleting branches or files, discarding changes. Approval for one step does not cover the next.
+- **Describe changes by what they look like**, such as "the title moves lower in portrait mode", not only by file names. Offer to open the page so they can see it.
+- **Never "fix" things silently.** If a request would break an invariant, a security boundary, or someone else's work, say so and propose an alternative.
+- If you are unsure what they want, ask one clear question rather than guessing.
+
+## Language
+
+| Chinese | English |
+| --- | --- |
+| User-facing docs (`README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `docs/user/`), UI text | Technical docs (`AGENTS.md`, `docs/dev/`, `docs/qa/`, `tests/**/README.md`) |
+| GitHub issues, PR titles and descriptions | Code, identifiers, code comments |
+| Commit messages | Replies to English-language comments or reviews |
+| Conversation with the owner | |
+
+## Git and GitHub workflow
+
+### Before you start
+
+1. Run `git status` and `git branch --show-current`.
+   - If there are uncommitted changes you did not make, **stop and ask** whose they are. Never discard, stash or commit them on your own.
+   - If a merge, rebase or cherry-pick is in progress, stop and ask.
+2. Run `git fetch origin`.
+3. Create a new branch from the latest `main` for the task:
+
+   ```sh
+   git switch -c <type>/<short-slug> origin/main    # e.g. fix/poster-title-overlap
+   ```
+
+   Use the commit types below for `<type>`. One branch per task, and never reuse someone else's branch.
+
+### Do not commit directly to `main`
+
+`main` is the shared, reviewed version, and the live site is deployed from it. Work there skips review and can collide with collaborators. GitHub does not block it in this repo, so **you** are the safeguard.
+
+- Always work on a branch, even for one-line changes.
+- If the person asks you to commit or push to `main`, or you notice you are on `main` with changes:
+  1. Explain in plain Chinese why that is risky: no review, it can overwrite or conflict with others' work, and the live site is deployed from `main`. Suggest the branch + PR path instead.
+  2. Ask them to confirm **explicitly** that they understand and still want to commit to `main` this time.
+  3. Proceed only on a clear yes, for that one time. Do not treat it as standing permission.
+- If you have uncommitted changes on `main`, move them to a branch with `git switch -c <type>/<slug>`. The changes come along.
+
+### Change → check → commit
+
+Work in small, focused steps:
+
+1. Make one focused change.
+2. `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass.
+3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
+4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
+5. Commit, including the rebuilt `index.html` and `dist/` files when the source change affects them.
+
+Never bundle unrelated changes in one commit.
+
+### Commit messages
+
+[Conventional Commits](https://www.conventionalcommits.org/zh-hans/v1.0.0/) with an English type and a Chinese description:
+
+```
+<type>[(scope)]: <中文简述>
+
+[中文正文：改了什么、为什么]
+```
+
+- Types: `feat`, `fix`, `docs`, `refactor`, `test`, `build`, `chore`, `perf`, `ci`, `style`, `revert`.
+- An optional scope is an English noun for the area, e.g. `fix(export): …`, `feat(narrative): …`.
+- Examples: `fix(poster): 修复竖屏互换时标题遮挡短句`, `docs: 更新 OBS 三层输出说明`.
+- Do not add AI attribution lines (`Co-Authored-By: <AI>`, "Generated with …").
+
+### Push and pull request
+
+1. **Ask before pushing.** Then push the branch with `git push -u origin <branch>`.
+2. Open a PR into `main` with `gh pr create`. The title and description are in Chinese and follow [the template](.github/pull_request_template.md): what changed, why, how it was checked, and screenshots for visual changes.
+3. **Merge only through GitHub**, after review, and only when the owner or a maintainer says to. Never merge into `main` locally.
+4. To bring a pushed branch up to date with `main`, use `git merge origin/main`, not rebase, so no force-push is needed.
+
+### Never
+
+- Force-push (`--force`, `--force-with-lease`) or rewrite history that has been pushed.
+- Run `git reset --hard`, `git clean`, `git checkout -- <file>` or `git restore` on work you did not create, without explicit approval.
+- Delete branches that are not yours.
+- Commit secrets: `.wrangler/`, `.dev.vars`, `.env*`, tokens, API keys.
+- Edit `index.html` or `dist/` by hand.
+- Resolve a conflict in `index.html` or `dist/` by hand. Resolve the source conflicts, rebuild, and commit the rebuilt files.
+
+## Code rules
+
+- **The source is in `src/` and `runtime/`.** The build splices them into one page, and spliced modules share one scope. A new file must be wired into `tools/build.mjs`, and a new test into `tools/check.mjs`.
+- **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
+- **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.
+- **Storage is keyed by page path.** Moving or renaming the served page loses users' saved settings unless you add a migration.
+- **Match the surrounding style** for now. A frontend restructure into its own directory with proper modules is planned; do not start large refactors or reformat whole files without agreement in an issue.
+- Do not add runtime network dependencies, npm packages or frameworks without agreement. The page must keep working offline from `file://`.
+- Do not add official game logos, characters or UI assets. Badges and designs are original artwork.
+
+## Documentation rules
+
+Update docs in the same branch as the change:
+
+| Change | Update |
+| --- | --- |
+| Anything users notice | The `## 未发布` section of `CHANGELOG.md`, and the relevant page in `docs/user/` (Chinese) |
+| Architecture, state fields, timing, export internals, build or deploy | The relevant page in `docs/dev/` (English) |
+| A notable manual or native-app verification | A new record in `docs/qa/` (`<version>-<topic>.md`, English) plus a row in its README |
+
+Do not leave stale statements behind. Fix or remove them.
+
+## Deployment
+
+Deploying (`npx wrangler deploy`) updates the public site and needs the owner's Cloudflare login. **Never deploy without the owner's explicit approval for that deploy.** Deploy only from an up-to-date `main` with a clean tree and passing checks. Pushing or merging on GitHub does **not** deploy. See [deploy.md](docs/dev/deploy.md).
+
+## Environment notes
+
+- Node.js 18+ is the only requirement. There is no `npm install`.
+- The owner works on Windows. `start.cmd` and `build.cmd` are double-click shortcuts, so keep them working.
+- `.gitattributes` forces LF line endings. A Windows checkout made before it existed needs a one-time refresh; see [build-and-test.md](docs/dev/build-and-test.md#generated-files-and-line-endings). If a fresh build changes `index.html` with no source changes, suspect line endings first.
+
+## Before you report a task as done
+
+- [ ] Build and check pass; UI changes were also checked in the browser.
+- [ ] Each commit is focused, with a Conventional Commits message in Chinese.
+- [ ] Docs and `CHANGELOG.md` are updated where needed.
+- [ ] You told the person, in plain words, what changed, what you checked, and what you did **not** check.
+- [ ] You asked before pushing, opening a PR or deploying, and did not merge or deploy without explicit approval.
