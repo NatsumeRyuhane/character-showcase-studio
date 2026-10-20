@@ -90,10 +90,10 @@ const document = `<!doctype html>
 <html lang="zh-CN" data-visualize-standalone>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="${shellCsp}"><title>${title}</title><style>:root{color-scheme:light;background:#edf0e9}html,body{margin:0;height:100%;overflow:hidden}body{box-sizing:border-box;background:inherit}iframe{display:block;width:100%;height:100dvh;margin:0 auto;border:0}</style></head>
 <body><script type="application/json" id="studio-startup-defaults">${startupJson}</script><iframe id="codex-visualization" sandbox="allow-scripts" referrerpolicy="no-referrer" title="${title}" data-srcdoc="${escape(frameHtml)}"></iframe><script>${outputHost}</script><script>${shell}</script></body></html>\n`;
+// dist/ is build output only; it is gitignored and never edited by hand.
 await fs.mkdir(path.join(root, 'dist'), { recursive: true });
-await fs.writeFile(path.join(root, 'index.html'), document);
 await fs.writeFile(path.join(root, 'dist', 'index.html'), document);
 await fs.writeFile(path.join(root, 'dist', 'character-explorations.fragment.html'), fragment);
 await fs.writeFile(path.join(root, 'dist', 'exploration-full-source.js'), script);
 const count = [...fragment.matchAll(/<section\b[^>]*\bdata-variant=/g)].length;
-console.log(`Built ${count} design variants. index.html: ${Buffer.byteLength(document).toLocaleString()} bytes.`);
+console.log(`Built ${count} design variants. dist/index.html: ${Buffer.byteLength(document).toLocaleString()} bytes.`);

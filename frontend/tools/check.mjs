@@ -8,11 +8,11 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => fs.readFile(path.join(root, file), 'utf8');
 new vm.Script(await read('dist/exploration-full-source.js'), { filename: 'exploration-full-source.js' });
-for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/sync-source.mjs']) {
+for (const file of ['tools/build.mjs', 'tools/server.mjs']) {
   const result = spawnSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${file} syntax check failed`);
 }
-const document = await read('index.html');
+const document = await read('dist/index.html');
 const fragment = await read('dist/character-explorations.fragment.html');
 // Parse every actual executable script after both HTML serialization layers.
 // This catches corrupted vendor payloads even if the separate source file parses.

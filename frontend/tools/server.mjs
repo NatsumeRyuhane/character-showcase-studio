@@ -4,7 +4,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Serve the build output at / so the page URL (and its saved-settings key) stays http://127.0.0.1:<port>/.
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const port = Number(process.argv[2] || 8768);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port.');
 const types = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.mjs':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.json':'application/json; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.woff2':'font/woff2', '.md':'text/plain; charset=utf-8' };
@@ -21,4 +22,5 @@ const server = http.createServer(async (req, res) => {
   } catch (error) { res.writeHead(error.code === 'ENOENT' ? 404 : 400); res.end('File not found'); }
 });
 server.on('error', error => { console.error(error.code === 'EADDRINUSE' ? `Port ${port} is in use. Try: node tools/server.mjs 8769` : error.message); process.exitCode=1; });
+try { await fs.access(path.join(root, 'index.html')); } catch { console.error('dist/index.html not found. Run: node tools/build.mjs'); process.exit(1); }
 server.listen(port, '127.0.0.1', () => console.log(`Character Showcase Studio\nhttp://127.0.0.1:${port}/\nPress Ctrl+C to stop.`));
