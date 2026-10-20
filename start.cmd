@@ -1,14 +1,14 @@
 @echo off
 cd /d "%~dp0frontend"
 where node >nul 2>nul
-if %errorlevel%==0 (
-  node tools/server.mjs 8768
+if not %errorlevel%==0 (
+  echo Node.js 18+ is required. Install it from https://nodejs.org/
+  pause
   goto :eof
 )
-where py >nul 2>nul
-if %errorlevel%==0 (
-  py -3 -m http.server 8768 --bind 127.0.0.1
+node tools/build.mjs
+if errorlevel 1 (
+  pause
   goto :eof
 )
-echo Install Node.js 18+ or Python 3, or open index.html directly.
-pause
+node tools/server.mjs 8768

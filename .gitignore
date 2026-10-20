@@ -10,3 +10,4 @@ dist-cloudflare/
 .idea/
 .vscode/
 .agents/settings.local.json
+frontend/dist/

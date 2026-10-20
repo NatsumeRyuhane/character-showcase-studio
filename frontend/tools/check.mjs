@@ -12,7 +12,7 @@ for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/sync-source.mj
   const result = spawnSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${file} syntax check failed`);
 }
-const document = await read('index.html');
+const document = await read('dist/index.html');
 const fragment = await read('dist/character-explorations.fragment.html');
 // Parse every actual executable script after both HTML serialization layers.
 // This catches corrupted vendor payloads even if the separate source file parses.

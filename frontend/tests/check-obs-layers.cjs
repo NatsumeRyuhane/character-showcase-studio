@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const decode=value=>value.replace(/&quot;/g,'"').replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&');
-const built=read('index.html'),frameTemplate=decode(built.match(/\bdata-srcdoc="([^"]*)"/)[1]),policy=decode(built.match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)[1]);
+const built=read('dist/index.html'),frameTemplate=decode(built.match(/\bdata-srcdoc="([^"]*)"/)[1]),policy=decode(built.match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)[1]);
 let downloaded=null;
 const scope={TextEncoder,Blob,crypto:{randomUUID:()=> 'obs-layer-test-0001'},document:{getElementById:id=>id==='codex-visualization'?{dataset:{srcdoc:frameTemplate}}:null,querySelector:()=>({content:policy})},studioZip:files=>files,studioDownload:(files,filename)=>{downloaded={files,filename}}};
 vm.createContext(scope);

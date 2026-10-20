@@ -22,7 +22,7 @@ near(run('studioRetime(2.25,4.5,8)'),4);near(run('studioRetime(7.5,4.5,8)'),11);
 near(run('studioRetime(2.25,4.5,0)'),0);near(run('studioRetime(3,0,8)'),11);
 // Use the trusted, fully built template rather than a hand-written surrogate.
 const decode=value=>value.replace(/&quot;/g,'"').replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&');
-const document=fs.readFileSync(root+'/index.html','utf8');
+const document=fs.readFileSync(root+'/dist/index.html','utf8');
 const template=decode(document.match(/\bdata-srcdoc="([^"]*)"/)[1]);
 const policy=decode(document.match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)[1]);
 const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==';
