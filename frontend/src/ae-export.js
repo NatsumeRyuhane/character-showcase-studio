@@ -1,5 +1,5 @@
 import { studioShowDuration } from './timeline.ts';
-import { createMotionClock } from './motion-clock.js';
+import { createMotionClock } from './motion-clock.ts';
 import assets from './badge-assets.json';
 import { paintExploration } from './exploration-full-scene.js';
 import { currentSeries, draw, images, measure, motionClock, setMotionClock, state, workspace } from './exploration-full-logic.js';

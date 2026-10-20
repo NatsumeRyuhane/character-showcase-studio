@@ -83,8 +83,8 @@ Consequences:
 | `urban-language-scene.js` / `urban-language-styles.css` | The three urban designs, `district`, `tuner` and `arcade`: palettes, recommended geometry, animated backgrounds, typography |
 | `dual-language-scene.js` / `-styles.css` / `-markup.html` | The two-panel `dual` design |
 | `studio-geometry.js` | Series geometry devices (`facet`, `ribbon`, `blocks`), drawn by `paintExploration` with its canvas and helpers passed in |
-| `motion-clock.js` | Continuous ring, text and border clocks that never reset |
-| `information-motion.js` | Text entrance and subtle idle motion |
+| `motion-clock.ts` | Continuous ring, text and border clocks that never reset |
+| `information-motion.ts` | Text entrance and subtle idle motion |
 | `timeline.ts` | Narrative timing: intro / show / outro poses, looping, retiming |
 | `story-intro.js` / `.css` | Two-shot poster intro (character shot → creator shot) and its deterministic overlay effects |
 | `studio-narrative.js` / `.css` | Intro and outro controls, brand ending |

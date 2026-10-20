@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { studioCRTPose } from '../../runtime/crt-motion.js';
-import { informationMotionPose } from '../../src/information-motion.js';
-import { advanceMotionClock, createMotionClock } from '../../src/motion-clock.js';
+import { informationMotionPose } from '../../src/information-motion.ts';
+import { advanceMotionClock, createMotionClock } from '../../src/motion-clock.ts';
 import {
   studioAdvanceTime, studioNarrativePose, studioNarrativeSettings, studioNarrativeTime, studioPhase,
   studioRetimeShow, studioStoryDuration, studioStoryPose, studioTotalDuration, type NarrativeInput,

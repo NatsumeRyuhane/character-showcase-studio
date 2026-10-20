@@ -109,7 +109,7 @@ Story intro fields, stored in `narrative`:
 
 A disabled shot takes no time, and with both disabled the page goes straight to the show. During the two shots the main info, model layer and rings are hidden; the whole poster layer uses `display:none` when inactive, so child `visibility` cannot override it. Shot images fall back: character shot → main image → secondary image; creator shot → secondary image → main image; with no image, only the text packaging shows. `studioPaintStoryEffect(ctx, w, h, {effect, time, strength, speed, accent, dark})` is deterministic for the same input.
 
-### 2. Continuous motion clocks (`src/motion-clock.js`)
+### 2. Continuous motion clocks (`src/motion-clock.ts`)
 
 The ring, text and border clocks, and the background `t` / `gridMoving` clock, **only ever advance**. They never reset on replay, loop, phase change or speed change. Rings move from the first intro frame (`ringTime`). Speed changes must not cause phase jumps.
 

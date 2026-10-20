@@ -5,7 +5,7 @@ const assert=require('assert/strict');
 
 // Exercise the production restore/save/event handler without constructing UI.
 const logic=moduleScript('src/exploration-full-logic.js');
-const clocks=moduleScript('src/motion-clock.js');
+const clocks=moduleScript('src/motion-clock.ts');
 const timeline=moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.ts');
 const start=logic.indexOf("window.addEventListener('openai:set_globals'");
 const end=logic.indexOf(';reduced.addEventListener',start);
