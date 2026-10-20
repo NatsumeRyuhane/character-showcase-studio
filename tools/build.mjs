@@ -66,6 +66,10 @@ if (/<script\b[^>]*\bsrc\s*=/i.test(kit) || /@import\b/i.test(fragment)) throw n
 const stylesheet = await read('runtime', 'visualize.css');
 const bridge = inlineScript(await read('runtime', 'standalone-host-bridge.js'));
 const shell = inlineScript(await read('runtime', 'standalone-shell.js'));
+// Published starting point is data only, never imported markup or scripts.
+const startupDefaults = JSON.parse(await read('runtime', 'startup-defaults.json'));
+if (typeof startupDefaults.revision !== 'string' || !startupDefaults.widgetState?.privateContent || Buffer.byteLength(JSON.stringify(startupDefaults.widgetState)) > 16384) throw new Error('Invalid startup defaults.');
+const startupJson = JSON.stringify(startupDefaults).replaceAll('<', '\\u003c');
 let exportPackages = await read('runtime', 'export-packages.js');
 exportPackages = replaceRequired(exportPackages, '__STUDIO_AE_TEMPLATE__', JSON.stringify(replaceRequired(await read('runtime', 'ae-import-template.jsx'), '/* CRT_MOTION_FUNCTION */', await read('runtime', 'crt-motion.js'))));
 exportPackages = replaceRequired(exportPackages, '__STUDIO_ASSET_NOTICES__', JSON.stringify(notices));
@@ -85,7 +89,7 @@ const frameHtml = `<!doctype html>
 const document = `<!doctype html>
 <html lang="zh-CN" data-visualize-standalone>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="${shellCsp}"><title>${title}</title><style>:root{color-scheme:light;background:#edf0e9}html,body{margin:0;height:100%;overflow:hidden}body{box-sizing:border-box;background:inherit}iframe{display:block;width:100%;height:100dvh;margin:0 auto;border:0}</style></head>
-<body><iframe id="codex-visualization" sandbox="allow-scripts" referrerpolicy="no-referrer" title="${title}" data-srcdoc="${escape(frameHtml)}"></iframe><script>${outputHost}</script><script>${shell}</script></body></html>\n`;
+<body><script type="application/json" id="studio-startup-defaults">${startupJson}</script><iframe id="codex-visualization" sandbox="allow-scripts" referrerpolicy="no-referrer" title="${title}" data-srcdoc="${escape(frameHtml)}"></iframe><script>${outputHost}</script><script>${shell}</script></body></html>\n`;
 await fs.mkdir(path.join(root, 'dist'), { recursive: true });
 await fs.writeFile(path.join(root, 'index.html'), document);
 await fs.writeFile(path.join(root, 'dist', 'index.html'), document);

@@ -8,6 +8,8 @@ function buildStudioOutputDocument(frameTemplate,payload,policy){
   const scale=source.width===(portrait?2160:3840)?2:1;
   const layer=['picture','effects','borders'].includes(source.layer)?source.layer:'all';
   const config={enabled:true,width:(portrait?1080:1920)*scale,height:(portrait?1920:1080)*scale,transparent:['effects','borders'].includes(layer)||source.transparent===true,includeCharacters:source.includeCharacters===true,start:source.start==='show'?'show':'intro',fit:source.fit==='cover'?'cover':'contain',layer,obsLayers:source.obsLayers==='separate'?'separate':'combined'};
+  // Standalone HTML contains the full sequence; OBS retains direct/manual playback.
+  if(source.playback==='complete'){config.playback='complete';config.start='intro';}
   // Only our loopback service endpoint is permitted. This stays outside the
   // opaque-origin sandbox; the iframe keeps its original network policy.
   if(source.sync&&typeof source.sync.key==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(source.sync.key)&&source.sync.endpoint==='/__studio_clock')config.sync={key:source.sync.key,endpoint:'/__studio_clock'};

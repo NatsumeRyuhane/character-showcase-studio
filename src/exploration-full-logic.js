@@ -1,5 +1,6 @@
 (()=>{
-const root=document.getElementById('character-directions'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+// Rendered output plays the requested animation regardless of OS UI preferences.
+const root=document.getElementById('character-directions'),reduced=globalThis.studioOutput?.enabled===true?{matches:false,addEventListener(){}}:matchMedia('(prefers-reduced-motion: reduce)');
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n)),lerp=(a,b,p)=>a+(b-a)*p,smooth=n=>{n=clamp(n);return n*n*(3-2*n)};
 /* TIMELINE_FUNCTIONS */
 /* MOTION_FUNCTIONS */
@@ -58,7 +59,7 @@ if(oldExploration){if(Object.hasOwn(geometryNames,v.ringStyle))target.geometryBy
 restoreEffects(target.effects,v.effects);for(const key of Object.keys(shadowDefaults))if(typeof v.shadows?.[key]==='boolean')target.shadows[key]=v.shadows[key];
 }return true;}
 restore(window.openai?.widgetState);
-if(globalThis.studioOutput?.enabled===true){const output=globalThis.studioOutput;state.time=output.start==='show'?state.introDuration:0;state.playing=!reduced.matches;state.output.transparent=output.transparent===true;state.output.includeCharacters=output.includeCharacters===true;state.output.obsLayers=output.obsLayers==='separate'?'separate':'combined';state.output.start=output.start==='show'?'show':'intro';state.output.fit=output.fit==='cover'?'cover':'contain';for(const key of Object.keys(images)){const value=globalThis.studioImages?.[key];if(typeof value==='string'&&/^data:image\/(png|jpeg|webp);base64,/i.test(value)){images[key]=value;imageNames[key]='已打包素材'}}}
+if(globalThis.studioOutput?.enabled===true){const output=globalThis.studioOutput;if(output.playback==='complete'&&state.narrative.outroEnabled)state.narrative.outroTrigger='auto';state.time=output.start==='show'?state.introDuration:0;state.playing=!reduced.matches;state.output.transparent=output.transparent===true;state.output.includeCharacters=output.includeCharacters===true;state.output.obsLayers=output.obsLayers==='separate'?'separate':'combined';state.output.start=output.start==='show'?'show':'intro';state.output.fit=output.fit==='cover'?'cover':'contain';for(const key of Object.keys(images)){const value=globalThis.studioImages?.[key];if(typeof value==='string'&&/^data:image\/(png|jpeg|webp);base64,/i.test(value)){images[key]=value;imageNames[key]='已打包素材'}}}
 let motionClock=createMotionClock(state.time,state.variants,state.edges);
 const ownSnapshots=new Set();
 function stateSignature(value){return JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item)}

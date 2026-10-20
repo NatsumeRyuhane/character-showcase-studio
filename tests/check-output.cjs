@@ -77,8 +77,8 @@ const prefix=fs.readFileSync(root+'/src/studio-text.js','utf8')+'\n'+logic.slice
   .replace('/* VARIANT_CODEC */',fs.readFileSync(root+'/src/variant-codec.js','utf8'));
 const outputLogic=fs.readFileSync(root+'/src/studio-output.js','utf8'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
 assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
-function editorFixture(widgetState,globals={}){
-  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:false}),window:{openai:{widgetState}}};
+function editorFixture(widgetState,globals={},reducedMotion=false){
+  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState}}};
   vm.createContext(app);vm.runInContext(prefix,app);return app;
 }
 const editor=editorFixture();
@@ -134,6 +134,22 @@ for(const kind of ['html','obs'])for(const includeCharacters of [false,true])for
   assert.equal(value.story.role,start==='show'?'show':'character');
   assert.deepEqual(Object.keys(value.images).filter(key=>value.images[key]).sort(),keys);
 }
+// Complete HTML ignores paused snapshots, direct OBS start and reduced UI motion.
+const completeGlobals=globalsOf(build({state:{...state,time:7,playing:false,narrative:{...storySettings,outroEnabled:true,outroTrigger:'manual',showDuration:2,outroDuration:1.5}},config:{width:1920,start:'show',playback:'complete'}}));
+assert.equal(completeGlobals.studioOutput.start,'intro');
+const completeApp=editorFixture(completeGlobals.widgetState,{studioOutput:completeGlobals.studioOutput},true);
+assert.equal(vm.runInContext('state.playing',completeApp),true);
+near(vm.runInContext('state.time',completeApp),0);
+assert.equal(vm.runInContext('state.narrative.outroTrigger',completeApp),'auto');
+vm.runInContext('for(let i=0;i<2000;i++)state.time=studioAdvanceTime(state.time,.02,state.introDuration,state.narrative)',completeApp);
+assert.equal(vm.runInContext('studioPhase(state.time,state.introDuration,state.narrative)',completeApp),'outro');
+// Exercise the actual config producer, rather than the fixture's mock config.
+const configSource=outputLogic.slice(outputLogic.indexOf('function config('),outputLogic.indexOf('  function downloadLabel'));
+vm.runInContext("function dimensions(){return [1920,1080]}"+configSource,storyEditor);
+vm.runInContext("state.output.start='show'",storyEditor);
+assert.equal(vm.runInContext("config('html').start",storyEditor),'intro');
+assert.equal(vm.runInContext("config('html').playback",storyEditor),'complete');
+assert.equal(vm.runInContext("config('obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
 for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])vm.runInContext(fs.readFileSync(root+'/src/'+file,'utf8'),scope);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){

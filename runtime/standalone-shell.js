@@ -55,6 +55,16 @@
   };
   let storage = null;
   let state = null;
+  let startupDefaults = null;
+  try {
+    const preset = JSON.parse(document.getElementById('studio-startup-defaults')?.textContent ?? 'null');
+    if (typeof preset?.revision === 'string' && preset.widgetState?.privateContent) {
+      startupDefaults = { revision: preset.revision, state: parseState(JSON.stringify(preset.widgetState)) };
+      state = startupDefaults.state;
+    }
+  } catch {
+    // Invalid preset data must never prevent opening the editor.
+  }
   try {
     const localStorage = globalThis.localStorage;
     const probeKey = `${storageKey}:probe`;
@@ -62,7 +72,15 @@
     localStorage.removeItem(probeKey);
     storage = localStorage;
     const savedState = storage.getItem(storageKey);
-    if (savedState != null) {
+    const revisionKey = `${storageKey}:startup-revision`;
+    const newPreset = startupDefaults != null && storage.getItem(revisionKey) !== startupDefaults.revision;
+    if (newPreset) {
+      // Apply a newly published preset once. Keep the previous browser state
+      // recoverable, then let normal editing persist exactly as before.
+      if (savedState != null) storage.setItem(`${storageKey}:before-startup-preset`, savedState);
+      storage.setItem(storageKey, JSON.stringify(state));
+      storage.setItem(revisionKey, startupDefaults.revision);
+    } else if (savedState != null) {
       try {
         state = parseState(savedState);
       } catch {
