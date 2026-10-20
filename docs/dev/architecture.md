@@ -2,7 +2,7 @@
 
 Character Showcase Studio is a browser editor for animated character showcase screens. The editor UI and its content are Chinese. Users pick one of 13 visual designs, fill in character and brand content, tune motion and effects, and export the result as a standalone HTML page, an OBS browser-source package, or an editable After Effects template.
 
-This document describes the code **as it is today**, partway through the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling) is done. Read it before moving or splitting modules: several invariants below are easy to break silently.
+This document describes the code **as it is today**, partway through the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling) and phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
 
 Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [build-and-test.md](build-and-test.md), [deploy.md](deploy.md).
 
@@ -128,7 +128,7 @@ Design-specific layout logic exists too. For example, `fitPosterCopy` in `explor
 
 ## Invariants
 
-Keep these when changing or restructuring code. Most have regression tests in `tests/`.
+Keep these when changing or restructuring code. Most have regression tests in `tests/`, and the screenshot baseline in `tests/visual/` catches changes to the rendered frames.
 
 **Motion and timing**
 - Narrative animation is a **pure function of time**. Seeking, pausing, replaying and changing speed must reproduce the same frame. Never drive transitions with one-shot CSS animations or event sequences.

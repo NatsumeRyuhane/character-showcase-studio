@@ -38,6 +38,37 @@ jobs:
         working-directory: frontend
         run: node tools/check.mjs
 
+  # Screenshot baseline (docs/dev/build-and-test.md#visual-regression-tests). The image tag must match
+  # @playwright/test in frontend/package-lock.json; tools/visual-docker.mjs runs the same image locally.
+  frontend-visual:
+    name: Frontend visual regression
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      STUDIO_VISUAL_DOCKER: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund
+      - name: Build
+        working-directory: frontend
+        run: node tools/build.mjs
+      - name: Visual regression tests
+        working-directory: frontend
+        run: npx playwright test
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 14
+
   # Frozen pre-rewrite snapshot, kept for comparison until the rewrite is done (frontend-legacy/README.md).
   frontend-legacy:
     name: Legacy frontend build and check

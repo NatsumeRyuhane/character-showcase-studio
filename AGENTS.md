@@ -111,7 +111,7 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 Work in small, focused steps:
 
 1. Make one focused change.
-2. In `frontend/`: `npm ci` if `node_modules/` is missing or `package-lock.json` changed, then `node tools/build.mjs`, then `node tools/check.mjs` (it includes the TypeScript check). Both must pass. If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
+2. In `frontend/`: `npm ci` if `node_modules/` is missing or `package-lock.json` changed, then `node tools/build.mjs`, then `node tools/check.mjs` (it includes the TypeScript check). Both must pass. If the change can affect what the preview draws (anything in `src/` or `runtime/`), also run `npm run test:visual`, which needs Docker; CI runs it on every PR. Update its screenshot baseline only for an intended visual change, and look at every changed frame first (see [build-and-test.md](docs/dev/build-and-test.md#visual-regression-tests)). If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
 3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
 4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
 5. Commit. Never commit `frontend/dist/`; it is gitignored build output.
