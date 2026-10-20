@@ -76,7 +76,7 @@ Consequences:
 | --- | --- |
 | `main.js` | Entry of the frame script: imports the CSS in cascade order, then `exploration-full-logic.js` |
 | `exploration-full-template.html` | Preview canvas, global and per-design controls, base styles. Holds the 13 `section[data-design]` views. |
-| `exploration-full-logic.js` | The main module: defaults, validation and restore, form binding, the shared paint loop, image reading. It imports the other modules and exports the shared editor state (`state`, `images`, `motionClock`, `update`, `draw`, …) that the UI modules import back. |
+| `exploration-full-logic.js` | The main module: the live editor state and its persistence glue, form binding, the shared paint loop, image reading. It imports the other modules and exports the shared editor state (`state`, `images`, `motionClock`, `update`, `draw`, …) that the UI modules import back. |
 | `studio-workspace.js` / `.css` | Turns the original controls into the three-pane editor: shared content (left), preview and playback (centre), current design's inspector (right). Tabs below 1120 px, focus mode. Styles are scoped under `.studio-editor`. |
 | `exploration-full-scene.js` | Base scene, geometry and background painting |
 | `design-language-scene.js` / `design-language-styles.css` | Fashion, avant-garde, plush, relaxed, cute and paper designs |
@@ -91,6 +91,7 @@ Consequences:
 | `studio-post.js` / `.css` | Post-processing (polar, CRT, holo, bloom, anamorphic, prism, film) over one shared optical surface. Borders stay outside it. |
 | `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) and their DOM styling |
 | `typography.ts` | Typography settings: validation and defaults, override text with letter case |
+| `studio-state.ts` | Editor state types and defaults, restore and validation of saved snapshots, the saved snapshot (see [state-and-timing.md](state-and-timing.md#state)) |
 | `variant-codec.ts` | `tuple-v1` compact encoding of per-design settings |
 | `studio-output.js` / `.css` | Output dialog, clean-output mode, export requests to the shell |
 | `export-layout.js` | Logical layout size and output scaling |
@@ -156,5 +157,5 @@ The planned frontend restructure is meant to fix these. The plan (a staged move 
 
 - Source files are written in a dense, minified-looking style, with single lines up to about 1,700 characters. Line-based diffs and merges are hard to use.
 - The UI modules (`studio-workspace.js`, `studio-narrative.js`, `studio-output.js`, `ae-export.js`, …) import mutable editor state from `exploration-full-logic.js`, which imports them back. The cycle is safe because every cross-module access happens inside functions called after startup, but it is still one shared state in disguise. Phase 4 (React editor) removes it.
-- `exploration-full-logic.js` mixes defaults, validation, persistence, form binding and painting.
+- `exploration-full-logic.js` still mixes form binding, painting and DOM measurement. Defaults, validation and restore have moved to `studio-state.ts`.
 - The runtime still carries Codex widget naming. The `localStorage` key includes the page path (see [state-and-timing.md](state-and-timing.md#storage)), so **moving or renaming the served page loses every user's saved settings** unless a migration is added. The local server serves `dist/` at `/` to keep that path stable.

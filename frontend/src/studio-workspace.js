@@ -1,4 +1,5 @@
-import { currentSeries, draw, imageNames, images, measure, seriesDefaults, state, update } from './exploration-full-logic.js';
+import { currentSeries, draw, imageNames, images, measure, state, update } from './exploration-full-logic.js';
+import { seriesDefaults } from './studio-state.ts';
 import { studioOutputLayout } from './export-layout.js';
 
 // Editor chrome only. Existing inputs and listeners are retained, never cloned.
