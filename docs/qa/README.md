@@ -15,5 +15,6 @@ Paths these records mention, such as `outputs/…`, `work/…` and `archives/…
 | [`0.8.4-ring-motion.md`](0.8.4-ring-motion.md) | 0.8.4 | AE ring path interpolation fix |
 | [`0.9.0-story-intro.md`](0.9.0-story-intro.md) | 0.9.0 | Two-shot poster intro |
 | [`0.11.0-rewrite-phase-1.md`](0.11.0-rewrite-phase-1.md) | after 0.11.0 | Frontend rewrite phase 1 (ES modules + Vite) compared with `frontend-legacy/`: free names, check output, page bytes, 78 seeked browser frames |
+| [`0.11.0-rewrite-phase-2.md`](0.11.0-rewrite-phase-2.md) | after 0.11.0 | Frontend rewrite phase 2 screenshot baseline: determinism across runs and CPU architectures, sensitivity to injected changes |
 
 New records go in this folder in English, named `<version>-<topic>.md`, and get a row in this table.
