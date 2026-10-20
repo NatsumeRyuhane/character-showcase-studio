@@ -220,10 +220,10 @@
       endingLayer.property('ADBE Transform Group').property('ADBE Scale').expression=shutdownCode+'[100,100*(1-crt.shutter)]';
       endingLayer.property('ADBE Transform Group').property('ADBE Position').expression=shutdownCode+'value+[crt.jitter*'+d.width+',0]';
       endingLayer.property('ADBE Transform Group').property('ADBE Opacity').expression=shutdownCode+'100*crt.flicker';
-      var safeX=d.frame==='vertical'?d.frameThickness:0,safeY=d.frame==='horizontal'?d.frameThickness:0,stageW=d.width-2*safeX,stageH=d.height-2*safeY;
+      var safeX=0,safeY=0,stageW=d.width,stageH=d.height;
       for(var j=0;j<2;j++){
         var shutter=rect(main,j?'SHUTDOWN · bottom shutter':'SHUTDOWN · top shutter',d.width/2,j?d.height-safeY:safeY,stageW,stageH*.501,[0,0,0,1],0),tr=shutter.property('ADBE Transform Group');
-        tr.property('ADBE Anchor Point').setValue([0,(j?1:-1)*stageH*.2505]);tr.property('ADBE Scale').expression=shutdownCode+'[100,100*crt.shutter]';shutter.label=13;shutter.comment='Native CRT black shutter. Edit fill/path; toggle and timing in CONTROLS. Persistent border layers stay independent.';
+        tr.property('ADBE Anchor Point').setValue([0,(j?1:-1)*stageH*.2505]);tr.property('ADBE Scale').expression=shutdownCode+'[100,100*crt.shutter]';shutter.label=13;shutter.comment='Native CRT black shutter. Edit fill/path; toggle and timing in CONTROLS. Full-frame shutdown covers the independent editable border layers.';
       }
       function crtGlow(l,color,softness){var glow=l.property('ADBE Effect Parade').addProperty('ADBE Drop Shadow');glow.property(1).setValue(color);glow.property(2).setValue(100);glow.property(4).setValue(0);glow.property(5).setValue(softness);l.label=13;l.comment='Editable native CRT element. Cyber Shutdown and Shutdown Duration in CONTROLS drive the shared seekable envelope.';}
       var flash=rect(main,'SHUTDOWN · raster flash',d.width/2,d.height/2,stageW,stageH,[1,.985,.94,1],0);flash.property('ADBE Transform Group').property('ADBE Opacity').expression=shutdownCode+'100*crt.flash';flash.label=13;
@@ -299,10 +299,14 @@
     }else for(var mm=showModels.length-1;mm>=0;mm--)showModels[mm].moveToBeginning();
     // Keep persistent borders above all narrative layers, including the ending.
     for(var b=0;b<borderLayers.length;b++)borderLayers[b].moveToBeginning();
+    // Global CRT shutters and phosphor sit above the independent border layers.
+    var powerOffLayers=[];
+    for(var si=1;si<=main.numLayers;si++)if(main.layer(si).name.indexOf('SHUTDOWN · ')===0)powerOffLayers.push(main.layer(si));
+    for(var si=powerOffLayers.length-1;si>=0;si--)powerOffLayers[si].moveToBeginning();
     controls.moveToBeginning();controls.comment='START HERE · Timing / colors / motion / post-processing. '+controls.comment;main.time=Math.min(d.duration-.1,d.intro+.5);main.openInViewer();
     main.markerProperty.setValueAtTime(0,new MarkerValue(d.intro?'INTRO · editable':'SHOWCASE · editable'));
     if(d.intro)main.markerProperty.setValueAtTime(d.intro,new MarkerValue('SHOWCASE'));
-    main.comment='START HERE. Top to bottom: CONTROLS → BORDERS → MODEL (showcase, above FX) → FX OPTICS → FX ADJUSTMENT → INTRO / ENDING → SHOWCASE TYPE → GEOMETRY → PATTERN → BACKGROUND. Double-click numbered source compositions to edit. Green = replace footage; purple = FX; blue = text; violet = borders. Native editable text / paths / controls. '+warnings.join(' | ');
+    main.comment='START HERE. Top to bottom: CONTROLS → SHUTDOWN → BORDERS → MODEL (showcase, above FX) → FX OPTICS → FX ADJUSTMENT → INTRO / ENDING → SHOWCASE TYPE → GEOMETRY → PATTERN → BACKGROUND. Double-click numbered source compositions to edit. Green = replace footage; purple = FX; blue = text; violet = borders. Native editable text / paths / controls. '+warnings.join(' | ');
     $.global.STUDIO_AE_RESULT={main:main,geometry:geo,folder:folder,warnings:warnings};
     if(!$.global.STUDIO_AE_QA)alert('已创建可编辑合成：'+main.name+'\n文字、圆环路径、颜色控制与边框均可继续修改。\n请另存为 .aep。\n\n注意：复杂渐变与细毛质感为近似重建；缺少字体时请安装对应字体。');
   }

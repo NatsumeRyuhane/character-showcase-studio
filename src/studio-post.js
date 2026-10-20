@@ -22,7 +22,7 @@ function mountStudioPostProcessing(view){
   const surface=document.createElement('div');surface.className='studio-post-surface';
   // These elements keep their own size containers, so existing cqw/cqh layouts
   // and measured export coordinates do not change when grouped for processing.
-  for(const el of [view.composition,view.storyLayer,view.ending,view.shutdown])if(el)surface.append(el);
+  for(const el of [view.composition,view.storyLayer,view.ending])if(el)surface.append(el);
   const canvas=document.createElement('canvas');canvas.className='studio-post-optics';canvas.setAttribute('aria-hidden','true');
   viewport.append(surface,canvas);view.art.append(viewport);
   // Showcase models sit above picture processing; poster-shot media stay inside

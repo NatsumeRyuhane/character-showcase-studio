@@ -2,7 +2,7 @@
 #character-directions .model-first-intro .name-stack{will-change:opacity}
 #character-directions .brand-ending{position:absolute;inset:var(--safe-y) var(--safe-x);z-index:30;display:grid;place-items:center;pointer-events:none;overflow:hidden;opacity:0;visibility:hidden;color:var(--ink);container-type:size}
 #character-directions .ending-content{position:absolute;inset:0;display:grid;place-items:center;transform-origin:center;container-type:size}
-#character-directions .cyber-shutdown{position:absolute;inset:var(--safe-y) var(--safe-x);z-index:40;pointer-events:none;overflow:hidden;visibility:hidden;container-type:size}
+#character-directions .cyber-shutdown{position:absolute;inset:0;z-index:40;pointer-events:none;overflow:hidden;visibility:hidden;container-type:size}
 #character-directions .shutdown-shutter{position:absolute;left:0;width:100%;height:50.1%;background:#000;transform:scaleY(0)}
 #character-directions .shutdown-top{top:0;transform-origin:top}
 #character-directions .shutdown-bottom{bottom:0;transform-origin:bottom}

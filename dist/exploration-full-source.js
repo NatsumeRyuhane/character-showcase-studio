@@ -612,7 +612,7 @@ function mountStudioPostProcessing(view){
   const surface=document.createElement('div');surface.className='studio-post-surface';
   // These elements keep their own size containers, so existing cqw/cqh layouts
   // and measured export coordinates do not change when grouped for processing.
-  for(const el of [view.composition,view.storyLayer,view.ending,view.shutdown])if(el)surface.append(el);
+  for(const el of [view.composition,view.storyLayer,view.ending])if(el)surface.append(el);
   const canvas=document.createElement('canvas');canvas.className='studio-post-optics';canvas.setAttribute('aria-hidden','true');
   viewport.append(surface,canvas);view.art.append(viewport);
   // Showcase models sit above picture processing; poster-shot media stay inside
@@ -823,7 +823,7 @@ function mountStudioNarrative(root,views){
     group.querySelector('[data-shutdown-controls]').hidden=!n.shutdownEnabled;
     group.querySelector('#studio-shutdown-duration').max=Math.min(1.5,n.outroDuration*.45);
     group.querySelector('[data-ending-map]').classList.toggle('is-disabled',!n.outroEnabled);
-    group.querySelector('[data-ending-note]').textContent=!n.outroEnabled?(continuous?'引入只播放一次，随后停留在展示页。圆环、背景、文字与滚动边框持续运动；暂停后继续也不会重播。':'引入只播放一次，展示页按设定时长重新播放入场。'):(n.outroContent==='logo'&&!images.logo?'尚未上传 Logo，暂用品牌字样。请在「角色与品牌 → 署名与品牌 Logo」上传。':'沿用「角色与品牌」中的字样 / Logo。')+(n.outroTrigger==='manual'?'点击预览下的「片尾」，或在 OBS 源交互中按 E 进入。AE 按 '+n.showDuration+' 秒展示段落导出。':'展示 '+n.showDuration+' 秒后进入片尾。')+(n.shutdownEnabled?'最后 '+n.shutdownDuration+' 秒收成亮线与光点，停在黑场；边框持续显示。':'最后停在品牌画面。');
+    group.querySelector('[data-ending-note]').textContent=!n.outroEnabled?(continuous?'引入只播放一次，随后停留在展示页。圆环、背景、文字与滚动边框持续运动；暂停后继续也不会重播。':'引入只播放一次，展示页按设定时长重新播放入场。'):(n.outroContent==='logo'&&!images.logo?'尚未上传 Logo，暂用品牌字样。请在「角色与品牌 → 署名与品牌 Logo」上传。':'沿用「角色与品牌」中的字样 / Logo。')+(n.outroTrigger==='manual'?'点击预览下的「片尾」，或在 OBS 源交互中按 E 进入。AE 按 '+n.showDuration+' 秒展示段落导出。':'展示 '+n.showDuration+' 秒后进入片尾。')+(n.shutdownEnabled?'最后 '+n.shutdownDuration+' 秒收成亮线与光点，连同边框一起关机，最后停在全黑画面。':'最后停在品牌画面。');
     for(const view of views){view.section.querySelector('[data-ending-preview]').disabled=!n.outroEnabled;view.ending.dataset.style=n.outroStyle;view.ending.classList.toggle('uses-logo',n.outroContent!=='word'&&!!images.logo);view.ending.querySelector('.ending-word').textContent=state.brand||'YOUR STUDIO';if(images.logo)view.ending.querySelector('img').src=images.logo;}
   }};
 }

@@ -1,3 +1,5 @@
+/* The top border source owns the full-frame shutdown, covering every OBS layer. */
+#character-directions:is([data-output-layer="picture"],[data-output-layer="effects"]) .cyber-shutdown{display:none!important}
 /* Hide surfaces without removing their measurement containers. Every source
    keeps the same logical canvas, safe area and responsive typography. */
 #character-directions[data-output-layer="picture"] .edge{visibility:hidden!important}

@@ -59,7 +59,8 @@ const mainModel=new Element('div','character-layer'),portrait=new Element('div',
 composition.append(mainModel,portrait,showCopy);story.append(posterImage,posterSubtitle);art.append(composition,story,ending,shutdown,top,bottom);
 const view={key:'qa',art,composition,storyLayer:story,ending,shutdown};scope.mountStudioPostProcessing(view);
 const post=view.post;
-for(const node of [composition,posterImage,posterSubtitle,showCopy,ending,shutdown])assert.ok(post.surface.contains(node),'picture/copy belongs to optical surface');
+assert.ok(art.contains(shutdown)&&!post.surface.contains(shutdown),'global shutdown stays above borders and outside optical safe-area');
+for(const node of [composition,posterImage,posterSubtitle,showCopy,ending])assert.ok(post.surface.contains(node),'picture/copy belongs to optical surface');
 for(const node of [mainModel,portrait]){assert.ok(post.foreground.contains(node),'showcase model is foreground');assert.ok(!post.viewport.contains(node),'showcase model bypasses picture filter');}
 for(const edge of [top,bottom]){assert.equal(edge.parentElement,art,'borders remain independent siblings');assert.ok(!post.viewport.contains(edge),'borders bypass optical processing');}
 const css=read('src/studio-post.css'),stack=selector=>Number(css.match(new RegExp('\\.'+selector+'\\{([^}]+)\\}'))[1].match(/z-index\s*:\s*(\d+)/)[1]);
