@@ -14,12 +14,13 @@ Install the build dependencies with `npm ci` once, and again whenever `package-l
 | `node tools/build.mjs` (`npm run build`) | Builds `dist/` from `src/`, `runtime/`, `assets/`, `vendor/` |
 | `node tools/check.mjs` (`npm run check`) | Runs all automated checks against the **built** output. Build first. |
 | `npm run typecheck` | Runs `tsc` alone; `check.mjs` runs it too |
+| `npm run test:visual` | Builds and runs the [visual regression tests](#visual-regression-tests) in Docker. Add `-- --update-snapshots` to rewrite the baseline. |
 | `node tools/server.mjs [port]` (`npm start`) | Serves `dist/` read-only on `http://127.0.0.1:8768/` in the foreground. Build first. |
 | `./start.sh <command>` / `start.cmd <command>` (repository root) | The [launcher](launcher.md): `start`, `stop`, `restart`, `status`, `build`, `check`, `doctor`, `upgrade` |
 
 Always run **build, then check**, and commit only when the check prints its final `PASS` line. The check:
 
-1. Parses `dist/exploration-full-source.js` and the syntax of the tool scripts, and runs the TypeScript check (`tsc`, see `tsconfig.json`; JavaScript is allowed but not type-checked yet).
+1. Parses `dist/exploration-full-source.js` and the syntax of the tool and visual-test scripts, and runs the TypeScript check (`tsc`, see `tsconfig.json`; JavaScript is allowed but not type-checked yet).
 2. Decodes the shell and the sandboxed frame from `dist/index.html` and parses every embedded script; at least 9 must be present.
 3. Asserts the sandbox and CSP are still there, all 13 designs are present, there are no external `<script src>` or `@import`, and no machine-specific paths such as `C:\Users\…` or `.codex/`.
 4. Runs every regression script in `tests/check-*.cjs`.
@@ -38,11 +39,37 @@ To add a source module, create it in `src/` (`.js` or `.ts`) and import it where
 
 `tests/ae/` holds manual After Effects harnesses; see its README.
 
+## Visual regression tests
+
+`tests/visual/` holds a [Playwright](https://playwright.dev/) screenshot baseline of the preview: every design, landscape and portrait, at four points on the timeline (character shot 1.2 s, creator shot 4 s, show 11 s, outro 18.4 s), plus the swapped layout in the show. That is 10 frames per design, 130 in all, in `tests/visual/__screenshots__/<design>/`. It is the safety net for the rest of the rewrite: a refactor that should not change the picture must leave every frame identical.
+
+**How a frame is made.** Each test seeds `localStorage` with a saved state, the way a returning user's browser has one, and loads the page. The state is `tests/visual/fixtures/studio-state.json` (a frozen copy of the startup preset, so publishing a new preset does not move the baseline) with the design, ratio, side swap and `time` set, and `playing: false`. A paused state restores with its motion clock rebuilt from `time`, so the frame is a pure function of the state. The tests do not click or seek through the editor UI, which phase 4 replaces. Each test screenshots the active design's `.design-art` element and fails on page errors or console warnings.
+
+Rules the harness relies on:
+
+- **Never play.** Unpaused playback under a fake clock is not deterministic (see the [phase 1 record](../qa/0.11.0-rewrite-phase-1.md#browser-comparison)).
+- **No reduced motion.** With `prefers-reduced-motion` the editor freezes post-processing time at 0, which renders a different frame.
+- **Fixed preview size.** The editor sizes the preview from the window, so the viewport (1280×800 landscape, 1280×1080 portrait) decides the frame size, 708×398 and 405×720. If the editor layout changes the preview size, every frame changes; keep the size or rebuild the baseline on the commit before the layout change, at the new size.
+- **Pinned environment.** Fonts and rasterization differ between systems, so the baseline holds only in the Playwright Linux image (`mcr.microsoft.com/playwright:v<version>-noble`). `playwright.config.mjs` refuses to run elsewhere. The comparison is exact: any changed pixel fails. With Playwright 1.64.1 the image's x86-64 and arm64 variants render identical frames; if they ever diverge, CI (x86-64) is the reference, and `docker run --platform linux/amd64` reproduces it.
+
+**Running.** `npm run test:visual` needs Docker. `tools/visual-docker.mjs` mounts `frontend/` into the image whose tag matches the locked `@playwright/test`, installs Linux dependencies into a Docker volume (your `node_modules/` is untouched), builds, and runs the tests (about half a minute after the first run). Pass Playwright arguments after `--`, for example `npm run test:visual -- -g poster` for one design. A failure writes the expected, actual and diff images to `test-results/`.
+
+**Updating the baseline.** Only when a change is meant to alter the picture:
+
+1. Run `npm run test:visual -- --update-snapshots`.
+2. Open every changed PNG (`git status tests/visual/__screenshots__`) and confirm that each difference is intended and that nothing else moved.
+3. Commit the new frames in the same commit as the change that caused them, and say in the PR which designs changed and why.
+
+When the Playwright version changes, update the image tag in `.github/workflows/ci.yml` too. A new browser can rasterize differently, so rebuild the baseline in its own commit, with no other change, after checking the diffs.
+
+Not covered yet: uploaded images (every frame uses the placeholders), the border modes other than the fixture's top and bottom borders, post-processing effects other than its prism, long names, the narrow editor, and exports.
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every pull request and every push to `main`:
 
 - **Frontend:** `npm ci`, build and check on Ubuntu and Windows with Node 22 and 24. The Windows run also confirms the line-ending setup produces a working build.
+- **Frontend visual regression:** the [visual regression tests](#visual-regression-tests) in the pinned Playwright image. On failure, the expected, actual and diff images are uploaded as the `visual-regression-report` artifact.
 - **Legacy frontend:** build and check of the frozen pre-rewrite snapshot in `frontend-legacy/` (see its README), so it stays usable for comparison until the rewrite is done.
 - **Launcher:** the launcher test suite on Ubuntu, macOS and Windows, plus the `start.sh` / `start.cmd` shims (see [launcher.md](launcher.md#tests-and-ci)).
 
@@ -54,7 +81,7 @@ Until the rewrite is done, `frontend-legacy/` holds the frontend as it was befor
 
 ## Manual verification
 
-The automated checks cover pure functions and generated data. They do not open a browser. After a UI or visual change, open the page (`./start.sh start` from the root) and check:
+`node tools/check.mjs` covers pure functions and generated data and does not open a browser; the visual tests cover only the frames listed above. After a UI or visual change, open the page (`./start.sh start` from the root) and check:
 
 - The browser console has no errors.
 - All 13 designs can be selected; inputs update the preview immediately; settings survive a reload.
