@@ -1,5 +1,4 @@
-import { currentSeries, draw, imageNames, images, measure, state, update } from './exploration-full-logic.js';
-import { seriesDefaults } from './studio-state.ts';
+import { draw, measure, state, update } from './exploration-full-logic.js';
 import { studioOutputLayout } from './export-layout.js';
 import { loopNote } from './editor/format.ts';
 
@@ -33,32 +32,7 @@ export function mountStudioWorkspace(root,views){
 
   const layout=make('div','studio-layout');
   const left=make('aside','studio-content');left.id='studio-content-panel';left.setAttribute('aria-label','作品内容与系列');
-  const leftTitle=make('div','studio-panel-title');leftTitle.append(make('h2','','作品内容'),make('span','studio-scope-label','所有方案共用'));left.append(leftTitle,note('先准备作品资料，再调整画面。'));
-  const series=group('系列管理',true);series.dataset.studioGroup='series';
-  const seriesSelect=root.querySelector('#direction-series');seriesSelect.hidden=true;seriesSelect.setAttribute('aria-hidden','true');
-  const seriesTabs=make('div','studio-series-tabs');seriesTabs.setAttribute('role','group');seriesTabs.setAttribute('aria-label','选择作品系列');
-  const seriesDescriptions={atelier:'时装精作',fur:'毛绒触感',mini:'Q版简约'};
-  for(const key of Object.keys(seriesDescriptions)){const el=button('');el.dataset.seriesChoice=key;el.innerHTML='<strong></strong><small></small>';el.querySelector('small').textContent=seriesDescriptions[key];el.addEventListener('click',()=>{state.series=key;update()});seriesTabs.append(el)}
-  const seriesSummary=make('div','studio-series-summary');
-  const seriesEdit=group('系列名称、编号与短句');seriesEdit.classList.add('studio-subgroup');seriesEdit.append(fields(['direction-series-name','direction-prefix','direction-serial','direction-caption','direction-subtitle'].map(field)));
-  series.append(seriesSelect,seriesTabs,seriesSummary,note('名称、编号和短句随系列分别保存。'),seriesEdit);left.append(series);
-
-  const identity=group('角色与品牌',true);
-  identity.append(fields([field('direction-name'),field('direction-brand')]));
-  const credits=group('署名与品牌 Logo');credits.classList.add('studio-subgroup');credits.append(fields([field('direction-model-credit'),field('direction-design-credit'),field('direction-logo-file')]),root.querySelector('[data-clear="logo"]'));
-  identity.append(credits);left.append(identity);
-  const uploads=group('角色图片',true);const uploadNames={};
-  for(const [key,label]of [['model','主角色图片'],['portrait','补充 / 特写图片']]){const card=make('div','studio-upload-card'),entry=field('direction-'+key+'-file');entry.querySelector('label').firstChild.textContent=label;const status=make('span','studio-upload-name','尚未选择图片');status.dataset.uploadStatus=key;uploadNames[key]=status;card.append(entry,status,root.querySelector('[data-clear="'+key+'"]'));uploads.append(card)}
-  uploads.append(note('PNG / WebP / JPG，单张不超过 12 MB。图片仅在本次打开时保留。'));left.append(uploads);
-  const storyUploads=group('片头镜头素材');storyUploads.classList.add('studio-subgroup');
-  for(const [key,label]of [['introCharacter','第一幕 · 角色镜头'],['introAuthor','第二幕 · 作者镜头']]){
-    const card=make('div','studio-upload-card'),entry=make('div','direction-field'),labelNode=make('label','',label),input=make('input','form-control'),status=make('span','studio-upload-name','尚未选择图片'),clear=button('清除图片');
-    input.type='file';input.accept='image/png,image/jpeg,image/webp';input.id='direction-'+key+'-file';labelNode.htmlFor=input.id;clear.dataset.clear=key;status.dataset.uploadStatus=key;uploadNames[key]=status;entry.append(labelNode,input);card.append(entry,status,clear);storyUploads.append(card);
-  }
-  storyUploads.append(note('两个镜头可独立选图。不选时，第一幕使用主角色图，第二幕优先使用特写图。模型动作可在 AE / OBS 叠加，或替换导出后的镜头素材。'));uploads.append(storyUploads);
-  const formats=findGroup('交付格式与适配标识');formats.classList.add('studio-group');formats.dataset.studioGroup='formats';formats.querySelector('summary').textContent='交付格式与适配标识';formats.insertBefore(note('勾选需要出现在画面里的格式与标识。'),formats.children[1]);left.append(formats);
-  const codes=group('作品链接与条码');codes.append(fields(['direction-qr','direction-qr-file','direction-barcode-file'].map(field)),root.querySelector('[data-clear="qr"]'),root.querySelector('[data-clear="barcode"]'));left.append(codes);
-  left.append(global.querySelector('[data-error]'));
+  // The pane's content is the React component src/editor/ContentPanel.tsx.
 
   const toolbar=make('div','studio-canvas-toolbar');toolbar.setAttribute('aria-label','预览与画布设置');
   const designRow=make('div','studio-design-row'),designField=make('label','studio-design-field');designField.append(make('span','','视觉方案'));
@@ -106,12 +80,7 @@ export function mountStudioWorkspace(root,views){
   const edgeControls=make('div','studio-shared-edges');const edgeSource=findGroup('边框滚动');edgeControls.append(fields([field('direction-top-text'),field('direction-bottom-text')]));for(const el of [...edgeSource.children].slice(1))edgeControls.append(el);
   layout.append(left,toolbar,originalViews);oldHeading.remove();oldCanvasOptions.remove();global.remove();root.append(header,tabs,layout);
 
-  const rename={
-    'direction-series-name':'系列显示名称','direction-prefix':'编号前缀','direction-serial':'作品编号',
-    'direction-caption':'系列中文短句','direction-subtitle':'系列英文短句','direction-name':'角色名字',
-    'direction-brand':'品牌字标','direction-frame':'信息边框','direction-ratio':'画幅',
-    'direction-qr':'作品链接 · 自动生成二维码'
-  };
+  const rename={'direction-frame':'信息边框','direction-ratio':'画幅'};
   for(const[id,label]of Object.entries(rename)){const el=root.querySelector('label[for="'+id+'"]');if(el)el.firstChild.textContent=label}
   const labelByField={ringStyle:'几何样式',cutStrength:'装饰丰富度',geometryStrength:'线条粗细',shadowDepth:'阴影偏移'};
   for(const view of views)for(const [key,text]of Object.entries(labelByField)){const input=view.section.querySelector('[data-vfield="'+key+'"],[data-vrange="'+key+'"],[data-erange="'+key+'"]');const label=input?.closest('label')||input?.closest('.direction-field')?.querySelector('label');if(label?.firstChild?.nodeType===3)label.firstChild.textContent=text;}
@@ -149,9 +118,6 @@ export function mountStudioWorkspace(root,views){
       disable('[data-efield="grade"],[data-erange="gradeStrength"],[data-effect="gradeModel"]',!variant.effects.gradeEnabled);
       disable('[data-erange="gradientStrength"],[data-ecolor="gradientColor"],[data-effect="gradientMotion"]',variant.effects.gradient==='none');
     }
-    for(const el of seriesTabs.children){const key=el.dataset.seriesChoice;el.setAttribute('aria-pressed',String(key===state.series));el.querySelector('strong').textContent=state.seriesData[key].label||seriesDefaults[key].label;el.setAttribute('aria-label',(state.seriesData[key].label||seriesDefaults[key].label)+' · '+seriesDescriptions[key])}
-    seriesSummary.textContent='当前系列  '+(currentSeries().label||'EDITION')+' / '+(currentSeries().prefix||'ID')+'-'+(currentSeries().serial||'001');
-    for(const[key,el]of Object.entries(uploadNames)){el.textContent=images[key]?(imageNames[key]||'已载入图片'):'尚未选择图片';el.classList.toggle('has-file',!!images[key]);root.querySelector('[data-clear="'+key+'"]').disabled=!images[key]}
     const frameDirection=state.frame==='vertical';root.querySelector('label[for="direction-top-text"]').textContent=frameDirection?'左边框文字':'上边框文字';root.querySelector('label[for="direction-bottom-text"]').textContent=frameDirection?'右边框文字':'下边框文字';
     root.querySelector('.studio-loop-note').textContent=loopNote(state);
     requestAnimationFrame(()=>sizePreview(selected));

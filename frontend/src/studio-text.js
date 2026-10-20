@@ -18,5 +18,3 @@ export function applyStudioStoryTypography(view,part,role){
   // Long centered names still leave room for the smaller credit block.
   if(el.dataset.corner==='center'&&el.clientHeight){const limit=el.clientHeight*.42;if(primary.offsetHeight>limit){const current=parseFloat(getComputedStyle(title).fontSize);title.style.fontSize=Math.max(11,current*limit/primary.offsetHeight)+'px';}secondary.style.top=(el.clientHeight*.5+primary.offsetHeight*.5+Math.max(6,el.clientWidth*.025))+'px';}
 }
-// The controls are the React component src/editor/TypographyPanel.tsx; this places its group in the content pane.
-export function mountStudioTypography(root){const group=document.createElement('details');group.className='studio-group studio-typography';group.open=false;root.querySelector('.studio-content > details:nth-of-type(2)').after(group);return group}

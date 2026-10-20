@@ -18,11 +18,8 @@ export function setStudioNarrative(key,value){
   if(key==='showDuration')state.time=studioRetimeShow(state.time,state.introDuration,before,state.narrative);state.time=Math.min(state.time,studioTotalDuration(state.introDuration,state.narrative));update();
 }
 export function jumpToStudioStory(role){const n=state.narrative;state.time=role==='show'?state.introDuration:role==='author'&&n.characterShotEnabled?n.characterShotDuration:0;state.playing=true;resetLastFrame();update()}
-export function mountStudioNarrative(root,views){
+export function mountStudioNarrative(views){
   legacyIntroDuration=state.narrative.introStyle==='story'?4.5:state.introDuration;
-  const group=document.createElement('details');group.className='studio-group studio-narrative';group.open=true;
-  const postGroup=document.createElement('details');postGroup.className='studio-group studio-narrative studio-postprocessing';postGroup.open=true;
-  root.querySelector('.studio-content').querySelectorAll(':scope > details')[1].after(group,postGroup);
   if(state.narrative.introStyle==='story'){const next=studioStoryDuration(state.narrative);state.time=studioRetime(state.time,state.introDuration,next);state.introDuration=next;}
   for(const view of views){
     const ending=document.createElement('div');ending.className='brand-ending';ending.setAttribute('aria-label','品牌片尾');

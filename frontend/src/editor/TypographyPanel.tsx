@@ -1,7 +1,6 @@
 // Typography controls: the shared text overrides for the show title, the two story shots and the series copy.
 // The DOM styling they drive stays in studio-text.js; the settings themselves are typography.ts.
 import { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { currentSeries, state, update } from '../exploration-full-logic.js';
 import { studioTypographySettings, type StoryCopy, type TextStyle, type TypographyKey } from '../typography.ts';
 import { optionList, type Options } from './controls.tsx';
@@ -16,7 +15,7 @@ const copyFields: readonly (readonly [keyof StoryCopy, string, number])[] = [['k
 
 interface View { storyShots?: { textLayoutKey: string }[] }
 
-export function TypographyPanel({ group, views }: { group: Element; views: View[] }) {
+export function TypographyPanel({ views }: { views: View[] }) {
   useEditorRevision();
   const [selected, setSelected] = useState<TypographyKey>('name');
   const item = state.typography[selected];
@@ -32,7 +31,7 @@ export function TypographyPanel({ group, views }: { group: Element; views: View[
     for (const view of views) view.storyShots?.forEach(part => part.textLayoutKey = '');
     update();
   }
-  return createPortal(<>
+  return <details className="studio-group studio-typography">
     <summary>文字排版</summary>
     <p className="studio-note">各方案共用。文案留空时沿用角色、品牌与系列资料；选择「跟随方案」保留原有设计。</p>
     <div className="direction-field studio-text-target">
@@ -108,5 +107,5 @@ export function TypographyPanel({ group, views }: { group: Element; views: View[
       update();
     }}>恢复当前文字默认</button>
     <p className="studio-note studio-text-font-note">英文字体随网页打包；中文使用系统字体。AE 打开时需要安装对应字体。</p>
-  </>, group);
+  </details>;
 }

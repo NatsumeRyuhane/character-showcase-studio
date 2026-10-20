@@ -1,7 +1,6 @@
 // Sequence controls (intro, show, outro) and post-processing. The state changes they make
 // (retiming, switching to and from the story intro) are in studio-narrative.js.
 import type { ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import { images, state } from '../exploration-full-logic.js';
 import { jumpToStudioStory, setStudioIntroDuration, setStudioNarrative } from '../studio-narrative.js';
 import { studioContinuousShow, studioStoryDuration, type NarrativeSettings } from '../timeline.ts';
@@ -60,7 +59,7 @@ function StoryShot({ role, index, label }: { role: Role; index: string; label: s
   );
 }
 
-export function NarrativePanel({ group }: { group: Element }) {
+export function NarrativePanel() {
   useEditorRevision();
   const n = state.narrative, story = n.introStyle === 'story', continuous = studioContinuousShow(n);
   const introNote = story
@@ -71,7 +70,7 @@ export function NarrativePanel({ group }: { group: Element }) {
     : (n.outroContent === 'logo' && !images.logo ? '尚未上传 Logo，暂用品牌字样。请在「角色与品牌 → 署名与品牌 Logo」上传。' : '沿用「角色与品牌」中的字样 / Logo。')
       + (n.outroTrigger === 'manual' ? '点击预览下的「片尾」，或在 OBS 源交互中按 E 进入。AE 按 ' + n.showDuration + ' 秒展示段落导出。' : '展示 ' + n.showDuration + ' 秒后进入片尾。')
       + (n.shutdownEnabled ? '最后 ' + n.shutdownDuration + ' 秒收成亮线与光点，连同边框一起关机，最后停在全黑画面。' : '最后停在品牌画面。');
-  return createPortal(<>
+  return <details className="studio-group studio-narrative" open>
     <summary>片头、展示与片尾</summary>
     <div className="studio-sequence-map" aria-hidden="true">
       <span>{story ? '01 / 02 海报' : '01 引入'}</span><i>→</i><span>{story ? '03 主展示' : '02 展示'}</span><i>→</i><span className={n.outroEnabled ? undefined : 'is-disabled'}>{story ? '04 片尾' : '03 片尾'}</span>
@@ -148,14 +147,14 @@ export function NarrativePanel({ group }: { group: Element }) {
       </div>
       <p className="studio-note">{endingNote}</p>
     </div>
-  </>, group);
+  </details>;
 }
 
-export function PostPanel({ group }: { group: Element }) {
+export function PostPanel() {
   useEditorRevision();
   const n = state.narrative;
   const scene = (field: Key, label: string) => <label><input type="checkbox" checked={n[field] as boolean} onChange={event => set(field, event.target.checked)} /><span>{label}</span></label>;
-  return createPortal(<>
+  return <details className="studio-group studio-narrative studio-postprocessing" open>
     <summary>画面后处理</summary>
     <div className="direction-settings">
       <div className="direction-field">
@@ -173,5 +172,5 @@ export function PostPanel({ group }: { group: Element }) {
     </div>
     <p className="studio-note">片头：素材与字幕一起处理。展示页：角色位于滤镜上方，背景与文字接受处理。边框始终独立。效果连续运动，离开所选镜头时柔和淡出。</p>
     <button type="button" className="btn studio-post-preview" onClick={() => jumpToStudioStory('start')}>从片头预览效果</button>
-  </>, group);
+  </details>;
 }
