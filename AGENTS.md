@@ -43,10 +43,43 @@ When the person you are working for may be the owner, or you are not sure:
 | Commit messages | Replies to English-language comments or reviews |
 | Conversation with the owner | |
 
+## GitHub access is required
+
+Many design decisions and much of the context behind this project live only on GitHub, in issues, PR descriptions and review threads, not in the code or docs. Working without them means working blind. You need a working [GitHub CLI](https://cli.github.com/) (`gh`), logged in with access to `nekokaii/character-showcase-studio`.
+
+**Check at the start of every session:**
+
+```sh
+gh auth status
+gh repo view nekokaii/character-showcase-studio --json name
+```
+
+**If either check fails** (`gh` missing, not logged in, or no access to the repo):
+
+1. **Warn the person right away, in plain Chinese.** Tell them you cannot see the project's issues and PRs, so you may miss earlier decisions and cannot open PRs.
+2. Help them fix it. Installing `gh` is a normal software install. Logging in is interactive, so the person runs `gh auth login` themselves; in Claude Code they can type `! gh auth login`. If they lack access to the repository, the owner has to add them as a collaborator.
+3. Do not quietly carry on with work that touches design or behaviour. Continue without GitHub only if the person explicitly agrees after your warning, and say in your final report that you could not check GitHub.
+
+If `gh` reports an authentication error inside a sandboxed agent environment, the sandbox may be blocking the system credential store. Ask to retry outside the sandbox before deciding the login is broken.
+
+**Use GitHub as the project's memory:**
+
+- Before starting a task, read its issue and any linked PRs, and search for earlier related discussion:
+
+  ```sh
+  gh issue view <number> --comments
+  gh issue list --state all --search "<keywords>"
+  gh pr list --state all --search "<keywords>"
+  ```
+
+- `gh pr view --comments` does not show inline review threads or whether they are resolved. Read those with `gh api graphql`, using `reviewThreads` with `isResolved`.
+- When the person makes a design decision in your conversation, write it into the relevant issue or PR, in Chinese and after asking them, so the next person and the next agent can find it.
+
 ## Git and GitHub workflow
 
 ### Before you start
 
+0. Confirm GitHub access (see [above](#github-access-is-required)) and read the task's issue or PR if there is one.
 1. Run `git status` and `git branch --show-current`.
    - If there are uncommitted changes you did not make, **stop and ask** whose they are. Never discard, stash or commit them on your own.
    - If a merge, rebase or cherry-pick is in progress, stop and ask.
@@ -148,6 +181,7 @@ Deploying (`npx wrangler deploy` in `deploy/cloudflare/`) updates the public sit
 
 ## Before you report a task as done
 
+- [ ] You read the related issues and PRs, or told the person you could not reach GitHub.
 - [ ] Build and check pass; UI changes were also checked in the browser.
 - [ ] Each commit is focused, with a Conventional Commits message in Chinese.
 - [ ] Docs and `docs/CHANGELOG.md` are updated where needed.

@@ -10,6 +10,7 @@
 
 ### 文档
 - 新增 AI 助手协作规范 `AGENTS.md`（Claude Code 通过 `CLAUDE.md` 读取同一份内容）。
+- AI 助手需要能通过 `gh` 访问 GitHub，以读取 Issue 与 PR 中的设计决定；无法访问时应提醒使用者。
 - AI 助手的配置统一放在 `.agents/`，`.claude` 为指向它的符号链接。
 - 新增中文协作指南 `.github/CONTRIBUTING.md`，以及 Issue、PR 模板。
 - 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，更新记录移入 `docs/CHANGELOG.md`，且只保留最近一个版本。
