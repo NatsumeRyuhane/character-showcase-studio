@@ -12,7 +12,13 @@ const version = lock.packages['node_modules/@playwright/test']?.version;
 if (!version) throw new Error('@playwright/test is missing from package-lock.json.');
 const image = `mcr.microsoft.com/playwright:v${version}-noble`;
 const quote = value => `'${value.replace(/'/g, `'\\''`)}'`;
-const script = ['npm ci --no-audit --no-fund', 'node tools/build.mjs', ['npx playwright test', ...process.argv.slice(2).map(quote)].join(' ')].join(' && ');
+const steps = ['npm ci --no-audit --no-fund', 'node tools/build.mjs', ['npx playwright test', ...process.argv.slice(2).map(quote)].join(' ')].join(' && ');
+// The container runs as root. On a Linux host its output in the bind mount would stay root-owned and lock
+// the host user out of dist/ and the baseline, so hand it back, keeping the test exit status.
+const owner = process.getuid ? `${process.getuid()}:${process.getgid()}` : null;
+const script = owner
+  ? `(${steps}); status=$?; chown -R ${owner} dist test-results playwright-report tests/visual/__screenshots__ 2>/dev/null; exit $status`
+  : steps;
 const args = [
   'run', '--rm', '--init', '--ipc=host',
   // Linux-built node_modules and the npm cache live in volumes, so the host's node_modules is untouched.
