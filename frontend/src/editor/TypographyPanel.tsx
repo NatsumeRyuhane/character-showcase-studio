@@ -4,17 +4,15 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { currentSeries, state, update } from '../exploration-full-logic.js';
 import { studioTypographySettings, type StoryCopy, type TextStyle, type TypographyKey } from '../typography.ts';
+import { optionList, type Options } from './controls.tsx';
 import { useEditorRevision } from './store.ts';
 
-type Options = readonly (readonly [string, string])[];
 const targets: Options = [['name', '展示页 · 角色名'], ['character', '第一幕 · 角色标题'], ['author', '第二幕 · 作者标题'], ['caption', '展示页 · 系列短句'], ['subtitle', '展示页 · 英文说明']];
 const fonts: Options = [['auto', '跟随视觉方案'], ['manrope', '现代无衬线 · Manrope'], ['grotesk', '几何字体 · Space Grotesk'], ['condensed', '紧凑海报 · Barlow Condensed'], ['serif', '时尚衬线 · Cormorant'], ['rounded', '圆润可爱 · Nunito'], ['system', '清晰中文 · 系统字体']];
 const weights: Options = [['auto', '跟随方案'], ['400', '常规 · 400'], ['500', '中等 · 500'], ['600', '半粗 · 600'], ['700', '粗体 · 700'], ['800', '特粗 · 800'], ['900', '黑体 · 900']];
 const italics: Options = [['auto', '跟随方案'], ['normal', '正体'], ['italic', '斜体']];
 const cases: Options = [['original', '保留输入'], ['uppercase', '全部大写'], ['lowercase', '全部小写']];
 const copyFields: readonly (readonly [keyof StoryCopy, string, number])[] = [['kicker', '标题上方小字', 80], ['label', '辅助信息第一行', 80], ['meta', '辅助信息第二行', 120]];
-
-export const optionList = (items: Options) => items.map(([value, label]) => <option key={value} value={value}>{label}</option>);
 
 interface View { storyShots?: { textLayoutKey: string }[] }
 
