@@ -12,3 +12,5 @@ dist-cloudflare/
 .agents/settings.local.json
 frontend/dist/
 .studio/
+__pycache__/
+*.pyc
