@@ -1,17 +1,17 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "character-showcase-studio",
   "account_id": "a283fed3fc5ff0674320a74800643614",
-  "main": "frontend/tools/cloudflare-worker.mjs",
+  "main": "worker.mjs",
   "compatibility_date": "2026-10-20",
   "workers_dev": true,
   "routes": [
     { "pattern": "nekokaii.com/showcase-generator", "zone_name": "nekokaii.com" },
     { "pattern": "nekokaii.com/showcase-generator/*", "zone_name": "nekokaii.com" }
   ],
-  "build": { "command": "node frontend/tools/build-cloudflare.mjs" },
+  // Run deploys from this folder: npx wrangler deploy (see docs/dev/deploy.md).
+  "build": { "command": "node build.mjs" },
   "assets": {
-    "directory": "./frontend/dist-cloudflare",
+    "directory": "./dist-cloudflare",
     "binding": "ASSETS",
     "run_worker_first": true
   }
