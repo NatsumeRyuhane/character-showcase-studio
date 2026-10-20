@@ -5,10 +5,12 @@
 # ///
 """Character Showcase Studio launcher.
 
-Run with no arguments for the interactive menu, or with a subcommand
-(start, stop, restart, status, open, build, check, doctor, upgrade).
-Subcommands only need the standard library, so `doctor` still works when
-the menu's pip dependencies are missing.
+Run with no arguments in a terminal for the interactive menu, or with a
+subcommand (start, stop, restart, status, open, build, check, doctor,
+upgrade). Subcommands never prompt, so agents and scripts can call them.
+
+Requires rich and questionary (requirements.txt). The root start.sh /
+start.cmd install them automatically.
 """
 from __future__ import annotations
 
@@ -25,7 +27,8 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+# STUDIO_ROOT points the launcher at another checkout; the automated tests use it.
+ROOT = Path(os.environ.get("STUDIO_ROOT") or Path(__file__).resolve().parents[2]).resolve()
 FRONTEND = ROOT / "frontend"
 DIST_PAGE = FRONTEND / "dist" / "index.html"
 STATE_DIR = ROOT / ".studio"
@@ -43,12 +46,15 @@ MIN_NODE = 18
 WINDOWS = os.name == "nt"
 
 try:
+    import questionary
     from rich.console import Console
-    from rich.table import Table
+except ImportError:
+    print("缺少启动器依赖（rich、questionary）。请通过根目录的 start.sh / start.cmd 运行（会自动安装），\n"
+          f"或手动运行：python -m pip install -r {REQUIREMENTS}", file=sys.stderr)
+    raise SystemExit(2)
 
-    _console = Console()
-except ImportError:  # Subcommands fall back to plain output.
-    _console = None
+# soft_wrap keeps long messages on one line when output is captured (agents, CI).
+_console = Console(highlight=False, soft_wrap=True)
 
 
 class LauncherError(Exception):
@@ -58,10 +64,7 @@ class LauncherError(Exception):
 # ---------------------------------------------------------------- output
 
 def say(message: str = "", style: str | None = None) -> None:
-    if _console:
-        _console.print(message, style=style, highlight=False)
-    else:
-        print(re.sub(r"\[/?[a-z ]+\]", "", message))
+    _console.print(message, style=style)
 
 
 def ok(message: str) -> None:
@@ -346,13 +349,6 @@ def cmd_doctor(_args: argparse.Namespace | None = None) -> None:
     version = node_version()
     check(version is not None and version[0] >= MIN_NODE,
           f"Node.js {'.'.join(map(str, version)) if version else '未安装'}", "需要 Node.js 18 或更新版本：https://nodejs.org/")
-    try:
-        import questionary  # noqa: F401
-        import rich  # noqa: F401
-        check(True, "菜单所需的 Python 依赖已安装")
-    except ImportError:
-        check(None, "菜单所需的 Python 依赖未安装（命令行子命令不受影响）",
-              f"{Path(sys.executable).name} -m pip install -r {REQUIREMENTS.relative_to(ROOT)}")
 
     say("\n[bold]Git 与 GitHub[/bold]")
     if not shutil.which("git"):
@@ -415,29 +411,7 @@ MENU = [
 ]
 
 
-def ensure_menu_dependencies() -> bool:
-    try:
-        import questionary  # noqa: F401
-        import rich  # noqa: F401
-        return True
-    except ImportError:
-        pass
-    command = [sys.executable, "-m", "pip", "install", "-r", str(REQUIREMENTS)]
-    print("交互菜单需要安装两个 Python 依赖（rich、questionary）。")
-    print("将运行：" + " ".join(command))
-    if input("现在安装吗？[y/N] ").strip().lower() not in ("y", "yes"):
-        print("已取消。也可以直接使用子命令，例如：start、stop、doctor（运行 --help 查看全部）。")
-        return False
-    if subprocess.run(command).returncode != 0:
-        print("安装失败。请根据上方提示处理，或请 AI 助手协助安装。")
-        return False
-    # Run again in a fresh interpreter so the new packages import cleanly.
-    raise SystemExit(subprocess.call([sys.executable, *sys.argv]))
-
-
 def menu(parser: argparse.ArgumentParser) -> None:
-    import questionary
-
     while True:
         say()
         current = running_server()
@@ -462,7 +436,7 @@ COMMANDS = {
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="studio", description="角色展示设计工作台启动器。不带参数运行时显示交互菜单。")
+    parser = argparse.ArgumentParser(prog="studio", description="角色展示设计工作台启动器。在终端中不带参数运行时显示交互菜单；子命令不会询问任何问题，适合脚本与 AI 助手调用。")
     sub = parser.add_subparsers(dest="command")
     for name, help_text in [("start", "构建并在后台启动本机预览"), ("restart", "停止后重新构建并启动预览")]:
         command = sub.add_parser(name, help=help_text)
@@ -491,7 +465,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.command:
         dispatch(args)
-    elif sys.stdin.isatty() and ensure_menu_dependencies():
+    elif sys.stdin.isatty() and sys.stdout.isatty():
         try:
             menu(parser)
         except KeyboardInterrupt:
