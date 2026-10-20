@@ -5,7 +5,7 @@ How the three outputs (standalone HTML, OBS package, After Effects template) are
 ## Shared rules
 
 - **Exports are snapshots.** Each one carries the design and images as they were at export time. Nothing syncs back, and old exports never update; they must be re-exported.
-- **The sandbox only sends data.** `src/studio-output.js` collects state and images and sends them to the shell (`studio-output-export`). `runtime/export-packages.ts` validates them and builds the files. It never accepts HTML, script, expressions or file paths from the frame.
+- **The sandbox only sends data.** The output dialog (`src/editor/OutputDialog.tsx`) assembles the state and the permitted images with `studioOutputPayload` (`src/output-payload.ts`) and sends them to the shell (`studio-output-export`). `runtime/export-packages.ts` validates them and builds the files. It never accepts HTML, script, expressions or file paths from the frame.
 - **Limits.** State is at most 16 KiB, sent with the same `tuple-v1` encoding as persistence and expanded through the same restore path (`restoreStudioState`). Images must be PNG, JPEG or WebP base64, at most 18 MiB encoded each (shot uploads are capped at 12 MB). AE scene data is at most 48 MiB. JSON is written with `<` escaped.
 - **The user clicks to download.** Downloads go through the shell and need user activation. AE is two clicks: "generate" for the slow sampling, then "download".
 - **Image filtering.** `includeCharacters:false` drops all four character and shot images. `storyPackagingOnly:true` drops only the two shot images. The sandbox and the host apply the same filter.

@@ -4,7 +4,7 @@
 
 Node.js 22.12 or newer, with npm (it ships with Node.js). Run every command below from `frontend/`.
 
-Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. The dependencies (Vite, TypeScript, Vitest, Playwright) are development tools only; the built page loads nothing.
+Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. React and React DOM are bundled into the page; the other dependencies (Vite, TypeScript, Vitest, jsdom, Playwright) are development tools only. The built page loads nothing.
 
 ## Commands
 
@@ -22,7 +22,7 @@ Install the build dependencies with `npm ci` once, and again whenever `package-l
 Always run **build, then check**, and commit only when the check prints its final `PASS` line. The check:
 
 1. Parses `dist/exploration-full-source.js` and the syntax of the tool and test configuration scripts, runs the TypeScript check (`tsc`, see `tsconfig.json`; JavaScript is allowed but not type-checked yet), and runs the [unit tests](#unit-tests).
-2. Decodes the shell and the sandboxed frame from `dist/index.html` and parses every embedded script; at least 9 must be present.
+2. Decodes the shell and the sandboxed frame from `dist/index.html` and parses every embedded script; at least 5 must be present.
 3. Asserts the sandbox and CSP are still there, all 13 designs are present, there are no external `<script src>` or `@import`, and no machine-specific paths such as `C:\Users\…` or `.codex/`.
 4. Runs every regression script listed in it from `tests/check-*.cjs`.
 
@@ -34,7 +34,9 @@ There are two kinds of automated tests, and `node tools/check.mjs` runs both. Th
 
 `tests/unit/*.test.ts` are [Vitest](https://vitest.dev/) tests. They import the source modules directly, as the bundle does, and test their exported functions. `vitest.config.mjs` limits Vitest to this folder. `tsconfig.json` includes it, so the tests are type-checked too.
 
-To add one, create `tests/unit/<module>.test.ts`. Vitest finds it automatically; nothing needs registering. Write new tests here.
+`tests/unit/*.test.tsx` test the React editor components. They start with `// @vitest-environment jsdom`, render the components into jsdom, and replace `src/exploration-full-logic.js` with a stand-in (`vi.mock`) that holds a fresh `createStudioState()`, so each control can be checked against the setting it writes (see `editor-panels.test.tsx`).
+
+To add one, create `tests/unit/<module>.test.ts` (`.test.tsx` for components). Vitest finds it automatically; nothing needs registering. Write new tests here.
 
 ### Older regression scripts
 
@@ -48,7 +50,7 @@ A script that only tests a module's exports moves to `tests/unit/` when that mod
 
 ### Adding a source module
 
-Create it in `src/`, in TypeScript for new code, and import it where it is used. Imports name the file with its extension, `.ts` included (`import { … } from './variant-codec.ts'`). Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
+Create it in `src/`, in TypeScript for new code, and import it where it is used. Editor UI goes in `src/editor/` as React components (`.tsx`), rendered from `Workspace.tsx` (see [architecture.md](architecture.md#editor-workspace)). Imports name the file with its extension, `.ts` included (`import { … } from './variant-codec.ts'`). Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
 
 ## Visual regression tests
 
