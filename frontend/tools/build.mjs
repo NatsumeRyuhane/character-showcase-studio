@@ -21,6 +21,8 @@ const bundle = await build({
   root, configFile: false, publicDir: false, logLevel: 'warn',
   build: {
     write: false, target: 'esnext', minify: false, cssMinify: false,
+    // Region comments carry module paths relative to cwd; pin it so output never depends on where the build runs.
+    rolldownOptions: { cwd: root },
     lib: { entry: path.join(root, 'src', 'main.js'), formats: ['iife'], name: 'studio', fileName: () => 'studio.js', cssFileName: 'studio' },
   },
 });
