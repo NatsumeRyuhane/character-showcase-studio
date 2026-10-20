@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { decodeStudioVariants, encodeStudioVariants } from '../../src/variant-codec.js';
+import { decodeStudioVariants, encodeStudioVariants } from '../../src/variant-codec.ts';
 
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 // Compare plain JSON, as the snapshot stored by the shell would be.
 const encode = (value: unknown) => copy(encodeStudioVariants(value));
-const decode = (value: unknown, defaults: unknown) => copy(decodeStudioVariants(value, defaults));
+const decode = <T extends Record<string, unknown>>(value: unknown, defaults: T) => copy(decodeStudioVariants(value, defaults));
 const bytes = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).length;
 
 const names = ['couture', 'brutalist', 'cloud', 'plush', 'play', 'sticker', 'orbit', 'poster', 'wave', 'dual', 'district', 'tuner', 'arcade'];
@@ -107,7 +107,7 @@ describe('tuple-v1 decoding', () => {
   it('returns values independent of the defaults and the input', () => {
     const { defaults, variants, encoded } = setup();
     const unchanged = copy(defaults);
-    const decoded = decodeStudioVariants(encoded, defaults) as Record<string, Variant>;
+    const decoded = decodeStudioVariants(encoded, defaults);
     decoded.couture.effects.shadowColor = '#ffffff';
     decoded.couture.geometryBySeries.fur = 'none';
     decoded.couture.shadows.title = false;

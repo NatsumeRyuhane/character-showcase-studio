@@ -73,7 +73,7 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
 const logic=moduleScript('src/exploration-full-logic.js');
 // The logic module's imports share the VM context, standing in for the module graph.
-const prefix=[moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.js'),moduleScript('src/motion-clock.js'),moduleScript('src/variant-codec.js'),logic.slice(0,logic.indexOf('const template='))].join('\n');
+const prefix=[moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.js'),moduleScript('src/motion-clock.js'),moduleScript('src/variant-codec.ts'),logic.slice(0,logic.indexOf('const template='))].join('\n');
 const outputLogic=moduleScript('src/studio-output.js'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
 assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
 function editorFixture(widgetState,globals={},reducedMotion=false){

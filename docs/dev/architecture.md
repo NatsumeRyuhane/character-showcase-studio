@@ -90,7 +90,7 @@ Consequences:
 | `studio-narrative.js` / `.css` | Intro and outro controls, brand ending |
 | `studio-post.js` / `.css` | Post-processing (polar, CRT, holo, bloom, anamorphic, prism, film) over one shared optical surface. Borders stay outside it. |
 | `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) |
-| `variant-codec.js` | `tuple-v1` compact encoding of per-design settings |
+| `variant-codec.ts` | `tuple-v1` compact encoding of per-design settings |
 | `studio-output.js` / `.css` | Output dialog, clean-output mode, export requests to the shell |
 | `export-layout.js` | Logical layout size and output scaling |
 | `ae-canvas-recorder.js`, `ae-geometry-motion.js`, `ae-export.js` | AE export: record canvas paths, sample motion adaptively, measure layout and collect text and assets |

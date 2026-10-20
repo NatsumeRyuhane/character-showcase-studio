@@ -40,7 +40,7 @@ To add one, create `tests/unit/<module>.test.ts`. Vitest finds it automatically;
 
 `tests/check-*.cjs` are plain Node scripts using `node:assert` and `node:vm`. Most load source files into a VM context and call the production functions directly, and several stub just enough DOM to run parts of the editor module.
 
-Source files are ES modules, so these scripts load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else.
+Source files are ES modules, so these scripts load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It strips the types from `.ts` files with the transformer Vite uses, drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else.
 
 A script that only tests a module's exports moves to `tests/unit/` when that module is converted. The scripts that need the editor module or the shell scripts stay until those are split up. To change the list, edit `tools/check.mjs`: **a script that is not listed there does not run.** Each script exits non-zero on failure and prints a one-line `PASS: …` summary.
 
@@ -48,7 +48,7 @@ A script that only tests a module's exports moves to `tests/unit/` when that mod
 
 ### Adding a source module
 
-Create it in `src/` (`.js` or `.ts`) and import it where it is used. Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
+Create it in `src/`, in TypeScript for new code, and import it where it is used. Imports name the file with its extension, `.ts` included (`import { … } from './variant-codec.ts'`). Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
 
 ## Visual regression tests
 

@@ -1,6 +1,6 @@
 import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.js';
 import { createMotionClock } from './motion-clock.js';
-import { encodeStudioVariants } from './variant-codec.js';
+import { encodeStudioVariants } from './variant-codec.ts';
 import { images, resetLastFrame, setMotionClock, state, update, workspace } from './exploration-full-logic.js';
 import { collectStudioAEScene } from './ae-export.js';
 

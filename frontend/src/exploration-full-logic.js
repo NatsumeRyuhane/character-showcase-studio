@@ -1,7 +1,7 @@
 import { studioAdvanceTime, studioContinuousShow, studioIntroDuration, studioNarrativePose, studioNarrativeSettings, studioNarrativeTime, studioPhase, studioStoryDuration, studioTotalDuration } from './timeline.js';
 import { advanceMotionClock, createMotionClock } from './motion-clock.js';
 import { informationMotionPose, marqueeOffset } from './information-motion.js';
-import { decodeStudioVariants, encodeStudioVariants } from './variant-codec.js';
+import { decodeStudioVariants, encodeStudioVariants } from './variant-codec.ts';
 import assets from './badge-assets.json';
 import { designLanguagePalette } from './design-language-scene.js';
 import { paintExploration } from './exploration-full-scene.js';
