@@ -74,16 +74,16 @@ OBS 从下到上的顺序为画面 → 光效 → 边框；外部角色源可自
 
 已有项目的「模型先行 / 大字开场」选择会保留，不会被新默认片头覆盖。独立 HTML / OBS 若选择「直接展示」，会跳过双镜头片头；取消「包含角色预览图片」会同时排除主角色、补充角色及两张片头镜头图。「只显示包装」也不会将片头镜头图打包出去。AE 导出将角色与作者镜头拆为独立海报预合成，可编辑各自的图片、文案与简化特效，并在主控制器分别调整镜头开始时间、时长及特效强度和速度。
 
-从 0.8.7 起，导出的 AE 工程在 `01 MAIN → CONTROLS` 提供独立的转场开始时间和时长：`Show Transition Start / Duration` 控制圆环与标题移位，`Information Start / Fade Duration` 控制信息淡入，`Title Fade Duration` 控制名字淡入，`Ending Start / Transition Duration` 控制展示转入品牌片尾。单位是合成秒数；改变过渡不会改变圆环旋转速度。滑杆不会自动延长合成或素材图层，时间轴上的段落标记仅供参考。详细说明见 [AE-EXPORT.md](docs/AE-EXPORT.md)。已导出的旧工程需要重新生成模板。
+从 0.8.7 起，导出的 AE 工程在 `01 MAIN → CONTROLS` 提供独立的转场开始时间和时长：`Show Transition Start / Duration` 控制圆环与标题移位，`Information Start / Fade Duration` 控制信息淡入，`Title Fade Duration` 控制名字淡入，`Ending Start / Transition Duration` 控制展示转入品牌片尾。单位是合成秒数；改变过渡不会改变圆环旋转速度。滑杆不会自动延长合成或素材图层，时间轴上的段落标记仅供参考。详细说明见 [docs/user/ae-export.md](docs/user/ae-export.md)。已导出的旧工程需要重新生成模板。
 
 顶部「输出 / AE 模板」有两个用途：
 
-- **OBS 纯画面**：下载独立 HTML 或完整 OBS 输出包，支持横竖屏、1080p / 4K、透明底、角色图开关、完整显示 / 铺满裁切。包内含浏览器源场景配置和本地路径准备脚本；OBS 直接加载页面本体，没有地址栏和编辑面板。OBS 的基础画布应与输出尺寸一致。详见 `docs/OBS-SPOUT.md`。
+- **OBS 纯画面**：下载独立 HTML 或完整 OBS 输出包，支持横竖屏、1080p / 4K、透明底、角色图开关、完整显示 / 铺满裁切。包内含浏览器源场景配置和本地路径准备脚本；OBS 直接加载页面本体，没有地址栏和编辑面板。OBS 的基础画布应与输出尺寸一致。详见 `docs/user/obs.md`。
 
 1080p 与 4K 共用同一套排版。选择 4K 只提高输出分辨率，文字、标识、圆环、阴影与边框的画面占比一致；网页 / OBS 输出和 AE 模板均适用。旧导出文件请用新版工作台重新导出。
 
 信息边框从片头至片尾持续显示。AE 主合成中，每侧边框有独立的 `background` 底板形状与 `text` 文字图层；双击文字图层，编辑 `Border copy · EDIT THIS`，滚动副本会自动同步。
-- **AE 可编辑模板**：生成并下载 ZIP，在 AE 运行包内 IMPORT_TO_AE.jsx，创建可编辑文字、切形、圆环路径、图案及滚动边框，最后另存为 .aep。复杂质感会简化，图标与二维码等为独立图片素材，缺少的桌面字体需安装或替换。详见 `docs/AE-EXPORT.md`。
+- **AE 可编辑模板**：生成并下载 ZIP，在 AE 运行包内 IMPORT_TO_AE.jsx，创建可编辑文字、切形、圆环路径、图案及滚动边框，最后另存为 .aep。复杂质感会简化，图标与二维码等为独立图片素材，缺少的桌面字体需安装或替换。详见 `docs/user/ae-export.md`。
 
 输出文件保留导出时的设计与图片快照。修改设计后重新导出。OBS 输出快捷键：空格暂停 / 继续、R 重播片头、S 跳至展示、E 进入已启用的片尾（先打开 OBS 源交互）。
 
@@ -127,7 +127,7 @@ node tools/server.mjs
 | `tests/` | 连续动画时钟、文字与边框动态、状态恢复的回归检查 |
 | `dist/` | 构建结果，可复制到静态服务器 |
 | `docs/DEVELOPER.md` | 源码结构与后续开发说明 |
-| `docs/AE-EXPORT.md` | 可编辑 AE 导出用法与效果边界 |
+| `docs/user/ae-export.md` | 可编辑 AE 导出用法与效果边界 |
 | `THIRD-PARTY-NOTICES.md` | 第三方素材与代码来源 |
 
 ## 当前边界
