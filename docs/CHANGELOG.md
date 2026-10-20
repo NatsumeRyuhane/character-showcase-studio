@@ -17,7 +17,7 @@
 - AE 手动验证脚本移至 `frontend/tests/ae/`。
 
 ### 新增
-- 跨平台启动器：Windows 双击 `start.cmd`，macOS / Linux 运行 `./start.sh`，在中文菜单中启动、停止、重启预览，诊断环境，或更新到最新版本。需要 Python 3.9+ 与 Node.js 18+。
+- 跨平台启动器：Windows 双击 `start.cmd`，macOS / Linux 运行 `./start.sh`，在中文菜单中启动、停止、重启预览，诊断环境，或更新到最新版本。需要 Python 3.9+（含 pip）与 Node.js 18+；首次运行会自动安装启动器的 Python 依赖。
 
 ### 变更
 - 项目目录调整：网页工作台移入 `frontend/`，Cloudflare 部署配置移入 `deploy/cloudflare/`。

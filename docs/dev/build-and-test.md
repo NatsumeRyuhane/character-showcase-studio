@@ -34,6 +34,15 @@ To add a source module:
 
 `tests/ae/` holds manual After Effects harnesses; see its README.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and every push to `main`:
+
+- **Frontend:** build and check on Ubuntu and Windows with Node 18 and 22. The Windows run also confirms the line-ending setup produces a working build.
+- **Launcher:** the launcher test suite on Ubuntu, macOS and Windows, plus the `start.sh` / `start.cmd` shims (see [launcher.md](launcher.md#tests-and-ci)).
+
+A PR should not be merged with failing CI.
+
 ## Manual verification
 
 The automated checks cover pure functions and generated data. They do not open a browser. After a UI or visual change, open the page (`./start.sh start` from the root) and check:

@@ -6,16 +6,19 @@
 
 | Tool | Needed for |
 | --- | --- |
-| Python 3.9+ | The launcher itself |
-| `rich`, `questionary` (`deploy/launcher/requirements.txt`) | The interactive menu only. When they are missing, the menu offers to install them with `python -m pip install -r deploy/launcher/requirements.txt`. |
+| Python 3.9+ with pip | The launcher |
+| `rich`, `questionary` (`deploy/launcher/requirements.txt`) | Required. `start.sh` / `start.cmd` check for them and run `python -m pip install -r deploy/launcher/requirements.txt` when missing. If that fails (no pip, an externally managed Python, no network), they print why and the manual command, then exit 1. Running `studio.py` directly without them prints the install command and exits 2. |
 | Node.js 18+ | Building and serving (`frontend/tools/*.mjs`) |
 | Git, `gh` | `upgrade`; `doctor` checks them |
 
-Subcommands use only the standard library, so `doctor` works before the menu dependencies are installed. The file also carries PEP 723 metadata, so `uv run deploy/launcher/studio.py` works too.
+The file also carries PEP 723 metadata, so `uv run deploy/launcher/studio.py` works too.
+
+## Two modes
+
+- **Interactive menu:** run with no arguments in a terminal (`start.cmd` double-click, `./start.sh`). Arrow-key menu in Chinese.
+- **Pure CLI, for agents and scripts:** run with a subcommand. Subcommands never prompt and never open the menu. When output is captured, `rich` prints plain text without colour and without wrapping, so each message stays on one line. The shims send their own messages (dependency install) to stderr, and `start.cmd` never pauses when given arguments.
 
 ## Commands
-
-No arguments in a terminal opens the menu (Chinese). Agents and scripts should call subcommands directly:
 
 | Command | Behaviour |
 | --- | --- |
@@ -25,7 +28,7 @@ No arguments in a terminal opens the menu (Chinese). Agents and scripts should c
 | `status` | Server state, whether `frontend/dist/` is older than the sources, current branch |
 | `open` | Opens the running preview in the browser |
 | `build` / `check` | `node tools/build.mjs`, and also `node tools/check.mjs` for `check` |
-| `doctor` | Checks Python, Node, menu dependencies, git branch and uncommitted changes, CRLF line endings, the `.claude` symlink, `gh` login and repo access, the port, and build freshness. Prints a fix hint for each problem. Exits 0 even when it reports problems. |
+| `doctor` | Checks Python, Node, git branch and uncommitted changes, CRLF line endings, the `.claude` symlink, `gh` login and repo access, the port, and build freshness. Prints a fix hint for each problem. Exits 0 even when it reports problems. |
 | `upgrade` | Fast-forwards `main` to `origin/main`, rebuilds, and restarts a running preview |
 
 Errors exit with status 1 and a plain-Chinese message.
@@ -38,8 +41,19 @@ Errors exit with status 1 and a plain-Chinese message.
 - **Proxy-free health checks.** Local requests bypass any HTTP proxy configured in the environment.
 - **Conservative `upgrade`.** It only fast-forwards when the current branch is `main`, there are no uncommitted changes to tracked files, and local `main` has no unpushed commits. Otherwise it explains why and stops, because those situations mean someone's work is in progress. It never merges, rebases, stashes or resets.
 
+## Tests and CI
+
+`deploy/launcher/tests/test_studio.py` runs the launcher end to end as a subprocess. Each run uses a throwaway clone whose `origin` is a local bare repository, selected with the test-only `STUDIO_ROOT` environment variable, so it never touches your checkout, a running preview or GitHub. It covers every subcommand except `open` (which launches a browser), the refusals, a real `upgrade` fast-forward, unwrapped captured output, the missing-dependency message and, on POSIX via a pseudo-terminal, the menu.
+
+```sh
+python -m pip install -r deploy/launcher/requirements.txt
+python -m unittest discover -s deploy/launcher/tests -v
+```
+
+CI (`.github/workflows/ci.yml`) runs these tests on Ubuntu, macOS and Windows. It also checks that `start.sh` installs the dependencies into a fresh environment, and that `start.cmd` runs subcommands without pausing.
+
 ## Changing the launcher
 
-- Keep subcommands stdlib-only; only the menu may use the pip dependencies.
+- Subcommands must stay non-interactive. Only the no-argument menu may prompt.
 - User-facing text is Chinese; code and comments are English.
-- Check by hand: `python deploy/launcher/studio.py doctor`, then `start --no-open`, `status`, `restart --no-open` and `stop` in sequence, with and without the menu dependencies installed. Windows behaviour (`start.cmd`, process detaching, `taskkill`) needs a Windows machine to verify.
+- Add or extend a test in `deploy/launcher/tests/` for every behaviour change, and keep CI green on all three operating systems. Windows-only paths (`start.cmd`, `DETACHED_PROCESS`, `taskkill`) are only exercised in CI.
