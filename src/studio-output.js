@@ -1,0 +1,73 @@
+// Clean stage previews and export controls. Native Spout transport belongs to OBS.
+function mountStudioOutput(root,views){
+  const exported=globalThis.studioOutput?.enabled===true;
+  const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text)el.textContent=text;return el};
+  const action=(text)=>{const el=make('button','btn',text);el.type='button';return el};
+  const actions=root.querySelector('.studio-header-actions'),open=action('输出 / AE 模板');open.classList.add('studio-output-button');open.dataset.outputOpen='';actions.append(open);
+  const dialog=make('dialog','studio-output-dialog');dialog.setAttribute('aria-labelledby','studio-output-heading');
+  dialog.innerHTML=`<div class="studio-output-heading"><div><span class="studio-kicker">EXPORT STUDIO</span><h2 id="studio-output-heading">把设计带到下一站</h2></div></div>
+  <div class="studio-output-tabs" role="tablist" aria-label="输出用途"><button type="button" role="tab" id="output-tab-obs" aria-controls="output-panel-obs" aria-selected="true" data-output-tab="obs">OBS 纯画面</button><button type="button" role="tab" id="output-tab-ae" aria-controls="output-panel-ae" aria-selected="false" data-output-tab="ae">AE 可编辑模板</button></div>
+  <div class="studio-output-panel" id="output-panel-obs" role="tabpanel" aria-labelledby="output-tab-obs" data-output-panel="obs"><p><strong>只把展示页面送进 OBS。</strong><br>下载后添加为「浏览器」源。无需将浏览器窗口全屏，也不会录入编辑面板和地址栏。</p></div>
+  <div class="studio-output-panel" id="output-panel-ae" role="tabpanel" aria-labelledby="output-tab-ae" data-output-panel="ae" hidden><p><strong>文字、角色、圆环、滤镜与边框分层编辑。</strong><br>下载 ZIP，在 AE 运行导入脚本，即可另存为可编辑 .aep。绿色 MODEL / REPLACE 容器用于替换角色素材，紫色 FX 图层用于修改后处理。</p><p>片头素材与字幕一起经过滤镜，展示角色位于滤镜上方。边框始终独立；即使没有上传角色图，也会保留空素材容器。</p><p>滤镜使用 AE 内置效果与矢量近似；复杂渐变、金属、云雾与细毛会简化，不逐像素还原。桌面未安装的字体会被 AE 替代。</p></div>
+  <div class="studio-output-fields"><div class="direction-field studio-output-wide" data-obs-field><label for="studio-output-layers">OBS 输出结构</label><select id="studio-output-layers" class="form-select"><option value="combined">一体网页源 · 一次导入完整画面</option><option value="separate">三层网页源 · 画面 + 光效 + 边框</option></select><small>三层输出方便在 OBS 中自由叠放角色素材。</small></div><div class="direction-field"><label for="studio-output-resolution">输出尺寸</label><select id="studio-output-resolution" class="form-select"><option value="1080">1080p</option><option value="2160">4K</option></select></div>
+  <div class="direction-field" data-obs-field><label for="studio-output-start">打开时从哪里开始</label><select id="studio-output-start" class="form-select"><option value="intro">引入页 → 展示（按片尾设置）</option><option value="show">直接展示（按片尾设置）</option></select></div>
+  <div class="direction-field" data-obs-field><label for="studio-output-fit">画幅不同时如何适配</label><select id="studio-output-fit" class="form-select"><option value="contain">完整显示 · 可能留边</option><option value="cover">铺满裁切 · 可能裁边</option></select></div>
+  <div class="direction-field" data-ae-field hidden><label for="studio-output-fps">AE 帧率</label><select id="studio-output-fps" class="form-select"><option value="30">30 fps</option><option value="60">60 fps</option></select></div></div>
+  <p class="studio-note">1080p 与 4K 使用相同排版。4K 仅提高清晰度，文字、标识、圆环和边框占比保持一致。</p>
+  <div class="studio-output-checks"><label class="form-check"><input class="form-check-input" type="checkbox" id="studio-output-transparent"><span>透明底 · 用于叠加</span></label><label class="form-check"><input class="form-check-input" type="checkbox" id="studio-output-characters"><span>包含角色预览图片</span></label><label class="form-check" data-ae-field hidden><input class="form-check-input" type="checkbox" id="studio-output-ae-intro"><span>包含引入页动画</span></label></div>
+  <div class="studio-output-summary" data-output-summary></div>
+  <div class="studio-output-layer-guide" data-layer-guide hidden><strong>OBS 图层顺序 · 从上到下</strong><ol><li><span>03</span> 边框 <small>始终清晰，独立编辑</small></li><li><span>02</span> 光效 <small>透明的扫描线、波纹与炫光</small></li><li><span>01</span> 画面 <small>背景、文字与预览素材</small></li></ol><p>外部角色素材：开场放在「光效」下方，展示页放在「光效」上方、边框下方。运行 START-LAYERS.cmd 打开同步控制页，统一重播、暂停或切换镜头。首次使用需要 Node.js 18 或更新版本。</p><p>光效源仅作透明叠加，无法读取其他 OBS 源的像素。真正的辉光、色散与画面变形保留在「画面」源内；外部角色需要这类处理时，请在 OBS 或 AE 中添加。</p></div>
+  <p class="studio-output-preview-note" data-obs-field>「预览纯画面」与「单独 HTML」始终使用一体画面，便于检查整体效果。</p>
+  <details class="studio-output-guide" data-obs-field><summary>OBS 导入方式 / Spout2</summary><ol><li>下载输出包并完整解压，双击 PREPARE-OBS.cmd 生成场景文件。</li><li>OBS「场景集合 → 导入」选择生成的 IMPORT-IN-OBS.json。</li><li>OBS「设置 → 视频」基础画布设为上方所示尺寸；场景集合不会可靠地修改全局视频设置。</li></ol><p data-output-import-guide>也可手动添加浏览器源 → 本地文件 → output.html，宽高与输出尺寸相同。不要使用窗口捕获。</p><p>若需要 Spout2，可在 OBS 中为各浏览器源添加 obs-spout2-plugin 的 Spout Filter。网页自身不直接发送 Spout2。</p><p>快捷键：空格暂停 / 继续，R 重播引入页，S 跳至展示，E 进入片尾（OBS 中先打开源的「交互」）。</p></details>
+  <details class="studio-output-guide" data-ae-field hidden><summary>AE 导入与编辑</summary><ol><li>先生成模板，再点击「下载 AE 模板」。解压 ZIP，保持 assets 素材文件夹完整。</li><li>AE「文件 → 脚本 → 运行脚本文件」选择 IMPORT_TO_AE.jsx。</li><li>打开 01 MAIN，在 CONTROLS 调颜色与动效；各合成内可继续编辑文字、路径和素材，最后保存为 .aep。</li></ol><p>转场可以在 AE 继续调整：Show Transition Start / Duration 控制圆环与大字过渡，Information Start / Fade Duration 控制信息入场，Ending Start / Transition Duration 控制进入片尾。单位均为秒，不改变圆环旋转速度。</p><p>老电视关机的亮线、光点、余辉和遮罩是独立图层；边框始终独立。改变转场参数不会自动延长合成总时长。</p><p>这会添加独立文件夹与合成，不关闭已有项目。模板使用当前设置的片头、展示时长，以及已启用的品牌片尾与关机动画。</p></details>
+  <p class="studio-output-status" role="status" aria-live="polite"></p>`;
+  const footer=make('div','studio-output-footer'),close=action('返回编辑'),preview=action('预览纯画面'),htmlDownload=action('单独 HTML'),download=action('下载 OBS 输出包');download.classList.add('btn-primary');download.dataset.outputDownload='';preview.dataset.outputPreview='';close.dataset.outputClose='';footer.append(close,preview,htmlDownload,download);dialog.append(footer);root.append(dialog);
+  const resolution=dialog.querySelector('#studio-output-resolution'),layers=dialog.querySelector('#studio-output-layers'),start=dialog.querySelector('#studio-output-start'),fit=dialog.querySelector('#studio-output-fit'),fps=dialog.querySelector('#studio-output-fps'),aeIntro=dialog.querySelector('#studio-output-ae-intro'),transparent=dialog.querySelector('#studio-output-transparent'),characters=dialog.querySelector('#studio-output-characters'),status=dialog.querySelector('[role="status"]');
+  let mode='obs',prepared=null,busy=false;
+  function dimensions(){const scale=state.output.resolution==='2160'?2:1;return state.ratio==='portrait'?[1080*scale,1920*scale]:[1920*scale,1080*scale]}
+  function config(kind='obs'){const [width,height]=dimensions();return {enabled:true,width,height,transparent:state.output.transparent,includeCharacters:state.output.includeCharacters,start:state.output.start,fit:state.output.fit,obsLayers:kind==='html'?'combined':state.output.obsLayers}}
+  function downloadLabel(){return state.output.obsLayers==='separate'?'下载 OBS 三层输出包':'下载 OBS 输出包'}
+  function resetPrepared(){prepared=null;download.textContent=mode==='ae'?'生成 AE 模板':downloadLabel()}
+  function settingsChanged(){state.output={...state.output,resolution:resolution.value,obsLayers:layers.value,start:start.value,fit:fit.value,fps:+fps.value,aeIntro:aeIntro.checked,transparent:transparent.checked,includeCharacters:characters.checked};resetPrepared();status.textContent='';update()}
+  for(const input of [resolution,layers,start,fit,fps,aeIntro,transparent,characters])input.addEventListener('change',settingsChanged);
+  function switchMode(next){mode=next;resetPrepared();status.textContent='';for(const tab of dialog.querySelectorAll('[data-output-tab]')){tab.setAttribute('aria-selected',String(tab.dataset.outputTab===mode));tab.tabIndex=tab.dataset.outputTab===mode?0:-1}for(const panel of dialog.querySelectorAll('[data-output-panel]'))panel.hidden=panel.dataset.outputPanel!==mode;for(const field of dialog.querySelectorAll('[data-obs-field]'))field.hidden=mode!=='obs';for(const field of dialog.querySelectorAll('[data-ae-field]'))field.hidden=mode!=='ae';htmlDownload.hidden=preview.hidden=mode!=='obs';ui.sync()}
+  for(const tab of dialog.querySelectorAll('[data-output-tab]')){tab.addEventListener('click',()=>switchMode(tab.dataset.outputTab));tab.addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();switchMode(mode==='obs'?'ae':'obs');dialog.querySelector('[aria-selected="true"]').focus()}})}
+  open.addEventListener('click',()=>{status.textContent='';resetPrepared();ui.sync();dialog.showModal()});close.addEventListener('click',()=>dialog.close());
+  const exitHint=make('div','studio-clean-hint','纯画面预览 · Esc 返回编辑');exitHint.hidden=true;root.append(exitHint);
+  function setClean(enabled){
+    root.classList.toggle('is-clean-output',enabled);root.classList.toggle('is-transparent-output',enabled&&state.output.transparent);root.classList.toggle('output-hide-characters',enabled&&!state.output.includeCharacters);
+    document.documentElement.classList.toggle('studio-output-root',enabled);document.body.classList.toggle('studio-output-body',enabled);
+    exitHint.hidden=!enabled||exported;exitHint.classList.toggle('is-visible',enabled&&!exported);workspace.sync();
+  }
+  preview.addEventListener('click',()=>{dialog.close();setClean(true)});
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&!exported&&root.classList.contains('is-clean-output')){event.preventDefault();setClean(false);return}
+    if(!exported||event.ctrlKey||event.altKey||event.metaKey||/INPUT|SELECT|TEXTAREA/.test(event.target?.tagName))return;
+    if(event.code==='Space'){event.preventDefault();if(!state.playing&&!studioContinuousShow(state.narrative)&&state.time>=studioTotalDuration(state.introDuration,state.narrative)){state.time=0;motionClock=createMotionClock(0,state.variants,state.edges)}state.playing=!state.playing;last=0;update()}
+    else if(event.key.toLowerCase()==='r'){state.time=0;motionClock=createMotionClock(0,state.variants,state.edges);state.playing=true;last=0;update()}
+    else if(event.key.toLowerCase()==='s'){state.time=state.introDuration;state.playing=true;last=0;update()}
+    else if(event.key.toLowerCase()==='e'&&state.narrative.outroEnabled){state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;last=0;update()}
+  });
+  function htmlPayload(kind){const packed=Object.fromEntries(Object.entries(images).filter(([key,value])=>value&&(state.output.includeCharacters||!['model','portrait','introCharacter','introAuthor'].includes(key))&&(!state.narrative.storyPackagingOnly||!['introCharacter','introAuthor'].includes(key))));const snapshot=JSON.parse(JSON.stringify(state));if(kind==='html')snapshot.output.obsLayers='combined';snapshot.variantEncoding='tuple-v1';snapshot.variants=encodeStudioVariants(state.variants);return {kind,state:snapshot,images:packed,config:config(kind)}}
+  async function exportDesign(kind){
+    if(busy)return;busy=true;download.disabled=htmlDownload.disabled=close.disabled=true;for(const field of dialog.querySelectorAll('input,select,[data-output-tab]'))field.disabled=true;
+    try{
+      if(!globalThis.downloadStudioOutput)throw new Error('请从完整本地工作台打开此功能。');
+      if(kind==='ae'&&!prepared){status.textContent='正在生成原生图层与圆环关键帧…';download.textContent='生成中…';const [width,height]=dimensions();prepared=await collectStudioAEScene(views.find(v=>!v.section.hidden),{width,height,fps:state.output.fps,includeIntro:state.output.aeIntro,transparent:state.output.transparent,includeCharacters:state.output.includeCharacters});download.textContent='下载 AE 模板';status.textContent='模板已就绪：'+prepared.scene.layers.length+' 个信息图层 / '+prepared.scene.geometry.length+' 组可编辑几何。点击「下载 AE 模板」保存 ZIP。';return}
+      status.textContent='正在打包下载…';
+      // A second deliberate click downloads an asynchronously prepared AE package.
+      // This preserves the sandbox user-activation boundary even for large assets.
+      const result=await globalThis.downloadStudioOutput(kind==='ae'?{kind,...prepared}:htmlPayload(kind));
+      status.textContent='已发起下载：'+result.filename+'。请查看浏览器下载列表。';
+    }catch(err){status.textContent='导出未完成：'+err.message;if(kind==='ae')resetPrepared()}finally{busy=false;download.disabled=htmlDownload.disabled=close.disabled=false;for(const field of dialog.querySelectorAll('input,select,[data-output-tab]'))field.disabled=false}
+  }
+  download.addEventListener('click',()=>exportDesign(mode));htmlDownload.addEventListener('click',()=>exportDesign('html'));
+  const ui={sync(){
+    resolution.value=state.output.resolution;layers.value=state.output.obsLayers||'combined';start.value=state.output.start;transparent.checked=state.output.transparent;characters.checked=state.output.includeCharacters;fit.value=state.output.fit;fps.value=String(state.output.fps);aeIntro.checked=state.output.aeIntro;
+    const separate=mode==='obs'&&state.output.obsLayers==='separate';dialog.querySelector('[data-layer-guide]').hidden=!separate;dialog.querySelector('[data-output-import-guide]').textContent=separate?'三层模式请先运行 START-LAYERS.cmd，再导入生成的场景文件。若手动添加，请使用服务生成的网页地址，并保持三个源宽高一致。':'也可手动添加浏览器源 → 本地文件 → output.html，宽高与输出尺寸相同。不要使用窗口捕获。';if(mode==='obs'&&!busy)download.textContent=downloadLabel();
+    const [width,height]=dimensions();dialog.querySelector('[data-output-summary]').textContent=width+' × '+height+' · '+(state.output.transparent?'透明底':'完整背景')+(mode==='obs'?(separate?' · 三层源 / 同步控制':' · 一体网页源'):' · '+state.output.fps+' fps 可编辑合成')+' · 引入 '+((mode==='ae'&&!state.output.aeIntro)||(mode==='obs'&&state.output.start==='show')?0:state.introDuration)+' 秒 / '+(mode==='obs'&&studioContinuousShow(state.narrative)?'持续展示':'展示 '+state.narrative.showDuration+' 秒')+(state.narrative.outroEnabled?' / 片尾 '+state.narrative.outroDuration+' 秒':mode==='obs'&&!studioContinuousShow(state.narrative)?' · 循环':'');
+    for(const option of resolution.options){const scale=option.value==='2160'?2:1,portrait=state.ratio==='portrait';option.textContent=(scale===2?'4K':'1080p')+' · '+(portrait?1080*scale:1920*scale)+' × '+(portrait?1920*scale:1080*scale)}
+    const loop=root.querySelector('.studio-loop-note');if(loop)loop.textContent='引入 '+state.introDuration+'s'+(studioContinuousShow(state.narrative)?'':' · 展示 '+state.narrative.showDuration+'s')+(state.narrative.outroEnabled?(state.narrative.outroTrigger==='manual'?' 循环 · 片尾待命':' · 片尾 '+state.narrative.outroDuration+'s'):studioContinuousShow(state.narrative)?' · 持续展示 ∞':' 循环');
+  }};
+  ui.sync();if(exported){root.classList.add('is-exported-output');setClean(true)}return ui;
+}
