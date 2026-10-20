@@ -72,10 +72,8 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // expanded thirteen-scheme document can exceed the host budget even though its
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
 const logic=moduleScript('src/exploration-full-logic.js');
-const prefix=moduleScript('src/studio-text.js')+'\n'+logic.slice(logic.indexOf('\n')+1,logic.indexOf('const template='))
-  .replace('/* TIMELINE_FUNCTIONS */',moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js'))
-  .replace('/* MOTION_FUNCTIONS */',moduleScript('src/motion-clock.js'))
-  .replace('/* VARIANT_CODEC */',moduleScript('src/variant-codec.js'));
+// The logic module's imports share the VM context, standing in for the module graph.
+const prefix=[moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.js'),moduleScript('src/motion-clock.js'),moduleScript('src/variant-codec.js'),logic.slice(0,logic.indexOf('const template='))].join('\n');
 const outputLogic=moduleScript('src/studio-output.js'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
 assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
 function editorFixture(widgetState,globals={},reducedMotion=false){

@@ -53,5 +53,5 @@ const studioVariantTupleCodec=(()=>{
   }
   return {encode,decode};
 })();
-function encodeStudioVariants(variants){return studioVariantTupleCodec.encode(variants)}
-function decodeStudioVariants(encoded,defaults){return studioVariantTupleCodec.decode(encoded,defaults)}
+export function encodeStudioVariants(variants){return studioVariantTupleCodec.encode(variants)}
+export function decodeStudioVariants(encoded,defaults){return studioVariantTupleCodec.decode(encoded,defaults)}

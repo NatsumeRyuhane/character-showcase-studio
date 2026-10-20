@@ -1,4 +1,9 @@
-function paintExploration(ctx,w,h,t,variant,settings){
+import { paintUrbanLanguage } from './urban-language-scene.js';
+import { designLanguagePalette, paintDesignLanguage } from './design-language-scene.js';
+import { paintDualLanguage } from './dual-language-scene.js';
+import { renderSeriesGeometry } from './studio-geometry.js';
+
+export function paintExploration(ctx,w,h,t,variant,settings){
   if(paintUrbanLanguage(ctx,w,h,t,variant,settings||{}))return;
   if(paintDualLanguage(ctx,w,h,t,variant,settings||{}))return;
   if(paintDesignLanguage(ctx,w,h,t,variant,settings||{}))return;
@@ -199,10 +204,9 @@ function paintExploration(ctx,w,h,t,variant,settings){
     ctx.restore();
   }
   const state={geometryStrength:strength};
-  /* LEGACY_SERIES_GEOMETRY */
   function classic(kind){
     const color={accent,fg,paper:dark?'#f5f0e5':'#f9f6eb',black:'#090b10'};
-    if(['facet','ribbon','blocks'].includes(kind)){cast(()=>renderSeriesGeometry(kind,0,0,r,a,color,1));return}
+    if(['facet','ribbon','blocks'].includes(kind)){cast(()=>renderSeriesGeometry(ctx,poly,state,kind,0,0,r,a,color,1));return}
     if(kind==='ring'){ellipse(r,r,0,0,Math.PI*2,accent,r*.065*strength,.78);ellipse(r*1.12,r*1.12,0,a,a+4.5,fg,r*.006,.28);return}
     if(kind==='cut'){ctx.save();ctx.rotate(a*.5);for(let i=0;i<8;i++){if(i===2||i===6)continue;const b=i*Math.PI/4,c=(i+.83)*Math.PI/4;stroke([[Math.cos(b)*r,Math.sin(b)*r],[Math.cos(c)*r,Math.sin(c)*r]],accent,r*.08*strength,.9,'butt')}const points=[];for(let i=0;i<8;i++){const b=i*Math.PI/4;points.push([Math.cos(b)*r*1.15,Math.sin(b)*r*1.15])}poly(points,null,fg,r*.008);ctx.restore();return}
     ctx.save();ctx.rotate(a);const rays=kind==='rays',count=rays?24:14;for(let i=0;i<count;i++){const angle=i*Math.PI*2/count,rr=r*(.91+.07*Math.sin(a*2+i)),length=r*(rays?(i%3===0?.30:.09):(i%3===0?.29:.14))*strength;poly([[Math.cos(angle)*rr,Math.sin(angle)*rr],[Math.cos(angle+.028)*(rr+length),Math.sin(angle+.028)*(rr+length)],[Math.cos(angle+.065)*rr,Math.sin(angle+.065)*rr]],i%3===0?color.paper:rgba(accent,.84))}ellipse(r*.77,r*.77,0,0,Math.PI*1.4,fg,r*.006,.2);ctx.restore();

@@ -1,6 +1,8 @@
+import { urbanLanguagePalette } from './urban-language-scene.js';
+
 /* Six material and composition systems. All paths are presentation geometry,
    deliberately kept away from the model's central silhouette. */
-function designLanguagePalette(variant,dark){
+export function designLanguagePalette(variant,dark){
   const urban=urbanLanguagePalette(variant,dark);if(urban)return urban;
   const palettes={
     couture:dark?['#17171a','#eee9e1','#a09b94']:['#efede8','#252522','#77766f'],
@@ -15,7 +17,7 @@ function designLanguagePalette(variant,dark){
   return {paper:colors[0],ink:colors[1],muted:colors[2]};
 }
 
-function paintDesignLanguage(ctx,w,h,t,variant,settings){
+export function paintDesignLanguage(ctx,w,h,t,variant,settings){
   if(!['couture','brutalist','cloud','plush','play','sticker'].includes(variant))return false;
   const input=settings||{};
   if((input.ringStyle||'signature')!=='signature')return false;

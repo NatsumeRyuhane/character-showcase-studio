@@ -9,8 +9,8 @@ const clocks=moduleScript('src/motion-clock.js');
 const timeline=moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js');
 const start=logic.indexOf("window.addEventListener('openai:set_globals'");
 const end=logic.indexOf(';reduced.addEventListener',start);
-const prefix=moduleScript('src/studio-text.js')+'\n'+logic.slice(logic.indexOf('\n')+1,logic.indexOf('const template='))
-  .replace('/* VARIANT_CODEC */',moduleScript('src/variant-codec.js')).replace('/* MOTION_FUNCTIONS */',clocks).replace('/* TIMELINE_FUNCTIONS */',timeline);
+// The logic module's imports share the VM context, standing in for the module graph.
+const prefix=[moduleScript('src/studio-text.js'),moduleScript('src/variant-codec.js'),clocks,timeline,logic.slice(0,logic.indexOf('const template='))].join('\n');
 assert.ok(start>=0&&end>start,'production widget-state callback exists');
 assert.ok(prefix.includes('function restore(')&&prefix.includes('function save('));
 

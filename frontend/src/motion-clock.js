@@ -7,7 +7,7 @@ function motionClockEdgeRate(edge,key){
   const duration=Number.isFinite(edge?.duration)?Math.max(12,Math.min(90,edge.duration)):fallback.duration;
   return (direction==='negative'?-1:direction==='positive'?1:0)/duration;
 }
-function createMotionClock(time,variants,edgeSettings){
+export function createMotionClock(time,variants,edgeSettings){
   const elapsed=Number.isFinite(time)?Math.max(0,time):0,entries=Object.entries(variants||{});
   return {elapsed,
     rings:Object.fromEntries(entries.map(([key,v])=>[key,elapsed*motionClockSpeed(v?.ringSpeed,0,3)])),
@@ -15,7 +15,7 @@ function createMotionClock(time,variants,edgeSettings){
     edges:Object.fromEntries(['top','bottom'].map(key=>[key,elapsed*motionClockEdgeRate(edgeSettings?.[key],key)]))
   };
 }
-function advanceMotionClock(clock,delta,variants,edgeSettings){
+export function advanceMotionClock(clock,delta,variants,edgeSettings){
   if(!Number.isFinite(delta)||delta<=0)return;
   clock.elapsed+=delta;
   clock.rings??={};clock.texts??={};clock.edges??={top:0,bottom:0};

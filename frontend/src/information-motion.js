@@ -1,7 +1,7 @@
 // time: narrative seconds; phase: independently accumulated text seconds.
 // index: stagger order (negative skips entry); style: refined / soft / playful.
 // x/y are pixels. entry is an unblurred fade for stationary QR/barcode layers.
-function informationMotionPose(time,phase,index,style,amount=1){
+export function informationMotionPose(time,phase,index,style,amount=1){
   const finite=(value,fallback)=>Number.isFinite(value)?value:fallback;
   const clamp=(value,min=0,max=1)=>Math.max(min,Math.min(max,value));
   const strength=clamp(finite(amount,1));
@@ -30,7 +30,7 @@ function informationMotionPose(time,phase,index,style,amount=1){
 
 // Positive cycles move right and negative cycles move left. Only the repeated
 // content's display position wraps; the shared animation clocks never wrap.
-function marqueeOffset(phase,cycleWidth){
+export function marqueeOffset(phase,cycleWidth){
   if(!Number.isFinite(phase)||!Number.isFinite(cycleWidth)||cycleWidth<=0)return 0;
   const fraction=((-phase%1)+1)%1;
   return fraction===0?0:-fraction*cycleWidth;

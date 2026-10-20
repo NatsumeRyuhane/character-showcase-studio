@@ -1,6 +1,6 @@
 /* Original urban graphic systems: a utility dial, an after-hours signal orbit,
    and a soft arcade loop. No third-party logos, character art, or type assets. */
-function urbanLanguagePalette(variant,dark){
+export function urbanLanguagePalette(variant,dark){
   const palettes={
     district:dark?['#191c19','#f0f0df','#8c9986']:['#efefdf','#20271e','#8b947f'],
     tuner:dark?['#1a1918','#f6e8cf','#a49a87']:['#f2eadc','#292722','#a69b86'],
@@ -10,7 +10,7 @@ function urbanLanguagePalette(variant,dark){
   return colors?{paper:colors[0],ink:colors[1],muted:colors[2]}:null;
 }
 
-function paintUrbanLanguage(ctx,w,h,t,variant,settings){
+export function paintUrbanLanguage(ctx,w,h,t,variant,settings){
   if(!['district','tuner','arcade'].includes(variant))return false;
   const input=settings||{};
   if((input.ringStyle||'signature')!=='signature')return false;

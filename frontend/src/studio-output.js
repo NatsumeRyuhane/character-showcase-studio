@@ -1,5 +1,11 @@
+import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.js';
+import { createMotionClock } from './motion-clock.js';
+import { encodeStudioVariants } from './variant-codec.js';
+import { images, resetLastFrame, setMotionClock, state, update, workspace } from './exploration-full-logic.js';
+import { collectStudioAEScene } from './ae-export.js';
+
 // Clean stage previews and export controls. Native Spout transport belongs to OBS.
-function mountStudioOutput(root,views){
+export function mountStudioOutput(root,views){
   const exported=globalThis.studioOutput?.enabled===true;
   const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text)el.textContent=text;return el};
   const action=(text)=>{const el=make('button','btn',text);el.type='button';return el};
@@ -43,10 +49,10 @@ function mountStudioOutput(root,views){
   document.addEventListener('keydown',event=>{
     if(event.key==='Escape'&&!exported&&root.classList.contains('is-clean-output')){event.preventDefault();setClean(false);return}
     if(!exported||event.ctrlKey||event.altKey||event.metaKey||/INPUT|SELECT|TEXTAREA/.test(event.target?.tagName))return;
-    if(event.code==='Space'){event.preventDefault();if(!state.playing&&!studioContinuousShow(state.narrative)&&state.time>=studioTotalDuration(state.introDuration,state.narrative)){state.time=0;motionClock=createMotionClock(0,state.variants,state.edges)}state.playing=!state.playing;last=0;update()}
-    else if(event.key.toLowerCase()==='r'){state.time=0;motionClock=createMotionClock(0,state.variants,state.edges);state.playing=true;last=0;update()}
-    else if(event.key.toLowerCase()==='s'){state.time=state.introDuration;state.playing=true;last=0;update()}
-    else if(event.key.toLowerCase()==='e'&&state.narrative.outroEnabled){state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;last=0;update()}
+    if(event.code==='Space'){event.preventDefault();if(!state.playing&&!studioContinuousShow(state.narrative)&&state.time>=studioTotalDuration(state.introDuration,state.narrative)){state.time=0;setMotionClock(createMotionClock(0,state.variants,state.edges))}state.playing=!state.playing;resetLastFrame();update()}
+    else if(event.key.toLowerCase()==='r'){state.time=0;setMotionClock(createMotionClock(0,state.variants,state.edges));state.playing=true;resetLastFrame();update()}
+    else if(event.key.toLowerCase()==='s'){state.time=state.introDuration;state.playing=true;resetLastFrame();update()}
+    else if(event.key.toLowerCase()==='e'&&state.narrative.outroEnabled){state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;resetLastFrame();update()}
   });
   function htmlPayload(kind){const packed=Object.fromEntries(Object.entries(images).filter(([key,value])=>value&&(state.output.includeCharacters||!['model','portrait','introCharacter','introAuthor'].includes(key))&&(!state.narrative.storyPackagingOnly||!['introCharacter','introAuthor'].includes(key))));const snapshot=JSON.parse(JSON.stringify(state));if(kind==='html')snapshot.output.obsLayers='combined';snapshot.variantEncoding='tuple-v1';snapshot.variants=encodeStudioVariants(state.variants);return {kind,state:snapshot,images:packed,config:config(kind)}}
   async function exportDesign(kind){

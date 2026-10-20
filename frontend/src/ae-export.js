@@ -1,5 +1,14 @@
+import { studioShowDuration } from './timeline.js';
+import { createMotionClock } from './motion-clock.js';
+import assets from './badge-assets.json';
+import { paintExploration } from './exploration-full-scene.js';
+import { currentSeries, draw, images, measure, motionClock, setMotionClock, state, workspace } from './exploration-full-logic.js';
+import { scaleStudioAEScene, studioReferenceSize } from './export-layout.js';
+import { createAECanvasRecorder } from './ae-canvas-recorder.js';
+import { captureStudioAEGeometry } from './ae-geometry-motion.js';
+
 // Capture at the shared logical resolution; uniformly scale editable data last.
-async function collectStudioAEScene(view,options){
+export async function collectStudioAEScene(view,options){
   const {width,height}=studioReferenceSize(options.width<options.height),v=state.variants[view.key],art=view.art;
   const saved={style:art.style.cssText,time:state.time,clock:motionClock,motion:v.textMotion,playing:state.playing};
   const packedAssets=[],layers=[],warnings=['Canvas 金属、云雾渐变转为近似纯色形状；细毛纤维简化。CSS 滤镜、毛玻璃与颗粒不会逐像素还原。'];
@@ -23,7 +32,7 @@ async function collectStudioAEScene(view,options){
   try{
     state.playing=false;
     art.style.setProperty('position','fixed','important');art.style.setProperty('left','-100000px','important');art.style.setProperty('top','0px','important');art.style.setProperty('width',width+'px','important');art.style.setProperty('height',height+'px','important');art.style.setProperty('max-width','none','important');art.style.setProperty('transform','none','important');art.style.setProperty('--preview-width',width+'px');
-    state.time=state.introDuration+Math.min(6,studioShowDuration(state.narrative)*.98);motionClock=createMotionClock(0,state.variants,state.edges);v.textMotion=false;measure(view);draw(view);base=art.getBoundingClientRect();
+    state.time=state.introDuration+Math.min(6,studioShowDuration(state.narrative)*.98);setMotionClock(createMotionClock(0,state.variants,state.edges));v.textMotion=false;measure(view);draw(view);base=art.getBoundingClientRect();
     const cs=getComputedStyle(art),composition=view.composition.getBoundingClientRect();
     scene={version:1,name:state.name||'SHOWCASE',design:view.key,width,height,fps:options.fps===60?60:30,intro:options.includeIntro?state.introDuration/state.speed:0,duration:((options.includeIntro?state.introDuration:0)+studioShowDuration(state.narrative)+(state.narrative.outroEnabled?state.narrative.outroDuration:0))/state.speed,speed:state.speed,offset:options.includeIntro?0:state.introDuration,background:rgba(cs.getPropertyValue('--paper')),ink:rgba(cs.getPropertyValue('--ink')),accent:rgba(v.accent),transparent:options.transparent,frame:state.frame,frameThickness:round(parseFloat(cs.getPropertyValue('--frame-thickness'))),layers,assets:[],warnings,geometry:[],motion:{enabled:saved.motion,style:v.textMotionStyle,amount:v.textMotionAmount,speed:v.textMotionSpeed},shadow:{enabled:v.effects.shadowEnabled,color:rgba(v.effects.shadowColor),strength:v.effects.shadowStrength,depth:v.effects.shadowDepth,soft:v.effects.shadowStyle==='soft'},pattern:{kind:v.grid?v.pattern:'none',opacity:v.gridOpacity,moving:v.gridMoving,amount:v.gridMotion},edges:JSON.parse(JSON.stringify(state.edges)),borderText:{top:[state.brand,state.topText,currentSeries().label+' / '+currentSeries().prefix+'-'+currentSeries().serial,state.name].filter(Boolean).join('     /     '),bottom:[state.modelCredit,state.bottomText,state.designCredit].filter(Boolean).join('     /     ')}};
     scene.showDuration=studioShowDuration(state.narrative)/state.speed;
@@ -88,7 +97,7 @@ async function collectStudioAEScene(view,options){
     if(captured.geometry.length<captured.total)warnings.push('细密纤维已简化：保留 '+captured.geometry.length+' 组可编辑主形状。');
     scene.geometry=captured.geometry.map(op=>({...op,color:rgba(op.color)}));
     if(v.effects.gradient!=='none'||v.effects.grain||v.effects.vignette)warnings.push('背景渐变、暗角与颗粒未映射；可在 AE 中继续添加效果。');
-  }finally{art.style.cssText=saved.style;state.time=saved.time;state.playing=saved.playing;motionClock=saved.clock;v.textMotion=saved.motion;measure(view);draw(view);workspace.sync()}
+  }finally{art.style.cssText=saved.style;state.time=saved.time;state.playing=saved.playing;setMotionClock(saved.clock);v.textMotion=saved.motion;measure(view);draw(view);workspace.sync()}
   function assetsForAE(id){return ['vrcft','liltoon','poiyomi'].includes(id)?assets[id]?.dataUri:null}
   // Rasterize only graphic marks; all copy, badge surfaces and main geometry stay native.
   for(const job of iconJobs){

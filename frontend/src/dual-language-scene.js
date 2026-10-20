@@ -1,6 +1,6 @@
 /* The archived acid-sticker spread, rebuilt on the shared continuous clock.
    It owns only the background; uploaded characters and editable copy remain DOM. */
-function paintDualLanguage(ctx,w,h,t,variant,settings){
+export function paintDualLanguage(ctx,w,h,t,variant,settings){
   if(variant!=='dual')return false;
   if(!ctx||!(w>0)||!(h>0))return true;
   const input=settings||{},clamp=(v,l=0,u=1)=>Math.max(l,Math.min(u,v)),num=(v,d)=>Number.isFinite(v)?v:d;

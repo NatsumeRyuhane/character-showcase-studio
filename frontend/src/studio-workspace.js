@@ -1,5 +1,8 @@
+import { currentSeries, draw, imageNames, images, measure, seriesDefaults, state, update } from './exploration-full-logic.js';
+import { studioOutputLayout } from './export-layout.js';
+
 // Editor chrome only. Existing inputs and listeners are retained, never cloned.
-function mountStudioWorkspace(root,views){
+export function mountStudioWorkspace(root,views){
   root.classList.add('studio-editor');root.dataset.panel='preview';
   const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text)el.textContent=text;return el};
   const button=(text,aria)=>{const el=make('button','btn',text);el.type='button';if(aria)el.setAttribute('aria-label',aria);return el};

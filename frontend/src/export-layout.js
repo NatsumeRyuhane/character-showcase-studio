@@ -1,10 +1,10 @@
 // Resolution changes sampling density, never the design's logical layout.
-function studioReferenceSize(portrait){return portrait?{width:1080,height:1920}:{width:1920,height:1080}}
-function studioOutputLayout(width,height,portrait,cover=false){
+export function studioReferenceSize(portrait){return portrait?{width:1080,height:1920}:{width:1920,height:1080}}
+export function studioOutputLayout(width,height,portrait,cover=false){
   const reference=studioReferenceSize(portrait);
   return {...reference,scale:(cover?Math.max:Math.min)(width/reference.width,height/reference.height)};
 }
-function scaleStudioAEScene(scene,width,height){
+export function scaleStudioAEScene(scene,width,height){
   const scale=width/scene.width;
   if(Math.abs(height/scene.height-scale)>.00001)throw Error('输出尺寸必须与画幅比例一致');
   const box=value=>{const result={...value};for(const key of ['x','y','w','h','fontSize','radius'])if(typeof result[key]==='number')result[key]*=scale;return result};
