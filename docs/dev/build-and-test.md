@@ -38,7 +38,8 @@ To add a source module:
 
 `.github/workflows/ci.yml` runs on every pull request and every push to `main`:
 
-- **Frontend:** build and check on Ubuntu and Windows with Node 18 and 22. The Windows run also confirms the line-ending setup produces a working build.
+- **Frontend:** `npm ci`, build and check on Ubuntu and Windows with Node 22 and 24. The Windows run also confirms the line-ending setup produces a working build.
+- **Legacy frontend:** build and check of the frozen pre-rewrite snapshot in `frontend-legacy/` (see its README), so it stays usable for comparison until the rewrite is done.
 - **Launcher:** the launcher test suite on Ubuntu, macOS and Windows, plus the `start.sh` / `start.cmd` shims (see [launcher.md](launcher.md#tests-and-ci)).
 
 A PR should not be merged with failing CI.
