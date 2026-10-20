@@ -11,3 +11,4 @@ dist-cloudflare/
 .vscode/
 .agents/settings.local.json
 frontend/dist/
+.studio/
