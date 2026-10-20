@@ -64,7 +64,7 @@ To publish a new preset, take the plain configuration JSON from an HTML export o
 
 There are two independent families of time. Keep them separate.
 
-### 1. Narrative time (`src/timeline.js`)
+### 1. Narrative time (`src/timeline.ts`)
 
 Narrative time is seekable, pausable and replayable. Every pose is a pure function of `(time, intro, narrative)`:
 

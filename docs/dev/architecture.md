@@ -85,7 +85,7 @@ Consequences:
 | `studio-geometry.js` | Series geometry devices (`facet`, `ribbon`, `blocks`), drawn by `paintExploration` with its canvas and helpers passed in |
 | `motion-clock.js` | Continuous ring, text and border clocks that never reset |
 | `information-motion.js` | Text entrance and subtle idle motion |
-| `timeline.js` | Narrative timing: intro / show / outro poses, looping, retiming |
+| `timeline.ts` | Narrative timing: intro / show / outro poses, looping, retiming |
 | `story-intro.js` / `.css` | Two-shot poster intro (character shot → creator shot) and its deterministic overlay effects |
 | `studio-narrative.js` / `.css` | Intro and outro controls, brand ending |
 | `studio-post.js` / `.css` | Post-processing (polar, CRT, holo, bloom, anamorphic, prism, film) over one shared optical surface. Borders stay outside it. |

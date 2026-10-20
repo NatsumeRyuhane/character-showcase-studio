@@ -1,4 +1,4 @@
-import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.js';
+import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.js';
 import { encodeStudioVariants } from './variant-codec.ts';
 import { images, resetLastFrame, setMotionClock, state, update, workspace } from './exploration-full-logic.js';

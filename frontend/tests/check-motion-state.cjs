@@ -6,7 +6,7 @@ const assert=require('assert/strict');
 // Exercise the production restore/save/event handler without constructing UI.
 const logic=moduleScript('src/exploration-full-logic.js');
 const clocks=moduleScript('src/motion-clock.js');
-const timeline=moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js');
+const timeline=moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.ts');
 const start=logic.indexOf("window.addEventListener('openai:set_globals'");
 const end=logic.indexOf(';reduced.addEventListener',start);
 // The logic module's imports share the VM context, standing in for the module graph.

@@ -1,4 +1,4 @@
-import { studioShowDuration } from './timeline.js';
+import { studioShowDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.js';
 import assets from './badge-assets.json';
 import { paintExploration } from './exploration-full-scene.js';

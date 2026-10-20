@@ -1,4 +1,4 @@
-import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.js';
+import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.js';
 import { root, setMotionClock, state } from './exploration-full-logic.js';
 

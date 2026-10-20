@@ -1,4 +1,4 @@
-import { studioAdvanceTime, studioContinuousShow, studioIntroDuration, studioNarrativePose, studioNarrativeSettings, studioNarrativeTime, studioPhase, studioStoryDuration, studioTotalDuration } from './timeline.js';
+import { studioAdvanceTime, studioContinuousShow, studioIntroDuration, studioNarrativePose, studioNarrativeSettings, studioNarrativeTime, studioPhase, studioStoryDuration, studioTotalDuration } from './timeline.ts';
 import { advanceMotionClock, createMotionClock } from './motion-clock.js';
 import { informationMotionPose, marqueeOffset } from './information-motion.js';
 import { decodeStudioVariants, encodeStudioVariants } from './variant-codec.ts';
