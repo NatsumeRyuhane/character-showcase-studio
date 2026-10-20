@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0"
+cd /d "%~dp0frontend"
 where node >nul 2>nul
 if %errorlevel%==0 (
   node tools/server.mjs 8768
