@@ -15,6 +15,13 @@ Character Showcase Studio is a browser editor for animated character showcase sc
 | [docs/dev/deploy.md](docs/dev/deploy.md) | Anything about the live site |
 | [docs/user/](docs/user/) | What users see and are told (Chinese) |
 
+## Agent files
+
+- **`AGENTS.md` and `.agents/` are the only real agent files**, whichever tool you use. Instructions go in `AGENTS.md`. Skills go in `.agents/skills/<name>/SKILL.md`, and shared tool configuration goes in `.agents/`.
+- Tool-specific entry points only point back to them: `.claude` is a symlink to `.agents/`, and `CLAUDE.md` contains just `@AGENTS.md`. Edit only the real files. Never replace the symlink with a copy, never put content in a tool-specific folder or file, and if another tool needs its own entry point, add a symlink or import instead of a new file.
+- Personal settings written through `.claude` land in `.agents/settings.local.json`, which is gitignored. Do not commit them.
+- On Windows, Git checks out symlinks as small text files unless symlink support is on (`core.symlinks=true`, which needs Developer Mode or administrator rights). If `.claude` is a file instead of a folder, tell the person a developer needs to set this up. Do not "fix" it by committing a copy.
+
 ## Who you are working for
 
 The repository owner is **nekokaii**, who designs the product but **does not have a software background** and may not know how git or GitHub work. Other collaborators, such as NatsumeRyuhane, are developers.
