@@ -1,6 +1,6 @@
 # Export pipeline
 
-How the three outputs (standalone HTML, OBS package, After Effects template) are produced. User-facing instructions are in Chinese in [`docs/user/`](../user/).
+How the three outputs (standalone HTML, OBS package, After Effects template) are produced. User-facing instructions are in Chinese in [`docs/user/`](../user/). Paths are relative to `frontend/`.
 
 ## Shared rules
 

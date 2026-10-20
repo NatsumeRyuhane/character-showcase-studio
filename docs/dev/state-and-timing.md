@@ -1,6 +1,6 @@
 # State and timing
 
-How settings are stored, encoded and restored, and how the timeline and motion clocks work. Covers the code as of 0.11.0.
+How settings are stored, encoded and restored, and how the timeline and motion clocks work. Covers the code as of 0.11.0. Paths are relative to `frontend/`.
 
 ## State
 
@@ -48,7 +48,7 @@ Measured sizes at 0.9.0: default snapshot 10,493 bytes; every text field at its 
 
 `runtime/standalone-shell.js` owns persistence:
 
-- Key: `codex:visualization-widget-state-v2:` + `JSON.stringify([location.pathname, location.search])`. **The key depends on the page URL.** `file:///…/index.html`, `http://127.0.0.1:8768/` and `https://nekokaii.com/showcase-generator` each keep separate settings, and moving the page to a new path starts from empty settings.
+- Key: `codex:visualization-widget-state-v2:` + `JSON.stringify([location.pathname, location.search])`. **The key depends on the page URL.** `http://127.0.0.1:8768/` (the local server, which serves `dist/` at `/`), `https://nekokaii.com/showcase-generator`, and a file opened from disk (`file:///…/frontend/dist/index.html`) each keep separate settings. Moving the page to a new path starts from empty settings. Settings saved by opening the old root `index.html` from disk, before the move into `frontend/`, are not carried over.
 - The frame sends state over the bridge, and the shell validates and stores it.
 - **Images are never stored.** `images.model`, `portrait`, `introCharacter`, `introAuthor`, the logo, the QR image and the barcode image are read with `FileReader` and kept only for the current session. A real product needs asset IDs, file references and project packaging; that is the first backend need.
 

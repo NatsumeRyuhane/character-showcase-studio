@@ -13,7 +13,12 @@
 - AI 助手的配置统一放在 `.agents/`，`.claude` 为指向它的符号链接。
 - 新增中文协作指南 `.github/CONTRIBUTING.md`，以及 Issue、PR 模板。
 - 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，更新记录移入 `docs/CHANGELOG.md`，且只保留最近一个版本。
-- AE 手动验证脚本移至 `tests/ae/`。
+- AE 手动验证脚本移至 `frontend/tests/ae/`。
+
+### 变更
+- 项目目录调整：网页工作台移入 `frontend/`，Cloudflare 部署配置移入 `deploy/cloudflare/`。
+- **构建产物不再提交到仓库**，仓库中不再有可直接打开的 `index.html`。本机使用需安装 Node.js：Windows 双击 `start.cmd` 会先构建再启动预览。
+- 通过 `start.cmd` 预览时页面地址不变，浏览器中已保存的设置会保留；以前直接打开 `index.html` 文件时保存的设置不会带过来。
 
 ### 修复
 - 统一换行符，避免 Windows 与 macOS 构建出不同的 `index.html`。

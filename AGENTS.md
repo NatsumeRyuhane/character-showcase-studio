@@ -75,10 +75,10 @@ When the person you are working for may be the owner, or you are not sure:
 Work in small, focused steps:
 
 1. Make one focused change.
-2. `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass.
+2. In `frontend/`: `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass.
 3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
 4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
-5. Commit, including the rebuilt `index.html` and `dist/` files when the source change affects them.
+5. Commit. Never commit `frontend/dist/`; it is gitignored build output.
 
 Never bundle unrelated changes in one commit.
 
@@ -110,12 +110,11 @@ Never bundle unrelated changes in one commit.
 - Run `git reset --hard`, `git clean`, `git checkout -- <file>` or `git restore` on work you did not create, without explicit approval.
 - Delete branches that are not yours.
 - Commit secrets: `.wrangler/`, `.dev.vars`, `.env*`, tokens, API keys.
-- Edit `index.html` or `dist/` by hand.
-- Resolve a conflict in `index.html` or `dist/` by hand. Resolve the source conflicts, rebuild, and commit the rebuilt files.
+- Edit or commit `frontend/dist/` (build output).
 
 ## Code rules
 
-- **The source is in `src/` and `runtime/`.** The build splices them into one page, and spliced modules share one scope. A new file must be wired into `tools/build.mjs`, and a new test into `tools/check.mjs`.
+- **The web app lives in `frontend/`**, with its source in `frontend/src/` and `frontend/runtime/`. The build splices them into one page, and spliced modules share one scope. A new file must be wired into `frontend/tools/build.mjs`, and a new test into `frontend/tools/check.mjs`. Paths in `docs/dev/` are relative to `frontend/`.
 - **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
 - **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.
 - **Storage is keyed by page path.** Moving or renaming the served page loses users' saved settings unless you add a migration.
@@ -139,12 +138,12 @@ Do not leave stale statements behind. Fix or remove them.
 
 ## Deployment
 
-Deploying (`npx wrangler deploy`) updates the public site and needs the owner's Cloudflare login. **Never deploy without the owner's explicit approval for that deploy.** Deploy only from an up-to-date `main` with a clean tree and passing checks. Pushing or merging on GitHub does **not** deploy. See [deploy.md](docs/dev/deploy.md).
+Deploying (`npx wrangler deploy` in `deploy/cloudflare/`) updates the public site and needs the owner's Cloudflare login. **Never deploy without the owner's explicit approval for that deploy.** Deploy only from an up-to-date `main` with a clean tree and passing checks. Pushing or merging on GitHub does **not** deploy. See [deploy.md](docs/dev/deploy.md).
 
 ## Environment notes
 
 - Node.js 18+ is the only requirement. There is no `npm install`.
-- The owner works on Windows. `start.cmd` and `build.cmd` are double-click shortcuts, so keep them working.
+- The owner works on Windows. `start.cmd` (build and serve) and `build.cmd` at the root are double-click shortcuts, so keep them working.
 - `.gitattributes` forces LF line endings. A Windows checkout made before it existed needs a one-time refresh; see [build-and-test.md](docs/dev/build-and-test.md#generated-files-and-line-endings). If a fresh build changes `index.html` with no source changes, suspect line endings first.
 
 ## Before you report a task as done

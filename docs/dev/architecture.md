@@ -6,9 +6,21 @@ This document describes the code **as it is today**, before the planned frontend
 
 Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [build-and-test.md](build-and-test.md), [deploy.md](deploy.md).
 
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `frontend/` | The web app: `src/`, `runtime/`, `assets/`, `vendor/`, `tests/`, `tools/`, `package.json`, `THIRD-PARTY-NOTICES.md`. The build writes to `frontend/dist/`, which is gitignored. |
+| `deploy/cloudflare/` | Wrangler config, the Worker, and the deploy build step |
+| `docs/` | `user/` (Chinese), `dev/` (English), `qa/`, `CHANGELOG.md` |
+| `.github/` | `CONTRIBUTING.md`, issue and PR templates |
+| `AGENTS.md`, `.agents/` | Agent instructions and tooling (`CLAUDE.md` and `.claude` point here) |
+
+**Paths in the `docs/dev/` pages are relative to `frontend/` unless they start with another top-level folder.**
+
 ## Shape of the product
 
-- **One self-contained HTML file.** `node tools/build.mjs` writes `index.html` (about 2.5 MB). Scripts, styles, icons, barcode/QR libraries and Latin fonts are all inlined. The page makes no network requests at runtime. Chinese text uses system fonts (Microsoft YaHei, PingFang SC).
+- **One self-contained HTML file.** `node tools/build.mjs` writes `dist/index.html` (about 2.5 MB). Scripts, styles, icons, barcode/QR libraries and Latin fonts are all inlined. The page makes no network requests at runtime. Chinese text uses system fonts (Microsoft YaHei, PingFang SC).
 - **No package manager, no framework, no bundler.** The build is a Node script that splices source files into each other at marker comments.
 - **No backend.** Settings live in the browser's `localStorage`. Uploaded images exist only for the current page session.
 - **Origin.** The project started as an OpenAI Codex "visualization" widget and was later exported to run standalone. That is why the runtime still uses identifiers such as `codex-visualization`, `codex:visualization-widget-state-v2` and `widgetState`. `runtime/visualize.html`, `runtime/visualize.css`, `runtime/standalone-shell.js` and `runtime/standalone-host-bridge.js` are that exported widget runtime.
@@ -16,7 +28,7 @@ Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [bu
 ## Runtime layers
 
 ```
-index.html  (shell document, strict CSP)
+dist/index.html  (shell document, strict CSP)
 ├─ <script type="application/json" id="studio-startup-defaults">   published preset (data only)
 ├─ <iframe id="codex-visualization" sandbox="allow-scripts" data-srcdoc="…">
 │    frame document (CSP, no network)
@@ -61,13 +73,13 @@ index.html  (shell document, strict CSP)
 4. Inlines Floating UI and Lucide from `vendor/` in place of their unpkg `<script src>` tags.
 5. Fills the export packager's placeholders: `__STUDIO_AE_TEMPLATE__` (the AE template, with `crt-motion.js` at `/* CRT_MOTION_FUNCTION */`), `__STUDIO_ASSET_NOTICES__`, `__STUDIO_OBS_LAYER_SERVER__` and `__STUDIO_OBS_LAYER_CONTROL__`.
 6. Validates the result. A missing marker, duplicate element IDs, document markup inside the fragment, any remaining `<script src>` or `@import`, or an invalid `runtime/startup-defaults.json` (over 16 KiB, or missing `revision`) all fail the build.
-7. Writes `index.html` and an identical `dist/index.html`. It also writes `dist/character-explorations.fragment.html` and `dist/exploration-full-source.js`; `tools/check.mjs` parses those two.
+7. Writes `dist/index.html`. It also writes `dist/character-explorations.fragment.html` and `dist/exploration-full-source.js`; `tools/check.mjs` parses those two.
 
 Consequences:
 
 - **All spliced modules share one function scope.** They reference each other's top-level names (`state`, `root`, `clamp`, `studioNarrativePose`, …) without imports. Insertion order matters.
 - **A new source file must be wired into `build.mjs` by hand.** A new test must be added to the list in `tools/check.mjs`.
-- **Never edit `index.html` or `dist/` by hand.** The next build overwrites them. They are committed so the owner can open the root `index.html` directly.
+- **`dist/` is build output.** It is gitignored. Never edit or commit it.
 
 ## Source map (`src/`)
 
@@ -122,7 +134,7 @@ Design-specific layout logic exists too. For example, `fitPosterCopy` in `explor
 
 `runtime/` holds the shell and frame runtime, the export packager, the ZIP writer, the AE ExtendScript template, the OBS layer server and control page, `crt-motion.js` (shared by the web page and AE), and `startup-defaults.json`.
 
-`tools/` holds `build.mjs`, `check.mjs`, `server.mjs` (a read-only static server on 127.0.0.1, port 8768 by default), `build-cloudflare.mjs` and `cloudflare-worker.mjs` (deploy), `prepare-vendor.py` (one-off vendor refresh, needs the network), and `sync-source.mjs` (handoff leftover that copies `src/` from another checkout; not needed any more).
+`tools/` holds `build.mjs`, `check.mjs`, `server.mjs` (a read-only static server for `dist/` on 127.0.0.1, port 8768 by default) and `prepare-vendor.py` (one-off vendor refresh, needs the network). Deploy scripts live in `deploy/cloudflare/`.
 
 ## Invariants
 
@@ -154,5 +166,4 @@ The planned frontend restructure is meant to fix these:
 - Source files are written in a dense, minified-looking style, with single lines up to about 1,700 characters. Line-based diffs and merges are hard to use.
 - Modules communicate through one shared closure scope, not imports.
 - `exploration-full-logic.js` mixes defaults, validation, persistence, form binding and painting.
-- The runtime still carries Codex widget naming. The `localStorage` key includes the page path (see [state-and-timing.md](state-and-timing.md#storage)), so **moving or renaming the served page loses every user's saved settings** unless a migration is added.
-- Build output is committed, and every source change rewrites the 2.5 MB `index.html`.
+- The runtime still carries Codex widget naming. The `localStorage` key includes the page path (see [state-and-timing.md](state-and-timing.md#storage)), so **moving or renaming the served page loses every user's saved settings** unless a migration is added. The local server serves `dist/` at `/` to keep that path stable.

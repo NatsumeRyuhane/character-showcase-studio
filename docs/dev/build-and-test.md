@@ -2,21 +2,21 @@
 
 ## Requirements
 
-Node.js 18 or newer. Nothing to install: there is no `npm install` and no `node_modules`.
+Node.js 18 or newer. Nothing to install: there is no `npm install` and no `node_modules`. Run every command below from `frontend/`.
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `node tools/build.mjs` (`npm run build`) | Builds `index.html` and `dist/` from `src/`, `runtime/`, `assets/`, `vendor/` |
+| `node tools/build.mjs` (`npm run build`) | Builds `dist/` from `src/`, `runtime/`, `assets/`, `vendor/` |
 | `node tools/check.mjs` (`npm run check`) | Runs all automated checks against the **built** output. Build first. |
-| `node tools/server.mjs [port]` (`npm start`) | Serves the folder read-only on `http://127.0.0.1:8768/` |
-| `start.cmd` / `build.cmd` | Windows double-click shortcuts for the owner |
+| `node tools/server.mjs [port]` (`npm start`) | Serves `dist/` read-only on `http://127.0.0.1:8768/`. Build first. |
+| `start.cmd` / `build.cmd` (repository root) | Windows double-click shortcuts: build then serve / build only |
 
 Always run **build, then check**, and commit only when the check prints its final `PASS` line. The check:
 
 1. Parses `dist/exploration-full-source.js` and the syntax of the tool scripts.
-2. Decodes the shell and the sandboxed frame from `index.html` and parses every embedded script; at least 9 must be present.
+2. Decodes the shell and the sandboxed frame from `dist/index.html` and parses every embedded script; at least 9 must be present.
 3. Asserts the sandbox and CSP are still there, all 13 designs are present, there are no external `<script src>` or `@import`, and no machine-specific paths such as `C:\Users\…` or `.codex/`.
 4. Runs every regression script in `tests/check-*.cjs`.
 
@@ -49,7 +49,7 @@ For export changes, also download a real HTML, OBS or AE package from the page a
 
 ## Generated files and line endings
 
-- `index.html` and `dist/` are **build output**, committed so the owner can open `index.html` directly. Never edit them by hand. Rebuild, and commit them in the same commit as the source change that produced them.
+- `dist/` is **build output**. It is gitignored: never edit or commit it. Every checkout builds its own copy.
 - `.gitattributes` forces LF line endings everywhere (CRLF only for `.cmd` / `.bat`). Before it existed, Windows checkouts converted sources to CRLF and the build embedded that, so the same source produced different output on Windows and macOS.
 - **On a Windows checkout made before `.gitattributes` existed**, refresh line endings once, with no uncommitted changes:
 
@@ -58,4 +58,4 @@ For export changes, also download a real HTML, OBS or AE package from the page a
   git reset --hard
   ```
 
-  After that, `git status` should be clean, and a fresh build should not change `index.html`.
+  After that, `git status` should be clean.

@@ -21,7 +21,7 @@ labels: bug
 
 ## 环境
 
-- 打开方式：直接打开 index.html / start.cmd / 线上网站
+- 打开方式：本机预览（start.cmd）/ 线上网站
 - 浏览器：
 - 如与导出有关：独立 HTML / OBS（一体或三层）/ AE 模板，以及 AE 或 OBS 版本
 
