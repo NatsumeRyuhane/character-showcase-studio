@@ -16,10 +16,14 @@
 - 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，更新记录移入 `docs/CHANGELOG.md`，且只保留最近一个版本。
 - AE 手动验证脚本移至 `frontend/tests/ae/`。
 
+### 新增
+- 跨平台启动器：Windows 双击 `start.cmd`，macOS / Linux 运行 `./start.sh`，在中文菜单中启动、停止、重启预览，诊断环境，或更新到最新版本。需要 Python 3.9+ 与 Node.js 18+。
+
 ### 变更
 - 项目目录调整：网页工作台移入 `frontend/`，Cloudflare 部署配置移入 `deploy/cloudflare/`。
-- **构建产物不再提交到仓库**，仓库中不再有可直接打开的 `index.html`。本机使用需安装 Node.js：Windows 双击 `start.cmd` 会先构建再启动预览。
-- 通过 `start.cmd` 预览时页面地址不变，浏览器中已保存的设置会保留；以前直接打开 `index.html` 文件时保存的设置不会带过来。
+- **构建产物不再提交到仓库**，仓库中不再有可直接打开的 `index.html`。本机使用请通过启动器（`start.cmd` / `./start.sh`），它会先构建再启动预览。
+- 通过启动器预览时页面地址不变，浏览器中已保存的设置会保留；以前直接打开 `index.html` 文件时保存的设置不会带过来。
+- 移除 `build.cmd`，构建改由启动器完成。
 
 ### 修复
 - 统一换行符，避免 Windows 与 macOS 构建出不同的 `index.html`。
