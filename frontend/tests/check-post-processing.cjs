@@ -1,7 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8'),plain=value=>JSON.parse(JSON.stringify(value));
 const scope={};vm.createContext(scope);
-for(const file of ['runtime/crt-motion.js','src/timeline.js','src/export-layout.js','src/studio-post.js'])vm.runInContext(read(file),scope,{filename:file});
+for(const file of ['runtime/crt-motion.js','src/timeline.js','src/export-layout.js','src/studio-post.js'])load(scope,file);
 const near=(actual,expected,message='')=>assert.ok(Math.abs(actual-expected)<1e-8,`${message}: ${actual} != ${expected}`);
 const options=scope.studioNarrativeSettings({introStyle:'story',outroEnabled:true,postFade:.4}),intro=scope.studioStoryDuration(options);
 const weight=(time,n=options,duration=intro)=>scope.studioPostSceneWeight(time,duration,n);

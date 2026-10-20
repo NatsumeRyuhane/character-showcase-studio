@@ -1,7 +1,9 @@
+import { studioCRTPose } from '../runtime/crt-motion.js';
+
 // Narrative timing is independent of the continuous geometry/text clocks.
-function studioIntroDuration(value){return Number.isFinite(value)?Math.max(0,Math.min(30,value)):4.5}
-function studioShowDuration(narrative){return Number.isFinite(narrative?.showDuration)?Math.max(1,Math.min(60,narrative.showDuration)):12}
-function studioNarrativeSettings(value={}){
+export function studioIntroDuration(value){return Number.isFinite(value)?Math.max(0,Math.min(30,value)):4.5}
+export function studioShowDuration(narrative){return Number.isFinite(narrative?.showDuration)?Math.max(1,Math.min(60,narrative.showDuration)):12}
+export function studioNarrativeSettings(value={}){
   value=value&&typeof value==='object'?value:{};
   const pick=(v,values,fallback)=>values.includes(v)?v:fallback;
   const bounded=(v,min,max,fallback)=>Number.isFinite(v)?Math.max(min,Math.min(max,v)):fallback;
@@ -22,7 +24,7 @@ function studioNarrativeSettings(value={}){
 }
 // Two independently composed poster shots precede the main showcase. Disabled
 // shots consume no time; with neither enabled, the opening is skipped entirely.
-function studioStoryDuration(narrative){
+export function studioStoryDuration(narrative){
   const n=studioNarrativeSettings(narrative);
   return (n.characterShotEnabled?n.characterShotDuration:0)+(n.authorShotEnabled?n.authorShotDuration:0)+(n.characterShotEnabled||n.authorShotEnabled?n.storyTransitionDuration:0);
 }
@@ -42,14 +44,14 @@ function studioStoryPose(time,intro,narrative){
   if(n.storyFlash){for(const boundary of [shots.length>1?shots[0].duration:-1,transitionStart])if(boundary>0){const distance=(t-boundary)/(.055*scale);flash=Math.max(flash,Math.exp(-distance*distance)*.7)}if(t>=total)flash=0;}
   return {active:t<total,role:t>=total?'show':shot.role,local,duration:shot.duration,alpha,shift,main,transitionStart,transitionDuration,flash};
 }
-function studioContinuousShow(narrative){return !narrative?.outroEnabled&&narrative?.showPlayback!=='repeat'}
-function studioTotalDuration(intro,narrative){return studioIntroDuration(intro)+studioShowDuration(narrative)+(narrative?.outroEnabled?studioNarrativeSettings(narrative).outroDuration:0)}
-function studioPhase(time,intro,narrative){return time<studioIntroDuration(intro)?'intro':narrative?.outroEnabled&&time>=studioIntroDuration(intro)+studioShowDuration(narrative)?'outro':'show'}
-function studioNarrativeTime(time,intro){
+export function studioContinuousShow(narrative){return !narrative?.outroEnabled&&narrative?.showPlayback!=='repeat'}
+export function studioTotalDuration(intro,narrative){return studioIntroDuration(intro)+studioShowDuration(narrative)+(narrative?.outroEnabled?studioNarrativeSettings(narrative).outroDuration:0)}
+export function studioPhase(time,intro,narrative){return time<studioIntroDuration(intro)?'intro':narrative?.outroEnabled&&time>=studioIntroDuration(intro)+studioShowDuration(narrative)?'outro':'show'}
+export function studioNarrativeTime(time,intro){
   const duration=studioIntroDuration(intro),t=Number.isFinite(time)?Math.max(0,time):0;
   return duration>0&&t<duration?t/duration*4.5:4.5+Math.max(0,t-duration);
 }
-function studioAdvanceTime(time,delta,intro,narrative){
+export function studioAdvanceTime(time,delta,intro,narrative){
   const duration=studioIntroDuration(intro),show=studioShowDuration(narrative),next=Math.max(0,time+delta);
   if(narrative?.outroEnabled&&(narrative.outroTrigger!=='manual'||time>=duration+show))return Math.min(next,studioTotalDuration(intro,narrative));
   // Hold the completed information entrance, while independent motion clocks
@@ -57,18 +59,18 @@ function studioAdvanceTime(time,delta,intro,narrative){
   if(studioContinuousShow(narrative))return Math.min(next,duration+show);
   return next>=duration+show?duration+(next-duration)%show:next;
 }
-function studioRetimeShow(time,intro,before,after){
+export function studioRetimeShow(time,intro,before,after){
   const start=studioIntroDuration(intro),old=studioShowDuration(before),next=studioShowDuration(after);
   if(time<start)return time;
   return time<start+old?start+(time-start)/old*next:start+next+(time-start-old);
 }
-function studioRetime(time,before,after){
+export function studioRetime(time,before,after){
   const old=studioIntroDuration(before),next=studioIntroDuration(after);
   return old>0&&time<old?time/old*next:next+Math.max(0,time-old);
 }
 // All narrative animation is seekable. The independent ring clock never resets
 // when moving from intro to showcase or when the brand ending starts.
-function studioNarrativePose(time,intro,narrative){
+export function studioNarrativePose(time,intro,narrative){
   const n=studioNarrativeSettings(narrative),duration=studioIntroDuration(intro),t=Math.max(0,time);
   const ease=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
   const story=n.introStyle==='story'?studioStoryPose(t,duration,n):null,geometry=story?story.main:ease((studioNarrativeTime(t,duration)-.75)/3.6),modelFirst=n.introStyle==='model';

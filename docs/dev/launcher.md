@@ -8,7 +8,7 @@
 | --- | --- |
 | Python 3.9+ with pip | The launcher |
 | `rich`, `questionary` (`deploy/launcher/requirements.txt`) | Required. `start.sh` / `start.cmd` check for them and run `python -m pip install -r deploy/launcher/requirements.txt` when missing. If that fails (no pip, an externally managed Python, no network), they print why and the manual command, then exit 1. Running `studio.py` directly without them prints the install command and exits 2. |
-| Node.js 18+ | Building and serving (`frontend/tools/*.mjs`) |
+| Node.js 22.12+ with npm | Building and serving (`frontend/tools/*.mjs`). npm ships with Node.js. |
 | Git, `gh` | `upgrade`; `doctor` checks them |
 
 The file also carries PEP 723 metadata, so `uv run deploy/launcher/studio.py` works too.
@@ -27,8 +27,8 @@ The file also carries PEP 723 metadata, so `uv run deploy/launcher/studio.py` wo
 | `restart [...]` | `stop`, then `start`, keeping the current port unless `--port` is given |
 | `status` | Server state, whether `frontend/dist/` is older than the sources, current branch |
 | `open` | Opens the running preview in the browser |
-| `build` / `check` | `node tools/build.mjs`, and also `node tools/check.mjs` for `check` |
-| `doctor` | Checks Python, Node, git branch and uncommitted changes, CRLF line endings, the `.claude` symlink, `gh` login and repo access, the port, and build freshness. Prints a fix hint for each problem. Exits 0 even when it reports problems. |
+| `build` / `check` | Installs the frontend dependencies if needed (see below), then `node tools/build.mjs`, and also `node tools/check.mjs` for `check` |
+| `doctor` | Checks Python, Node, npm, whether the frontend dependencies are installed, git branch and uncommitted changes, CRLF line endings, the `.claude` symlink, `gh` login and repo access, the port, and build freshness. Prints a fix hint for each problem. Exits 0 even when it reports problems. |
 | `upgrade` | Fast-forwards `main` to `origin/main`, rebuilds, and restarts a running preview |
 
 Errors exit with status 1 and a plain-Chinese message.
@@ -38,6 +38,7 @@ Errors exit with status 1 and a plain-Chinese message.
 - **Fixed origin.** Browser storage is per origin and the saved-settings key includes the path (see [state-and-timing.md](state-and-timing.md#storage)). The launcher always uses `http://127.0.0.1:8768/`. If the port is taken it stops with an explanation rather than silently picking another port, because a different port means empty settings.
 - **Background server.** The server runs detached: a new session on POSIX, `DETACHED_PROCESS` on Windows. Its PID and port go in `.studio/server.json` and its output in `.studio/server.log` (`.studio/` is gitignored), so closing the terminal does not stop the preview and a later `stop` or `status` can find it.
 - **Never kill a stranger.** `stop` only signals the recorded PID if that process is alive **and** the port serves our page; it checks for the page title. A stale record is cleared without killing anything.
+- **Automatic `npm ci`.** Every build first runs `npm ci` in `frontend/` when `node_modules/` is missing or `package-lock.json` is newer than npm's installed copy (`node_modules/.package-lock.json`). So the first build and the first build after an `upgrade` that changed dependencies need the network; later builds do not. A changed lockfile also marks `dist/` as stale.
 - **Proxy-free health checks.** Local requests bypass any HTTP proxy configured in the environment.
 - **Conservative `upgrade`.** It only fast-forwards when the current branch is `main`, there are no uncommitted changes to tracked files, and local `main` has no unpushed commits. Otherwise it explains why and stops, because those situations mean someone's work is in progress. It never merges, rebases, stashes or resets.
 

@@ -1,15 +1,16 @@
 const fs=require('fs');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 
 // Exercise the production restore/save/event handler without constructing UI.
-const logic=fs.readFileSync(__dirname+'/../src/exploration-full-logic.js','utf8');
-const clocks=fs.readFileSync(__dirname+'/../src/motion-clock.js','utf8');
-const timeline=fs.readFileSync(__dirname+'/../runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(__dirname+'/../src/timeline.js','utf8');
+const logic=moduleScript('src/exploration-full-logic.js');
+const clocks=moduleScript('src/motion-clock.js');
+const timeline=moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js');
 const start=logic.indexOf("window.addEventListener('openai:set_globals'");
 const end=logic.indexOf(';reduced.addEventListener',start);
-const prefix=fs.readFileSync(__dirname+'/../src/studio-text.js','utf8')+'\n'+logic.slice(logic.indexOf('\n')+1,logic.indexOf('const template='))
-  .replace('/* VARIANT_CODEC */',fs.readFileSync(__dirname+'/../src/variant-codec.js','utf8')).replace('/* MOTION_FUNCTIONS */',clocks).replace('/* TIMELINE_FUNCTIONS */',timeline);
+// The logic module's imports share the VM context, standing in for the module graph.
+const prefix=[moduleScript('src/studio-text.js'),moduleScript('src/variant-codec.js'),clocks,timeline,logic.slice(0,logic.indexOf('const template='))].join('\n');
 assert.ok(start>=0&&end>start,'production widget-state callback exists');
 assert.ok(prefix.includes('function restore(')&&prefix.includes('function save('));
 

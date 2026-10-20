@@ -1,0 +1,109 @@
+/* Original urban character identities. Common stage, product data and editing
+   controls stay shared; each identity gets a different typographic rhythm. */
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]){--copy-x:6%;--copy-w:30%;--name-x:4.5%;--name-w:33%;--edition-y:19%;--name-y:31%;--caption-y:56%;--subtitle-y:63%;--tech-y:74%;--title-size:17cqw;--title-weight:800;--title-angle:0deg;--title-track:-.045em;--caption-size:2cqw;--note-x:41%;--note-y:88%}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .language-sculpture{display:none}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .hero-name{font-style:normal;line-height:.86;transform-origin:20% 60%}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .art-brand{font-size:clamp(10px,.86cqw,19px);font-weight:800;letter-spacing:-.04em}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .hello{display:block;top:-3.4cqw;left:.3cqw;font:700 clamp(10px,.68cqw,15px)/1 "Manrope",sans-serif;letter-spacing:.12em;opacity:.55}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .art-edition{max-width:34%;gap:1cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .edition-label{font-size:clamp(10px,1cqw,21px);font-weight:800;letter-spacing:.045em}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .edition-type{font-size:clamp(10px,.65cqw,15px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .copy-caption{font-weight:800;letter-spacing:-.035em;line-height:1.22}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .copy-subtitle{font-size:clamp(10px,.75cqw,17px);letter-spacing:.035em;opacity:calc(var(--detail) * .58)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .technical{top:var(--tech-y);padding:0;border:0}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .formats{font-size:clamp(10px,.7cqw,16px);letter-spacing:-.015em;gap:.5cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .formats span+span:before{opacity:.3}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .marks{gap:.4cqw;margin-top:1.15cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .compatibility,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .qr-mark{flex-basis:4.3cqw;width:4.3cqw;height:4.6cqw;min-width:0;min-height:0;padding:.25cqw;border-radius:.7cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .language-note{font-size:clamp(10px,.58cqw,14px);letter-spacing:.15em;opacity:calc(var(--detail) * .35)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .issue-stamp{font-size:clamp(10px,.6cqw,14px);letter-spacing:.07em;opacity:calc(var(--detail) * .5)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]) .art-credit{font-size:clamp(10px,.6cqw,14px);opacity:calc(var(--detail) * .6)}
+
+/* DISTRICT: condensed italic wordmark, a cut underline and a compact folio. */
+#character-directions .design-art[data-kind="district"]{--name-y:27%;--caption-y:57%;--title-angle:-6deg;--title-style:italic;--title-size:18cqw;--caption-size:2.1cqw}
+#character-directions .design-art[data-kind="district"] .hero-name{font-size:min(var(--title-size),23cqh)}
+#character-directions .design-art[data-kind="district"] .hero-name{font-style:italic;letter-spacing:-.025em;color:var(--accent)}
+#character-directions .design-art[data-kind="district"] .hero-name:before{display:block;left:1%;right:8%;top:auto;bottom:-1.4cqw;height:.75cqw;background:var(--ink);clip-path:polygon(3% 0,100% 0,97% 100%,0 100%);transform:none}
+#character-directions .design-art[data-kind="district"] .hero-name:after{content:"";position:absolute;right:-1.6cqw;top:6%;width:.65cqw;height:58%;background:var(--accent);transform:skewY(-12deg)}
+#character-directions .design-art[data-kind="district"] .hello{top:-1.1cqw;color:var(--ink);opacity:.65}
+#character-directions .design-art[data-kind="district"] .art-brand:before{background:var(--accent);width:2.1cqw;height:.75cqw;clip-path:polygon(22% 0,100% 0,78% 100%,0 100%);border-radius:0;transform:none}
+#character-directions .design-art[data-kind="district"] .edition-label{padding:.45cqw .65cqw;background:var(--accent);color:var(--accent-contrast);font-weight:800;letter-spacing:0;clip-path:polygon(0 0,100% 0,93% 100%,0 100%)}
+#character-directions .design-art[data-kind="district"] .art-edition{gap:.7cqw;transform:rotate(-1deg)}
+#character-directions .design-art[data-kind="district"] .copy-caption{transform:rotate(-2deg)}
+
+/* TUNER: horizontal, tactile typographic hierarchy and an analogue cue. */
+#character-directions .design-art[data-kind="tuner"]{--copy-x:6.5%;--name-x:6%;--name-w:31%;--name-y:31%;--caption-y:55%;--subtitle-y:61%;--tech-y:74%;--title-size:12.7cqw;--title-track:-.075em;--title-weight:800;--caption-size:1.8cqw;--note-x:43%;--note-y:86%}
+#character-directions .design-art[data-kind="tuner"] .hero-name{font-size:min(var(--title-size),22cqh)}
+#character-directions .design-art[data-kind="tuner"] .art-brand{letter-spacing:.09em;font-weight:700}
+#character-directions .design-art[data-kind="tuner"] .art-brand:before{width:.7cqw;height:.7cqw;min-width:5px;min-height:5px;border-radius:50%;background:var(--accent);transform:none}
+#character-directions .design-art[data-kind="tuner"] .art-edition{align-items:baseline;gap:1.2cqw}
+#character-directions .design-art[data-kind="tuner"] .edition-label{font-weight:700;letter-spacing:.09em}
+#character-directions .design-art[data-kind="tuner"] .hello{top:-3.2cqw;font-family:"Courier New",monospace;letter-spacing:.12em}
+#character-directions .design-art[data-kind="tuner"] .hero-name{line-height:.9}
+#character-directions .design-art[data-kind="tuner"] .hero-name:before{display:block;left:0;right:0;top:auto;bottom:-1.8cqw;height:1px;transform:none;background:var(--ink);opacity:.28}
+#character-directions .design-art[data-kind="tuner"] .hero-name:after{content:"";position:absolute;left:0;bottom:-1.8cqw;width:19%;height:.4cqw;background:var(--accent)}
+#character-directions .design-art[data-kind="tuner"] .copy-caption{font-weight:600;letter-spacing:.06em}
+#character-directions .design-art[data-kind="tuner"] .formats,#character-directions .design-art[data-kind="tuner"] .serial{font-family:"Courier New",monospace;font-weight:700}
+#character-directions .design-art[data-kind="tuner"] .language-note{letter-spacing:.09em}
+
+/* ARCADE: rounded heavy lettering anchored by one eccentric label. */
+#character-directions .design-art[data-kind="arcade"]{--edition-y:18%;--name-y:30%;--title-size:12.7cqw;--title-weight:900;--title-angle:-3deg;--title-track:-.08em;--caption-y:56%;--subtitle-y:63%;--caption-size:1.9cqw;--note-x:40%;--note-y:88%}
+#character-directions .design-art[data-kind="arcade"] .hero-name{font-size:min(var(--title-size),22cqh)}
+#character-directions .design-art[data-kind="arcade"] .art-brand:before{border-radius:40%;transform:rotate(17deg);background:var(--accent)}
+#character-directions .design-art[data-kind="arcade"] .art-edition{gap:1.2cqw;transform:rotate(2deg)}
+#character-directions .design-art[data-kind="arcade"] .edition-label{background:var(--ink);color:var(--paper);padding:.55cqw 1cqw .6cqw;border-radius:1.8cqw .4cqw 1.8cqw 1.8cqw;letter-spacing:0;font-weight:800}
+#character-directions .design-art[data-kind="arcade"] .hello{top:-2.1cqw;left:.7cqw;font-weight:800;opacity:.5;letter-spacing:.08em}
+#character-directions .design-art[data-kind="arcade"] .hero-name{line-height:.9}
+#character-directions .design-art[data-kind="arcade"] .hero-name:before{display:block;left:1%;right:4%;top:auto;bottom:-1.4cqw;height:.7cqw;transform:rotate(2deg);background:var(--accent);border-radius:2cqw}
+#character-directions .design-art[data-kind="arcade"] .hero-name:after{content:"";position:absolute;right:-1cqw;top:-2cqw;width:1.2cqw;height:1.2cqw;transform:rotate(12deg);background:var(--accent);border-radius:.35cqw}
+#character-directions .design-art[data-kind="arcade"] .copy-caption{font-weight:700;letter-spacing:.02em}
+
+/* Dense symbols occupy two short rows inside the identity third. */
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-dense:not(.is-portrait){--tech-y:66%;--caption-y:55%}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-dense .marks{display:grid;grid-template-columns:repeat(4,5.1cqw);gap:.5cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-dense .compatibility,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-dense .qr-mark{width:5.1cqw;height:4.8cqw;flex-basis:5.1cqw}
+
+/* Landscape swaps move the identity as a unit without reflecting the letters. */
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-swapped:not(.is-portrait){--copy-x:64%;--name-x:62%;--note-x:58%}
+#character-directions .design-art[data-kind="tuner"].is-swapped:not(.is-portrait){--name-x:64%}
+
+/* Portrait preserves a compact upper identity, open character stage and bottom
+   product shelf. Font sizes use composition width, never output pixel count. */
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait{--copy-x:7%;--copy-w:86%;--name-x:6%;--name-w:86%;--edition-y:10%;--name-y:18%;--title-size:27cqw;--caption-y:31%;--subtitle-y:34.5%;--caption-size:4.2cqw;--note-x:92%;--note-y:72%;--tech-y:85%}
+#character-directions .design-art[data-kind="district"].is-portrait{--title-size:35cqw;--name-y:18.5%;--title-angle:-4deg}
+#character-directions .design-art[data-kind="tuner"].is-portrait{--title-size:27cqw;--name-y:20%;--caption-y:30%;--subtitle-y:34%}
+#character-directions .design-art[data-kind="arcade"].is-portrait{--title-size:27cqw;--name-y:19%;--caption-y:30.5%}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .hero-name{font-size:min(var(--title-size),12.7cqh)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .hello{top:-4.2cqw;font-size:clamp(10px,1.9cqw,18px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .art-edition{max-width:86%;gap:2.5cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .edition-label{font-size:clamp(10px,2.4cqw,25px);padding:1cqw 1.6cqw}
+#character-directions .design-art[data-kind="tuner"].is-portrait .edition-label{padding:0}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .edition-type{font-size:clamp(10px,1.9cqw,19px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .art-brand{font-size:clamp(10px,2.3cqw,22px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .copy-subtitle{font-size:clamp(10px,2.1cqw,21px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .copy-caption{font-size:clamp(10px,3.8cqw,40px);transform:none}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .formats{font-size:clamp(10px,2cqw,21px);gap:1.8cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .marks,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait.is-dense .marks{display:flex;gap:1cqw;margin-top:1.6cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .compatibility,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .qr-mark{width:9.3cqw;height:10cqw;flex-basis:9.3cqw;border-radius:1.4cqw}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .language-note{font-size:clamp(10px,1.3cqw,15px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .art-credit,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .issue-stamp{font-size:clamp(10px,1.7cqw,18px)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait.is-swapped{--copy-x:7%;--copy-w:86%;--name-x:6%;--name-w:86%;--edition-y:62%;--name-y:67%;--caption-y:79%;--subtitle-y:83%;--title-size:24cqw;--note-y:55%}
+#character-directions .design-art[data-kind="district"].is-portrait.is-swapped{--title-angle:-2deg}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait.is-swapped .hello{display:none}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait.is-swapped .hero-name{font-size:min(var(--title-size),9.4cqh)}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait.is-swapped .copy-subtitle{display:none}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .technical{top:85%;left:7%;width:86%}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .archive-line{min-height:8px}
+#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]).is-portrait .serial{font-size:clamp(8px,1.7cqw,16px)}
+
+@container(max-width:600px){
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait){--tech-y:68%}
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .copy-subtitle{display:none}
+}
+@container(max-width:420px){
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait){--edition-y:16%;--name-y:31%;--tech-y:63%}
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .hello{display:none}
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .marks{display:grid;grid-template-columns:repeat(4,6cqw);gap:.5cqw}
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .compatibility,#character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .qr-mark{width:6cqw;height:6cqw;flex-basis:6cqw}
+ #character-directions .design-art:is([data-kind="district"],[data-kind="tuner"],[data-kind="arcade"]):not(.is-portrait) .copy-caption{display:none}
+}

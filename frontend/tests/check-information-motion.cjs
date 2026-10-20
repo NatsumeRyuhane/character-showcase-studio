@@ -1,9 +1,10 @@
 const fs=require('fs');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const scope={};
 vm.createContext(scope);
-for(const file of ['motion-clock.js','information-motion.js'])vm.runInContext(fs.readFileSync(__dirname+'/../src/'+file,'utf8'),scope);
+for(const file of ['motion-clock.js','information-motion.js'])load(scope,'src/'+file);
 const {createMotionClock,advanceMotionClock,informationMotionPose,marqueeOffset}=scope;
 const near=(actual,expected)=>assert.ok(Math.abs(actual-expected)<1e-9,`${actual} != ${expected}`);
 const snapshot=value=>JSON.parse(JSON.stringify(value));

@@ -1,5 +1,10 @@
+import { studioContinuousShow, studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioShowDuration, studioStoryDuration, studioTotalDuration } from './timeline.js';
+import { images, motionClock, resetLastFrame, state, update } from './exploration-full-logic.js';
+import { drawStudioStoryIntro, mountStudioStoryIntro } from './story-intro.js';
+import { drawStudioPostProcessing, mountStudioPostProcessing } from './studio-post.js';
+
 // Sequence controls are shared by all designs, including pure output and AE.
-function mountStudioNarrative(root,views){
+export function mountStudioNarrative(root,views){
   const group=document.createElement('details');group.className='studio-group studio-narrative';group.open=true;
   let legacyIntroDuration=state.narrative.introStyle==='story'?4.5:state.introDuration;
   const percentKeys=['nameDelay','characterEffectStrength','authorEffectStrength','postStrength','postGlow'];
@@ -69,7 +74,7 @@ function mountStudioNarrative(root,views){
     if(state.introDuration!==beforeIntro)state.time=studioRetime(state.time,beforeIntro,state.introDuration);
     if(key==='showDuration')state.time=studioRetimeShow(state.time,state.introDuration,before,state.narrative);state.time=Math.min(state.time,studioTotalDuration(state.introDuration,state.narrative));if(final&&input.type==='number')input.value=state.narrative[key];update();
   };input.addEventListener(input.type==='range'||input.type==='number'?'input':'change',()=>apply(false));if(input.type==='number')input.addEventListener('change',()=>apply(true));}
-  for(const button of controlGroups.flatMap(el=>[...el.querySelectorAll('[data-story-jump]')]))button.addEventListener('click',()=>{const role=button.dataset.storyJump,n=state.narrative;state.time=role==='show'?state.introDuration:role==='author'&&n.characterShotEnabled?n.characterShotDuration:0;state.playing=true;last=0;update()});
+  for(const button of controlGroups.flatMap(el=>[...el.querySelectorAll('[data-story-jump]')]))button.addEventListener('click',()=>{const role=button.dataset.storyJump,n=state.narrative;state.time=role==='show'?state.introDuration:role==='author'&&n.characterShotEnabled?n.characterShotDuration:0;state.playing=true;resetLastFrame();update()});
   if(state.narrative.introStyle==='story'){const next=studioStoryDuration(state.narrative);state.time=studioRetime(state.time,state.introDuration,next);state.introDuration=next;}
   for(const view of views){
     const ending=document.createElement('div');ending.className='brand-ending';ending.setAttribute('aria-label','品牌片尾');
@@ -77,7 +82,7 @@ function mountStudioNarrative(root,views){
     view.art.append(ending);view.ending=ending;
     const shutdown=document.createElement('div');shutdown.className='cyber-shutdown';shutdown.setAttribute('aria-hidden','true');shutdown.innerHTML='<div class="shutdown-scan"></div><div class="shutdown-flash"></div><div class="shutdown-shutter shutdown-top"></div><div class="shutdown-shutter shutdown-bottom"></div><div class="shutdown-beam-glow"></div><div class="shutdown-line"></div><div class="shutdown-dot-glow"></div><div class="shutdown-dot"></div>';view.art.append(shutdown);view.shutdown=shutdown;
     const button=document.createElement('button');button.className='btn';button.type='button';button.textContent='片尾';button.dataset.endingPreview='';view.section.querySelector('[data-show]').after(button);
-    button.addEventListener('click',()=>{state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;last=0;update()});
+    button.addEventListener('click',()=>{state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;resetLastFrame();update()});
     if(typeof mountStudioStoryIntro==='function')mountStudioStoryIntro(view);
     if(typeof mountStudioPostProcessing==='function')mountStudioPostProcessing(view);
   }
@@ -108,7 +113,7 @@ function mountStudioNarrative(root,views){
     for(const view of views){view.section.querySelector('[data-ending-preview]').disabled=!n.outroEnabled;view.ending.dataset.style=n.outroStyle;view.ending.classList.toggle('uses-logo',n.outroContent!=='word'&&!!images.logo);view.ending.querySelector('.ending-word').textContent=state.brand||'YOUR STUDIO';if(images.logo)view.ending.querySelector('img').src=images.logo;}
   }};
 }
-function drawStudioNarrative(view,pose){
+export function drawStudioNarrative(view,pose){
   view.art.classList.toggle('model-first-intro',state.narrative.introStyle==='model');
   view.art.style.setProperty('--detail',pose.info);view.art.style.setProperty('--model-detail',pose.model);
   view.stack.style.opacity=pose.titleAlpha;

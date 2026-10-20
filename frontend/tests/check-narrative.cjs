@@ -1,5 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
-const scope={};vm.createContext(scope);vm.runInContext(fs.readFileSync(__dirname+'/../runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(__dirname+'/../src/timeline.js','utf8'),scope);
+const {load,moduleScript}=require('./support/module-script.cjs');
+const scope={};vm.createContext(scope);load(scope,'runtime/crt-motion.js','src/timeline.js');
 const config=scope.studioNarrativeSettings(),near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
 const pose=(time,intro=4.5,n=config)=>scope.studioNarrativePose(time,intro,n);
 assert.equal(config.introStyle,'model');assert.equal(config.outroEnabled,false);
@@ -46,7 +47,7 @@ near(scope.studioNarrativeSettings({showDuration:0}).showDuration,1);near(scope.
 near(scope.studioNarrativeSettings({outroDuration:1.5,shutdownDuration:99}).shutdownDuration,.675);
 // Run the real narrative and independent motion clocks past many former loop
 // boundaries. Information stays fully visible while every motion phase advances.
-for(const file of ['motion-clock.js','information-motion.js'])vm.runInContext(fs.readFileSync(__dirname+'/../src/'+file,'utf8'),scope);
+for(const file of ['motion-clock.js','information-motion.js'])load(scope,'src/'+file);
 for(const intro of [0,2,4.5])for(const showDuration of [1,7.5])for(const speed of [.5,1,1.8]){
   const n=scope.studioNarrativeSettings({showDuration}),variants={poster:{ringSpeed:1.7,textMotionSpeed:.8}},clock=scope.createMotionClock(0,variants);
   let time=0,previous=0;
@@ -62,7 +63,7 @@ for(const intro of [0,2,4.5])for(const showDuration of [1,7.5])for(const speed o
 }
 // Exercise the production renderer: framing must remain fully visible while
 // intro information is hidden and while showcase content fades into the ending.
-const renderer=fs.readFileSync(__dirname+'/../src/studio-narrative.js','utf8');
+const renderer=moduleScript('src/studio-narrative.js');
 vm.runInContext(renderer.slice(renderer.indexOf('function drawStudioNarrative')),scope);
 function node(){return {style:{setProperty(k,v){this[k]=v}},classList:{toggle(){}},setAttribute(){}}}
 const edges=[node(),node()],ending=node(),parts={};ending.querySelector=s=>parts[s]||(parts[s]=node());

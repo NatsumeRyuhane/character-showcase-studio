@@ -4,7 +4,7 @@ This file is for AI coding agents (Codex, Claude Code and others) working in thi
 
 ## The project
 
-Character Showcase Studio is a browser editor for animated character showcase screens. It exports a standalone HTML page, OBS browser-source packages, and editable After Effects templates. It is one self-contained HTML page built by a dependency-free Node script, with no framework, package manager or backend. It is live at https://nekokaii.com/showcase-generator.
+Character Showcase Studio is a browser editor for animated character showcase screens. It exports a standalone HTML page, OBS browser-source packages, and editable After Effects templates. It is one self-contained HTML page, built with Vite from the ES modules in `frontend/`, with no backend. A staged rewrite to Vite + React + TypeScript is in progress ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)). It is live at https://nekokaii.com/showcase-generator.
 
 | Read | When |
 | --- | --- |
@@ -93,6 +93,8 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 
    Use the commit types below for `<type>`. One branch per task, and never reuse someone else's branch.
 
+   **Exception: the frontend rewrite (#3).** Its work collects on the integration branch `refactor/frontend-rewrite` (draft PR #4), which merges into `main` once, at the end. Each phase or step branches from `origin/refactor/frontend-rewrite` instead (for example `refactor/frontend-rewrite-phase-2`), and its PR targets `refactor/frontend-rewrite`, not `main`.
+
 ### Do not commit directly to `main`
 
 `main` is the shared, reviewed version, and the live site is deployed from it. Work there skips review and can collide with collaborators. GitHub does not block it in this repo, so **you** are the safeguard.
@@ -109,7 +111,7 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 Work in small, focused steps:
 
 1. Make one focused change.
-2. In `frontend/`: `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass. If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
+2. In `frontend/`: `npm ci` if `node_modules/` is missing or `package-lock.json` changed, then `node tools/build.mjs`, then `node tools/check.mjs` (it includes the TypeScript check). Both must pass. If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
 3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
 4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
 5. Commit. Never commit `frontend/dist/`; it is gitignored build output.
@@ -148,11 +150,12 @@ Never bundle unrelated changes in one commit.
 
 ## Code rules
 
-- **The web app lives in `frontend/`**, with its source in `frontend/src/` and `frontend/runtime/`. The build splices them into one page, and spliced modules share one scope. A new file must be wired into `frontend/tools/build.mjs`, and a new test into `frontend/tools/check.mjs`. Paths in `docs/dev/` are relative to `frontend/`.
+- **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used; a new test must still be added to `frontend/tools/check.mjs`. Paths in `docs/dev/` are relative to `frontend/`.
+- **Never edit `frontend-legacy/`.** It is a frozen copy of the frontend from before the rewrite, kept only to compare behaviour, and deleted when the rewrite is done.
 - **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
 - **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.
 - **Storage is keyed by page path.** Moving or renaming the served page loses users' saved settings unless you add a migration.
-- **Match the surrounding style** for now. A frontend restructure into its own directory with proper modules is planned; do not start large refactors or reformat whole files without agreement in an issue.
+- **Match the surrounding style** for now. The frontend rewrite proceeds in the phases agreed in issue #3; do not start other large refactors or reformat whole files without agreement in an issue.
 - Do not add runtime network dependencies, npm packages or frameworks without agreement. The page must keep working offline from `file://`.
 - Do not add official game logos, characters or UI assets. Badges and designs are original artwork.
 
@@ -176,7 +179,7 @@ Deploying (`npx wrangler deploy` in `deploy/cloudflare/`) updates the public sit
 
 ## Environment notes
 
-- The frontend needs only Node.js 18+; there is no `npm install`. The launcher needs Python 3.9+ with pip; `start.sh` / `start.cmd` install its dependencies automatically.
+- The frontend needs Node.js 22.12+ with npm; its build dependencies are installed with `npm ci` in `frontend/`, which the launcher runs automatically when needed. The launcher needs Python 3.9+ with pip; `start.sh` / `start.cmd` install its dependencies automatically.
 - `start.cmd` / `start.sh` at the root run the launcher `deploy/launcher/studio.py` (see [launcher.md](docs/dev/launcher.md)). Always call it with a subcommand: subcommands are a pure, non-interactive CLI, while running it without arguments opens a menu meant for people. To preview, use `./start.sh start --no-open` and `./start.sh stop`; run `./start.sh doctor` when the environment seems broken. The owner works on Windows and double-clicks `start.cmd`, so keep it working.
 - `.gitattributes` forces LF line endings. A Windows checkout made before it existed needs a one-time refresh; see [build-and-test.md](docs/dev/build-and-test.md#generated-files-and-line-endings). `./start.sh doctor` reports CRLF files.
 

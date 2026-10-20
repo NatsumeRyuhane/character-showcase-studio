@@ -1,0 +1,207 @@
+VRCFaceTracking basic logo and brand assets
+https://raw.githubusercontent.com/VRCFaceTracking/brand-guide/master/LICENSE
+
+# VRCFaceTracking Brand Assets License
+
+## Terms and Conditions for Use of VRCFaceTracking Restricted Brand Assets
+
+**Last Updated:** June 7, 2025
+**Copyright Holder:** Benjamin Thomas
+
+**Note:** This license applies to specific VRCFaceTracking brand assets as defined below. The basic square VRCFaceTracking logo remains available for general use under permissive terms.  
+
+### 1. DEFINITIONS
+
+- **"Restricted Brand Assets"** means the official VRCFaceTracking compatibility badges, wordmarks, and branded promotional materials specifically covered by this license.
+- **"Basic Logo"** means the square VRCFaceTracking icon featuring the split design with green and pink sections, which remains available for general use under permissive terms.
+- **"Compatibility Badges"** means the official "Works with VRCFaceTracking" and "Compatible with Unified Expressions" badges.
+- **"Wordmarks"** means text-based branding including "VRCFaceTracking" typography and official brand names.
+- **"Authorized Use"** means use strictly in accordance with Section 2 of this license.
+
+### 2. SCOPE OF THIS LICENSE
+
+#### 2.1 Restricted Assets
+This license applies ONLY to the following VRCFaceTracking brand assets:
+- Official "Works with VRCFaceTracking" compatibility badge
+- Official "Compatible with Unified Expressions" compatibility badge  
+- VRCFaceTracking wordmarks and typography-based branding
+- Official promotional materials and branded templates
+
+#### 2.2 Unrestricted Assets
+The following remain available for general use:
+- **Basic square VRCFaceTracking logo/icon** (the split green/pink design)
+- General reference to VRCFaceTracking in text form
+- Educational or informational use of the basic logo
+
+### 3. PERMITTED USES OF RESTRICTED ASSETS
+
+The VRCFaceTracking Restricted Brand Assets may ONLY be used for the following authorized purposes:
+
+#### 3.1 Compatibility Badges
+- **"Works with VRCFaceTracking" Badge:** May be used by hardware manufacturers, software developers, and content creators whose products are officially listed in the VRCFaceTracking Module Registry.
+- **"Compatible with Unified Expressions" Badge:** May be used by software developers and avatar creators whose products support the Unified Expressions standard for face tracking shapes.
+
+#### 3.2 Permitted Users and Applications
+- Hardware manufacturers with products that support VRCFaceTracking
+- Software developers creating applications that integrate with VRCFaceTracking
+- Avatar creators whose avatars use Unified Expressions standard
+- Products officially listed in the VRCFaceTracking Module Registry
+
+#### 3.3 Branding Guidelines Compliance
+All authorized use must comply with the following requirements:
+- Use the full name "VRCFaceTracking" when space is available
+- Do NOT shorten to "VRCFT" when using the official logo/glyph
+- Use IBM Plex Mono Bold font for logo typeface
+- Maintain proper spacing and proportions as shown in brand guide
+- Use official color schemes and design specifications
+
+### 4. PROHIBITED USES OF RESTRICTED ASSETS
+
+The following uses of Restricted Brand Assets are strictly PROHIBITED:
+
+#### 4.1 Unauthorized Applications
+- Use by products NOT listed in the official VRCFaceTracking Module Registry
+- Use by software that does not actually support VRCFaceTracking or Unified Expressions
+- Use for products that only claim compatibility without official verification
+
+#### 4.2 Commercial Misuse
+- Using Restricted Brand Assets to imply official endorsement without authorization
+- Incorporating Restricted Brand Assets into other logos or trademarks
+- Selling or licensing the Restricted Brand Assets to third parties
+- Using Restricted Brand Assets in ways that could confuse consumers about product origin
+
+#### 4.3 Modification and Alteration
+- Altering, modifying, or creating derivative works of the Restricted Brand Assets
+- Changing colors, fonts, or design elements of compatibility badges
+- Combining Restricted Brand Assets with other logos in a way that creates confusion
+- Using outdated or unofficial versions of the Restricted Brand Assets
+
+### 5. VERIFICATION REQUIREMENTS
+
+#### 5.1 Module Registry Listing
+To use the "Works with VRCFaceTracking" badge, your product MUST be officially listed in the VRCFaceTracking Module Registry. Products that are not listed shall NOT use this badge, even if they may technically support VRCFaceTracking.
+
+#### 5.2 Unified Expressions Support
+To use the "Compatible with Unified Expressions" badge, your software or avatar MUST actually implement the Unified Expressions standard for face tracking shapes. For avatars, the base 3D model file itself must incorporate these shapes - compatibility achieved only through Unity scripts or workarounds without proper avatar integration does not qualify for badge use.
+
+### 6. QUALITY STANDARDS
+
+All authorized use must maintain the quality and reputation of the VRCFaceTracking brand:
+- Restricted Brand Assets must be displayed clearly and legibly
+- Restricted Brand Assets must not be used in contexts that could harm the VRCFaceTracking reputation
+- Restricted Brand Assets must be used in good faith to accurately represent compatibility
+
+### 7. TERMINATION
+
+This license may be terminated immediately if:
+- You violate any terms of this license
+- Your product is removed from the Module Registry
+- Your product no longer supports the required standards
+- You use Restricted Brand Assets in unauthorized ways
+
+### 8. ENFORCEMENT
+
+- Unauthorized use of VRCFaceTracking Restricted Brand Assets constitutes copyright infringement
+- The VRCFaceTracking project reserves the right to enforce this license
+- Violators may be required to cease use and remove Restricted Brand Assets immediately
+
+### 9. NO WARRANTIES
+
+Restricted Brand Assets are provided "as is" without warranty of any kind. The VRCFaceTracking project makes no representations about the suitability of the Restricted Brand Assets for any purpose.
+
+### 10. CONTACT
+
+For questions about this license or to request authorization for use cases not covered herein, please contact the VRCFaceTracking project:
+
+- **Email:** benaclejames@pm.me
+- **Discord:** Message an admin in the official VRCFaceTracking Discord server
+
+---
+
+**By using VRCFaceTracking Restricted Brand Assets, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.**
+
+lilToon logo usage
+https://raw.githubusercontent.com/lilxyzw/lilToon/master/logo/README.md
+
+## Details of logo image (English)
+- It can be used for thumbnails on websites such as BOOTH, used for works, and bundled, and there is no need to describe the license on the product page.
+- It is also possible to change the color and resolution to change the image to match the work.
+- Copyright is not abandoned.
+
+## ロゴ画像の詳細（日本語）
+- BOOTH等の販売サイトでのサムネイルへの使用や作品への使用・同梱が可能で、商品ページでのライセンスの記載も不要
+- 色や解像度を変更し、作品にマッチしたイメージに変更することも可能
+- 著作権自体は放棄されていません
+
+PoiyomiDocs license
+https://raw.githubusercontent.com/poiyomi/PoiyomiDocs/main/LICENSE
+
+MIT License
+
+Copyright (c) 2025 Poiyomi Labs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Lucide license
+https://raw.githubusercontent.com/lucide-icons/lucide/main/LICENSE
+
+ISC License
+
+Copyright (c) 2026 Lucide Icons and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+---
+
+The following Lucide icons are derived from the Feather project:
+
+airplay, alert-circle, alert-octagon, alert-triangle, aperture, arrow-down-circle, arrow-down-left, arrow-down-right, arrow-down, arrow-left-circle, arrow-left, arrow-right-circle, arrow-right, arrow-up-circle, arrow-up-left, arrow-up-right, arrow-up, at-sign, calendar, cast, check, chevron-down, chevron-left, chevron-right, chevron-up, chevrons-down, chevrons-left, chevrons-right, chevrons-up, circle, clipboard, clock, code, columns, command, compass, corner-down-left, corner-down-right, corner-left-down, corner-left-up, corner-right-down, corner-right-up, corner-up-left, corner-up-right, crosshair, database, divide-circle, divide-square, dollar-sign, download, external-link, feather, frown, hash, headphones, help-circle, info, italic, key, layout, life-buoy, link-2, link, loader, lock, log-in, log-out, maximize, meh, minimize, minimize-2, minus-circle, minus-square, minus, monitor, moon, more-horizontal, more-vertical, move, music, navigation-2, navigation, octagon, pause-circle, percent, plus-circle, plus-square, plus, power, radio, rss, search, server, share, shopping-bag, sidebar, smartphone, smile, square, table-2, tablet, target, terminal, trash-2, trash, triangle, tv, type, upload, x-circle, x-octagon, x-square, x, zoom-in, zoom-out
+
+The MIT License (MIT) (for the icons listed above)
+
+Copyright (c) 2013-present Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

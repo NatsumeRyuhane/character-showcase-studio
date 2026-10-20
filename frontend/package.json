@@ -7,7 +7,14 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "start": "node tools/server.mjs",
-    "check": "node tools/check.mjs"
+    "check": "node tools/check.mjs",
+    "typecheck": "tsc"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
 }

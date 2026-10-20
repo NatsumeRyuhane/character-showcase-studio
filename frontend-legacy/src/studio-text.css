@@ -1,0 +1,9 @@
+#character-directions .studio-typography .direction-settings{grid-template-columns:minmax(0,1fr)}
+#character-directions .studio-text-target{padding:.75rem;border-radius:12px;background:color-mix(in srgb,var(--studio-accent,#a8b98d) 9%,transparent);margin-bottom:1rem}
+#character-directions .studio-text-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;min-width:0}
+#character-directions .studio-text-row .direction-field{min-width:0}
+#character-directions .studio-typography input[type=color]{width:100%;height:36px;padding:4px;cursor:pointer}
+#character-directions .studio-text-range-label{margin-top:.5rem}
+#character-directions .studio-text-reset{margin-top:.8rem;width:100%}
+#character-directions .studio-text-font-note{margin-bottom:0;font-size:11px}
+#character-directions .studio-typography [hidden]{display:none!important}

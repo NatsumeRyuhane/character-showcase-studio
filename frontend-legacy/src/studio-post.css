@@ -1,0 +1,7 @@
+#character-directions .studio-post-viewport{position:absolute;inset:var(--safe-y) var(--safe-x);overflow:hidden;z-index:1;pointer-events:none;isolation:isolate}
+#character-directions .studio-post-surface{position:absolute;inset:0;isolation:isolate;background:var(--paper)}
+#character-directions .studio-post-surface>:is(.composition,.story-intro,.brand-ending,.cyber-shutdown){inset:0}
+#character-directions .studio-post-optics{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:0}
+#character-directions .studio-post-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+#character-directions .studio-show-foreground{position:absolute;inset:var(--safe-y) var(--safe-x);z-index:2;pointer-events:none;container-type:size;overflow:hidden}
+#character-directions.is-transparent-output .studio-post-surface{background:transparent}

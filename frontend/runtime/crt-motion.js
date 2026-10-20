@@ -1,6 +1,6 @@
 // Deterministic, seekable CRT power-off envelope shared by browser and AE.
 // ES3 syntax is intentional: this function also runs inside AE expressions.
-function studioCRTPose(progress){
+export function studioCRTPose(progress){
   var q=Math.max(0,Math.min(1,progress));
   function e(x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)}
   var shutter=e((q-.12)/.44),active=e(q/.035)*(1-e((q-.46)/.1));

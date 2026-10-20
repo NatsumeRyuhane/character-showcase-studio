@@ -125,6 +125,12 @@ class LauncherTest(unittest.TestCase):
         for section in ("运行环境", "Git 与 GitHub", "预览", "Node.js"):
             self.assertIn(section, out)
 
+    def test_build_installs_frontend_dependencies_once(self) -> None:
+        shutil.rmtree(self.work / "frontend" / "node_modules", ignore_errors=True)
+        self.assertIn("前端依赖已安装", self.assertOk(self.studio("build")))
+        self.assertTrue((self.work / "frontend" / "node_modules" / ".package-lock.json").exists())
+        self.assertNotIn("正在安装前端依赖", self.assertOk(self.studio("build")))
+
     def test_check_builds_and_passes(self) -> None:
         self.assertIn("自动检查全部通过", self.assertOk(self.studio("check")))
         self.assertTrue((self.work / "frontend" / "dist" / "index.html").exists())

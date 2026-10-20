@@ -1,6 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),scope={};vm.createContext(scope);
-vm.runInContext(fs.readFileSync(path.join(root,'src/export-layout.js'),'utf8'),scope);
+load(scope,'src/export-layout.js');
 const plain=value=>JSON.parse(JSON.stringify(value));
 for(const portrait of [false,true]){
   const reference=scope.studioReferenceSize(portrait);
@@ -29,7 +30,7 @@ for(const portrait of [false,true]){
   assert.throws(()=>scope.scaleStudioAEScene(scene,100,100),/比例/);
 }
 // Exercise the real measurement function with transformed (4K) DOM bounds.
-const logic=fs.readFileSync(path.join(root,'src/exploration-full-logic.js'),'utf8');
+const logic=moduleScript('src/exploration-full-logic.js');
 Object.assign(scope,{state:{frame:'horizontal'},devicePixelRatio:1,fitText:()=>{},measureEdgeTracks:()=>{}});
 vm.runInContext(logic.slice(logic.indexOf('function measure(view)'),logic.indexOf('function sync()')),scope);
 for(const scale of [1,2]){

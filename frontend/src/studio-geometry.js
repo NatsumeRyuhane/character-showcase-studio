@@ -1,4 +1,4 @@
-function renderSeriesGeometry(kind,cx,cy,r,a,c,p){
+export function renderSeriesGeometry(ctx,poly,state,kind,cx,cy,r,a,c,p){
   if(!['facet','ribbon','blocks'].includes(kind)||!Number.isFinite(r)||r<=0)return;
   const R=r;
   const strength=Number.isFinite(state.geometryStrength)?Math.max(.5,Math.min(1.5,state.geometryStrength)):1;

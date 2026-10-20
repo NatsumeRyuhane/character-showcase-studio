@@ -15,7 +15,7 @@ function studioAEGeometryError(a,b,actual,fraction){
   }
   return error;
 }
-async function captureStudioAEGeometry(paint,duration,options={}){
+export async function captureStudioAEGeometry(paint,duration,options={}){
   const tolerance=options.tolerance??.25,reference=paint(duration),limit=options.limit??100,minStep=1/((options.fps===60?60:30)*4);
   const score=op=>{const points=op.paths.flatMap(p=>p.v);if(!points.length)return 0;const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);return (Math.max(...xs)-Math.min(...xs))*(Math.max(...ys)-Math.min(...ys))+op.width*100};
   const selected=reference.map((op,i)=>({i,score:score(op)})).sort((a,b)=>b.score-a.score).slice(0,limit).map(item=>item.i).sort((a,b)=>a-b);

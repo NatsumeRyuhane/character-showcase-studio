@@ -1,10 +1,11 @@
 const fs=require('fs');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const root=__dirname+'/..';
 const scope={TextEncoder,document:{getElementById:()=>null,querySelector:()=>null}};
 vm.createContext(scope);
-vm.runInContext(fs.readFileSync(root+'/runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(root+'/src/timeline.js','utf8')+'\n'+fs.readFileSync(root+'/runtime/studio-output-host.js','utf8'),scope);
+vm.runInContext(moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js')+'\n'+fs.readFileSync(root+'/runtime/studio-output-host.js','utf8'),scope);
 const run=source=>vm.runInContext(source,scope);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 for(const duration of [0,1,4.5,8,30]){
@@ -70,12 +71,10 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // Use the actual editor defaults, output-payload function and restore path. An
 // expanded thirteen-scheme document can exceed the host budget even though its
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
-const logic=fs.readFileSync(root+'/src/exploration-full-logic.js','utf8');
-const prefix=fs.readFileSync(root+'/src/studio-text.js','utf8')+'\n'+logic.slice(logic.indexOf('\n')+1,logic.indexOf('const template='))
-  .replace('/* TIMELINE_FUNCTIONS */',fs.readFileSync(root+'/runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(root+'/src/timeline.js','utf8'))
-  .replace('/* MOTION_FUNCTIONS */',fs.readFileSync(root+'/src/motion-clock.js','utf8'))
-  .replace('/* VARIANT_CODEC */',fs.readFileSync(root+'/src/variant-codec.js','utf8'));
-const outputLogic=fs.readFileSync(root+'/src/studio-output.js','utf8'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
+const logic=moduleScript('src/exploration-full-logic.js');
+// The logic module's imports share the VM context, standing in for the module graph.
+const prefix=[moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.js'),moduleScript('src/motion-clock.js'),moduleScript('src/variant-codec.js'),logic.slice(0,logic.indexOf('const template='))].join('\n');
+const outputLogic=moduleScript('src/studio-output.js'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
 assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
 function editorFixture(widgetState,globals={},reducedMotion=false){
   const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState}}};
@@ -151,7 +150,7 @@ assert.equal(vm.runInContext("config('html').start",storyEditor),'intro');
 assert.equal(vm.runInContext("config('html').playback",storyEditor),'complete');
 assert.equal(vm.runInContext("config('obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
-for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])vm.runInContext(fs.readFileSync(root+'/src/'+file,'utf8'),scope);
+for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])load(scope,'src/'+file);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){
   for(const transparent of [false,true]){
     const fills=[];
