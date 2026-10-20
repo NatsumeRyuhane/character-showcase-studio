@@ -12,6 +12,8 @@ for (const file of ['tools/build.mjs', 'tools/server.mjs']) {
   const result = spawnSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${file} syntax check failed`);
 }
+const typecheck = spawnSync(process.execPath, [path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), '-p', root], { stdio: 'inherit' });
+assert.equal(typecheck.status, 0, 'TypeScript check failed (run npm ci first if node_modules is missing)');
 const document = await read('dist/index.html');
 const fragment = await read('dist/character-explorations.fragment.html');
 // Parse every actual executable script after both HTML serialization layers.
