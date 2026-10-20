@@ -64,6 +64,8 @@ class LauncherTest(unittest.TestCase):
         cls.work = base / "work"
         # The current commit becomes `main` on a local "GitHub".
         git(base, "init", "-q", "--bare", str(cls.remote))
+        # CI checks out a single commit; let the stand-in GitHub accept shallow history.
+        git(cls.remote, "config", "receive.shallowUpdate", "true")
         git(base, "clone", "-q", "--no-hardlinks", str(REPO), str(cls.seed))
         git(cls.seed, "checkout", "-q", "-B", "main")
         git(cls.seed, "push", "-q", str(cls.remote), "main")
