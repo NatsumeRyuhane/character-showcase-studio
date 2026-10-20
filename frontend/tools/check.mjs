@@ -8,12 +8,14 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => fs.readFile(path.join(root, file), 'utf8');
 new vm.Script(await read('dist/exploration-full-source.js'), { filename: 'exploration-full-source.js' });
-for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/visual-docker.mjs', 'playwright.config.mjs', 'tests/visual/showcase.spec.mjs']) {
+for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/visual-docker.mjs', 'playwright.config.mjs', 'vitest.config.mjs', 'tests/visual/showcase.spec.mjs']) {
   const result = spawnSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${file} syntax check failed`);
 }
 const typecheck = spawnSync(process.execPath, [path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), '-p', root], { stdio: 'inherit' });
 assert.equal(typecheck.status, 0, 'TypeScript check failed (run npm ci first if node_modules is missing)');
+const unit = spawnSync(process.execPath, [path.join(root, 'node_modules', 'vitest', 'vitest.mjs'), 'run', '--root', root], { stdio: 'inherit' });
+assert.equal(unit.status, 0, 'Unit tests failed');
 const document = await read('dist/index.html');
 const fragment = await read('dist/character-explorations.fragment.html');
 // Parse every actual executable script after both HTML serialization layers.
@@ -37,8 +39,8 @@ assert.equal([...fragment.matchAll(/<section\b[^>]*\bdata-variant=/g)].length, 1
 assert.ok(!/<script\b[^>]*\bsrc\s*=/i.test(document), 'runtime is embedded');
 assert.ok(!/@import\b/i.test(fragment), 'fonts do not need the network');
 assert.ok(!/C:[/\\]Users[/\\]|\.codex[/\\]/i.test(document), 'built page has no machine-specific path');
-for (const name of ['check-motion.cjs', 'check-information-motion.cjs', 'check-narrative.cjs', 'check-story-intro.cjs', 'check-typography.cjs', 'check-post-processing.cjs', 'check-motion-state.cjs', 'check-variant-codec.cjs', 'check-urban-designs.cjs', 'check-output.cjs', 'check-export-packages.cjs', 'check-obs-layer-clock.cjs', 'check-obs-layers.cjs', 'check-obs-sync-server.cjs', 'check-ae-postprocessing.cjs', 'check-resolution.cjs', 'check-ae-geometry-motion.cjs', 'check-ae-transitions.cjs']) {
+for (const name of ['check-motion.cjs', 'check-information-motion.cjs', 'check-narrative.cjs', 'check-story-intro.cjs', 'check-typography.cjs', 'check-post-processing.cjs', 'check-motion-state.cjs', 'check-urban-designs.cjs', 'check-output.cjs', 'check-export-packages.cjs', 'check-obs-layer-clock.cjs', 'check-obs-layers.cjs', 'check-obs-sync-server.cjs', 'check-ae-postprocessing.cjs', 'check-resolution.cjs', 'check-ae-geometry-motion.cjs', 'check-ae-transitions.cjs']) {
   const result = spawnSync(process.execPath, [path.join(root, 'tests', name)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${name} failed`);
 }
-console.log(`PASS: ${executableScripts} embedded scripts parse; 13 designs, retained sandbox/CSP, embedded runtime/fonts, and motion/state regressions.`);
+console.log(`PASS: ${executableScripts} embedded scripts parse; 13 designs, retained sandbox/CSP, embedded runtime/fonts, unit tests, and motion/state regressions.`);

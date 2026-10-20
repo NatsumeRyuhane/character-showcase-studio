@@ -111,7 +111,7 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 Work in small, focused steps:
 
 1. Make one focused change.
-2. In `frontend/`: `npm ci` if `node_modules/` is missing or `package-lock.json` changed, then `node tools/build.mjs`, then `node tools/check.mjs` (it includes the TypeScript check). Both must pass. If the change can affect what the preview draws (anything in `src/` or `runtime/`), also run `npm run test:visual`, which needs Docker; CI runs it on every PR. Update its screenshot baseline only for an intended visual change, and look at every changed frame first (see [build-and-test.md](docs/dev/build-and-test.md#visual-regression-tests)). If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
+2. In `frontend/`: `npm ci` if `node_modules/` is missing or `package-lock.json` changed, then `node tools/build.mjs`, then `node tools/check.mjs` (it includes the TypeScript check and the unit tests). Both must pass. If the change can affect what the preview draws (anything in `src/` or `runtime/`), also run `npm run test:visual`, which needs Docker; CI runs it on every PR. Update its screenshot baseline only for an intended visual change, and look at every changed frame first (see [build-and-test.md](docs/dev/build-and-test.md#visual-regression-tests)). If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
 3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
 4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
 5. Commit. Never commit `frontend/dist/`; it is gitignored build output.
@@ -150,7 +150,7 @@ Never bundle unrelated changes in one commit.
 
 ## Code rules
 
-- **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used; a new test must still be added to `frontend/tools/check.mjs`. Paths in `docs/dev/` are relative to `frontend/`.
+- **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used. New tests are Vitest tests in `frontend/tests/unit/`, found automatically; the older `frontend/tests/check-*.cjs` scripts run only if listed in `frontend/tools/check.mjs` (see [build-and-test.md](docs/dev/build-and-test.md#tests)). Paths in `docs/dev/` are relative to `frontend/`.
 - **Never edit `frontend-legacy/`.** It is a frozen copy of the frontend from before the rewrite, kept only to compare behaviour, and deleted when the rewrite is done.
 - **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
 - **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.

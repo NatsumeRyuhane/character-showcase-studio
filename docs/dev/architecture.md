@@ -23,7 +23,7 @@ Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [bu
 ## Shape of the product
 
 - **One self-contained HTML file.** `node tools/build.mjs` writes `dist/index.html` (about 2.6 MB). Scripts, styles, icons, barcode/QR libraries and Latin fonts are all inlined. The page makes no network requests at runtime. Chinese text uses system fonts (Microsoft YaHei, PingFang SC).
-- **Vite-bundled ES modules, no framework yet.** The editor's frame script is an ES module graph with entry `src/main.js`, which Vite bundles into one classic script; the same entry imports the CSS. `tools/build.mjs` then assembles the page. npm dependencies (Vite, TypeScript) are build-time only and locked in `package-lock.json`; nothing is fetched at runtime.
+- **Vite-bundled ES modules, no framework yet.** The editor's frame script is an ES module graph with entry `src/main.js`, which Vite bundles into one classic script; the same entry imports the CSS. `tools/build.mjs` then assembles the page. npm dependencies (Vite, TypeScript, and the test tools) are development-time only and locked in `package-lock.json`; nothing is fetched at runtime.
 - **No backend.** Settings live in the browser's `localStorage`. Uploaded images exist only for the current page session.
 - **Origin.** The project started as an OpenAI Codex "visualization" widget and was later exported to run standalone. That is why the runtime still uses identifiers such as `codex-visualization`, `codex:visualization-widget-state-v2` and `widgetState`. `runtime/visualize.html`, `runtime/visualize.css`, `runtime/standalone-shell.js` and `runtime/standalone-host-bridge.js` are that exported widget runtime.
 
@@ -67,7 +67,7 @@ Consequences:
 - **Modules import what they use.** A new module needs no change to `build.mjs`; import it where it is used. New CSS is imported from `src/main.js`, whose import order is the cascade order. Modules may be `.ts`; `tools/check.mjs` type-checks TypeScript (JavaScript is not type-checked yet).
 - **Imported bindings are read-only.** Modules that need to replace the logic module's `motionClock` or restart frame timing call `setMotionClock` / `resetLastFrame`.
 - **The shell-side scripts are still plain concatenation.** The output host (`runtime/export-zip.js`, `export-packages.js`, `obs-layer-host.js`, `studio-output-host.js`) and its `__STUDIO_*__` placeholders, the bridge, the shell and the kit are classic scripts assembled by `build.mjs`.
-- **A new test must be added to the list in `tools/check.mjs`.**
+- **Tests:** Vitest unit tests in `tests/unit/` are found automatically; an older `tests/check-*.cjs` script runs only if it is listed in `tools/check.mjs` (see [build-and-test.md](build-and-test.md#tests)).
 - **`dist/` is build output.** It is gitignored. Never edit or commit it.
 
 ## Source map (`src/`)

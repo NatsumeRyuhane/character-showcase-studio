@@ -7,7 +7,8 @@
 // - JSON imports become constants, and side-effect imports (CSS) are dropped;
 // - `export` keywords are removed.
 // Only these forms are supported, at the start of a line; anything else throws.
-// Vitest replaces this in phase 3 of the frontend rewrite (issue #3).
+// Scripts move to Vitest (tests/unit/) as their modules are converted in the
+// frontend rewrite (issue #3); this loader goes once none of them needs it.
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');

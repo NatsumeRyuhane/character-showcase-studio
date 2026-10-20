@@ -42,7 +42,7 @@ expanded = decodeStudioVariants(source.variants, variantBaseline);
 
 Measured sizes at 0.9.0: default snapshot 10,493 bytes; every text field at its maximum, 12,005 bytes.
 
-**When you add a field:** update the codec if it is per-design, and add or extend tests for old-object migration, default restoration from encoded snapshots, and maximum-length capacity (`tests/check-variant-codec.cjs`, `tests/check-motion-state.cjs`).
+**When you add a field:** update the codec if it is per-design, and add or extend tests for old-object migration, default restoration from encoded snapshots, and maximum-length capacity (`tests/unit/variant-codec.test.ts`, `tests/check-motion-state.cjs`).
 
 ### Storage
 
