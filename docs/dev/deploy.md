@@ -9,7 +9,7 @@
 ## How it is wired
 
 - `deploy/cloudflare/wrangler.jsonc` routes `nekokaii.com/showcase-generator` and `/showcase-generator/*` to this Worker. The site's other routes (home page, DNS, `/studio*`) belong to other projects and must not be touched.
-- `wrangler deploy` runs `deploy/cloudflare/build.mjs`. That runs the normal frontend build, then copies `frontend/dist/index.html` into `deploy/cloudflare/dist-cloudflare/` (gitignored). That one file is the only uploaded asset. All paths in the config are relative to `deploy/cloudflare/`.
+- `wrangler deploy` runs `deploy/cloudflare/build.mjs`. That runs `npm ci` in `frontend/` (so it needs the network and installs exactly the locked versions), then the normal frontend build, then copies `frontend/dist/index.html` into `deploy/cloudflare/dist-cloudflare/` (gitignored). That one file is the only uploaded asset. All paths in the config are relative to `deploy/cloudflare/`.
 - `deploy/cloudflare/worker.mjs` answers only `GET` / `HEAD` on the public path, or `/` on `*.workers.dev`, and returns 404 or 405 for anything else. It requests `/` from the assets binding internally, because asset hosting redirects `/index.html` → `/`, and that redirect must not escape the `/showcase-generator` mount. It sets `Cache-Control: no-cache` and `X-Content-Type-Options: nosniff`.
 
 ## Deploying
