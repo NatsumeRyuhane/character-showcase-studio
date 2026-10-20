@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => fs.readFile(path.join(root, file), 'utf8');
 new vm.Script(await read('dist/exploration-full-source.js'), { filename: 'exploration-full-source.js' });
-for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/visual-docker.mjs', 'playwright.config.mjs', 'vitest.config.mjs', 'tests/visual/showcase.spec.mjs']) {
+for (const file of ['tools/build.mjs', 'tools/server.mjs', 'tools/visual-docker.mjs', 'tools/output-host-defines.mjs', 'playwright.config.mjs', 'vitest.config.mjs', 'tests/visual/showcase.spec.mjs']) {
   const result = spawnSync(process.execPath, ['--check', path.join(root, file)], { stdio: 'inherit' });
   assert.equal(result.status, 0, `${file} syntax check failed`);
 }

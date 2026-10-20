@@ -5,7 +5,7 @@ const assert=require('assert/strict');
 const root=__dirname+'/..';
 const scope={TextEncoder,document:{getElementById:()=>null,querySelector:()=>null}};
 vm.createContext(scope);
-vm.runInContext(moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.ts')+'\n'+fs.readFileSync(root+'/runtime/studio-output-host.js','utf8'),scope);
+load(scope,'runtime/crt-motion.js','src/timeline.ts','runtime/obs-layer-host.ts','runtime/studio-output-host.ts');
 const run=source=>vm.runInContext(source,scope);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 for(const duration of [0,1,4.5,8,30]){

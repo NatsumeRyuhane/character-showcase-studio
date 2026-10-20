@@ -42,7 +42,7 @@ dist/index.html  (shell document, strict CSP)
 │              ├─ bundled CSS (imported by src/main.js: design languages, workspace, output, narrative, …)
 │              ├─ vendor script: barcode + QR generator
 │              └─ main script: Vite bundle of src/main.js → src/exploration-full-logic.js and its imports
-├─ output host script   runtime/export-zip.js + export-packages.js + obs-layer-host.js + studio-output-host.js
+├─ output host script   Vite bundle of runtime/output-host.ts → studio-output-host.ts, export-packages.ts, export-zip.ts, obs-layer-host.ts
 └─ runtime/standalone-shell.js   storage, sizing, startup preset, srcdoc boot
 ```
 
@@ -55,10 +55,11 @@ dist/index.html  (shell document, strict CSP)
 `tools/build.mjs` does the following, in order:
 
 1. Runs Vite (library mode, IIFE output, unminified, `target: 'esnext'`) on `src/main.js`. The result is one classic script with every imported module hoisted into a single function scope, plus one stylesheet built from the CSS that `src/main.js` imports, in import order. Nothing is lowered or minified, so the bundle runs the same code as the sources.
+   It runs Vite a second time, the same way, on `runtime/output-host.ts`: the shell's output host, a separate script that shares no code with the frame. The files it embeds in exports come in as build-time constants through Vite's `define` (see step 5).
 2. Inserts that stylesheet into `src/exploration-full-template.html` at `/* STUDIO_STYLES */`, and `src/dual-language-markup.html` at `<!-- DUAL_LANGUAGE_MARKUP -->`.
 3. Replaces the Google Fonts `@import` with `assets/fonts/fonts.css`, with every font inlined as base64, and swaps `'Noto Sans SC'` for system CJK fonts.
 4. Inlines Floating UI and Lucide from `vendor/` in place of their unpkg `<script src>` tags.
-5. Fills the export packager's placeholders: `__STUDIO_AE_TEMPLATE__` (the AE template, with `crt-motion.js` at `/* CRT_MOTION_FUNCTION */`, its `export` keyword removed because ExtendScript is ES3), `__STUDIO_ASSET_NOTICES__`, `__STUDIO_OBS_LAYER_SERVER__` and `__STUDIO_OBS_LAYER_CONTROL__`.
+5. Supplies the export packager's constants, from `tools/output-host-defines.mjs` (which `vitest.config.mjs` uses too): `__STUDIO_AE_TEMPLATE__` (the AE template, with `crt-motion.js` at `/* CRT_MOTION_FUNCTION */`, its `export` keyword removed because ExtendScript is ES3), `__STUDIO_ASSET_NOTICES__`, `__STUDIO_OBS_LAYER_SERVER__` and `__STUDIO_OBS_LAYER_CONTROL__`.
 6. Validates the result. A missing or unreplaced marker, duplicate element IDs, document markup inside the fragment, any remaining `<script src>` or `@import`, or an invalid `runtime/startup-defaults.json` (over 16 KiB, or missing `revision`) all fail the build.
 7. Writes `dist/index.html`. It also writes `dist/character-explorations.fragment.html` and `dist/exploration-full-source.js`; `tools/check.mjs` parses those two.
 
@@ -66,7 +67,8 @@ Consequences:
 
 - **Modules import what they use.** A new module needs no change to `build.mjs`; import it where it is used. New CSS is imported from `src/main.js`, whose import order is the cascade order. Modules may be `.ts`; `tools/check.mjs` type-checks TypeScript (JavaScript is not type-checked yet).
 - **Imported bindings are read-only.** Modules that need to replace the logic module's `motionClock` or restart frame timing call `setMotionClock` / `resetLastFrame`.
-- **The shell-side scripts are still plain concatenation.** The output host (`runtime/export-zip.js`, `export-packages.js`, `obs-layer-host.js`, `studio-output-host.js`) and its `__STUDIO_*__` placeholders, the bridge, the shell and the kit are classic scripts assembled by `build.mjs`.
+- **Two bundles, plus classic scripts.** The frame script and the output host are Vite bundles. The bridge (`runtime/standalone-host-bridge.js`), the shell (`runtime/standalone-shell.js`) and the kit are still classic scripts that `build.mjs` inserts as they are. The output host installs `globalThis.studioOutputHost`, the only name the shell uses from it.
+- **`studioOBSLayerBootstrap` is copied by source text** into synchronized OBS layer pages, so it must stay self-contained (`runtime/obs-layer-host.ts`).
 - **Tests:** Vitest unit tests in `tests/unit/` are found automatically; an older `tests/check-*.cjs` script runs only if it is listed in `tools/check.mjs` (see [build-and-test.md](build-and-test.md#tests)).
 - **`dist/` is build output.** It is gitignored. Never edit or commit it.
 
@@ -126,7 +128,7 @@ Design-specific layout logic exists too. For example, `fitPosterCopy` in `explor
 
 `runtime/` holds the shell and frame runtime, the export packager, the ZIP writer, the AE ExtendScript template, the OBS layer server and control page, `crt-motion.js` (shared by the web page and AE), and `startup-defaults.json`.
 
-`tools/` holds `build.mjs`, `check.mjs`, `server.mjs` (a read-only static server for `dist/` on 127.0.0.1, port 8768 by default) and `prepare-vendor.py` (one-off vendor refresh, needs the network). Deploy scripts live in `deploy/cloudflare/`.
+`tools/` holds `build.mjs` and `output-host-defines.mjs`, `check.mjs`, `server.mjs` (a read-only static server for `dist/` on 127.0.0.1, port 8768 by default) and `prepare-vendor.py` (one-off vendor refresh, needs the network). Deploy scripts live in `deploy/cloudflare/`.
 
 ## Invariants
 

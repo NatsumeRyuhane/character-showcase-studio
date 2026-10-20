@@ -1,5 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
 const {load,moduleScript}=require('./support/module-script.cjs');
+const {outputHostConstants}=require('./support/output-host.cjs');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8'),plain=value=>JSON.parse(JSON.stringify(value));
 const scope={};vm.createContext(scope);
 for(const file of ['runtime/crt-motion.js','src/timeline.ts','src/export-layout.js','src/studio-post.js'])load(scope,file);
@@ -100,7 +101,7 @@ for(const effect of ['polar','crt','holo','bloom','anamorphic','prism','film']){
 // selection, strength or fade. Exercise both logical orientations and the real
 // trusted export validator/serializer, so the configuration survives downloads.
 const exported={TextEncoder,Uint8Array,DataView,Blob,structuredClone,atob};vm.createContext(exported);
-vm.runInContext(read('runtime/export-packages.js').replace('__STUDIO_AE_TEMPLATE__',()=>JSON.stringify('__STUDIO_AE_SCENE__')).replace('__STUDIO_ASSET_NOTICES__',()=>JSON.stringify('QA notices')).replace('__STUDIO_OBS_LAYER_SERVER__',()=>JSON.stringify(read('runtime/obs-layer-server.mjs'))).replace('__STUDIO_OBS_LAYER_CONTROL__',()=>JSON.stringify(read('runtime/obs-layer-control.html'))),exported);
+Object.assign(exported,outputHostConstants({aeTemplate:'__STUDIO_AE_SCENE__',notices:'QA notices'}));load(exported,'runtime/export-packages.ts');
 const sceneFor=portrait=>({...plain(scope.studioReferenceSize(portrait)),version:1,name:'Post processing QA',design:'qa',fps:30,intro:0,duration:12,showDuration:12,speed:1,offset:intro,background:[.1,.1,.1,1],ink:[1,1,1,1],accent:[1,.2,.3,1],transparent:false,frame:'horizontal',frameThickness:60,layers:[{kind:'text',name:'Name',text:'NOVA',fontFamily:'Arial',fontSize:90,weight:700,tracking:0,x:300,y:300,w:600,h:120}],geometry:[],warnings:[],motion:{enabled:true,style:'refined',amount:.55,speed:1},shadow:{enabled:true,color:[0,0,0,1],strength:.5,depth:1,soft:false},pattern:{kind:'dots',opacity:.05,moving:true,amount:.15},edges:{top:{direction:'negative',duration:32},bottom:{direction:'positive',duration:38}},borderText:{top:'TEST',bottom:'TEST'},narrative:{introStyle:'model',nameReveal:'show',nameDelay:.65},ending:{duration:0,style:'quiet',brand:'STUDIO',logoAsset:'',word:{x:960,y:540,w:600,h:100}},post:{effect:'anamorphic',strength:.72,glow:.3,speed:1.17,fade:.53,scenes:{character:true,author:true,show:false,outro:true}}});
 for(const portrait of [false,true]){
   const scene=sceneFor(portrait),before=plain(scene),high=scope.scaleStudioAEScene(scene,scene.width*2,scene.height*2);
