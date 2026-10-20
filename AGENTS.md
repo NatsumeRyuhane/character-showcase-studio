@@ -133,6 +133,8 @@ Update docs in the same branch as the change:
 | Architecture, state fields, timing, export internals, build or deploy | The relevant page in `docs/dev/` (English) |
 | A notable manual or native-app verification | A new record in `docs/qa/` (`<version>-<topic>.md`, English) plus a row in its README |
 
+`docs/CHANGELOG.md` holds only `## 未发布` and the most recent release. Older releases live in git history. When cutting a release, rename `## 未发布` to the new version and date, delete the previous release's section, and add an empty `## 未发布`.
+
 Do not leave stale statements behind. Fix or remove them.
 
 ## Deployment
