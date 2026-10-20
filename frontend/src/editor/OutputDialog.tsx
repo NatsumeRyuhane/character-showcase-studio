@@ -1,6 +1,6 @@
 // Output dialog: OBS / AE settings and the export requests to the shell.
 // Clean-output mode and the exported page's keyboard shortcuts live in studio-output.js.
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
 import { createPortal } from 'react-dom';
 import { images, state, update } from '../exploration-full-logic.js';
 import { collectStudioAEScene } from '../ae-export.js';
@@ -16,7 +16,10 @@ interface View { section: HTMLElement }
 
 const downloadLabel = () => state.output.obsLayers === 'separate' ? '下载 OBS 三层输出包' : '下载 OBS 输出包';
 
-export function OutputDialog({ headerActions, root, views }: { headerActions: Element; root: Element; views: View[] }) {
+export interface OutputDialogHandle { open(): void }
+
+// The header's output button opens the dialog through `ref`.
+export function OutputDialog({ ref, root, views }: { ref: Ref<OutputDialogHandle>; root: Element; views: View[] }) {
   useEditorRevision();
   const dialog = useRef<HTMLDialogElement>(null);
   const [mode, setMode] = useState<OutputMode>('obs');
@@ -24,6 +27,13 @@ export function OutputDialog({ headerActions, root, views }: { headerActions: El
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const separate = mode === 'obs' && state.output.obsLayers === 'separate';
+  useImperativeHandle(ref, () => ({
+    open() {
+      setStatus('');
+      setPrepared(null);
+      dialog.current?.showModal();
+    },
+  }), []);
 
   function change<K extends keyof OutputSettings>(key: K, value: OutputSettings[K]) {
     state.output = { ...state.output, [key]: value };
@@ -79,14 +89,7 @@ export function OutputDialog({ headerActions, root, views }: { headerActions: El
     <button type="button" role="tab" id={'output-tab-' + key} aria-controls={'output-panel-' + key} aria-selected={mode === key}
       tabIndex={mode === key ? 0 : -1} data-output-tab={key} disabled={busy} onClick={() => switchMode(key)} onKeyDown={tabKey}>{label}</button>
   );
-  return <>
-    {createPortal(
-      <button className="btn studio-output-button" type="button" data-output-open="" onClick={() => {
-        setStatus('');
-        setPrepared(null);
-        dialog.current?.showModal();
-      }}>输出 / AE 模板</button>, headerActions)}
-    {createPortal(
+  return createPortal(
       <dialog ref={dialog} className="studio-output-dialog" aria-labelledby="studio-output-heading">
         <div className="studio-output-heading"><div><span className="studio-kicker">EXPORT STUDIO</span><h2 id="studio-output-heading">把设计带到下一站</h2></div></div>
         <div className="studio-output-tabs" role="tablist" aria-label="输出用途">{tab('obs', 'OBS 纯画面')}{tab('ae', 'AE 可编辑模板')}</div>
@@ -176,6 +179,5 @@ export function OutputDialog({ headerActions, root, views }: { headerActions: El
           <button className="btn" type="button" hidden={mode !== 'obs'} disabled={busy} onClick={() => exportDesign('html')}>单独 HTML</button>
           <button className="btn btn-primary" type="button" data-output-download="" disabled={busy} onClick={() => exportDesign(mode)}>{primaryLabel}</button>
         </div>
-      </dialog>, root)}
-  </>;
+      </dialog>, root);
 }

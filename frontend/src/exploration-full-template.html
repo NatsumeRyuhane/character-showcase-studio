@@ -290,8 +290,6 @@
 @media(max-width:500px){#character-directions .direction-heading{padding-right:0}#character-directions .direction-settings{grid-template-columns:minmax(0,1fr)}#character-directions .badge-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* STUDIO_STYLES */
 </style>
-<div class="direction-heading"><strong>角色展示 · 完整工作台</strong><span data-phase aria-live="polite">展示</span></div>
-<div class="direction-settings"><div class="direction-field"><label for="direction-ratio">画幅</label><select class="form-select" id="direction-ratio"><option value="landscape">横屏 · 16:9</option><option value="portrait">竖屏 · 9:16</option></select></div><div class="direction-field"><label for="direction-frame">信息边框</label><select class="form-select" id="direction-frame"><option value="none">开放式 · 无边框</option><option value="horizontal">上下信息边框</option><option value="vertical">左右信息边框</option></select></div></div>
 <div class="viz-carousel" aria-label="角色展示视觉方向" data-previous-label="上一个方案" data-next-label="下一个方案">
   <section data-variant="时尚 · 留白刊物" data-design="couture" aria-label="时尚 · 留白刊物方案"></section>
   <section data-variant="前卫 · 裁构宣言" data-design="brutalist" aria-label="前卫 · 裁构宣言方案" hidden></section>
@@ -324,11 +322,6 @@
     <div class="edge top"><div class="edge-inner edge-static"><div class="edge-primary"><span class="edge-line"><img class="brand-image" alt="用户品牌标志"><span class="brand-word">YOUR STUDIO</span></span><span class="edge-line edge-small" data-edge="topText">ORIGINAL / CHARACTER ARCHIVE</span></div><div class="edge-secondary"><span class="edge-line edge-highlight" data-edge="edition">ATELIER / AT-001</span><span class="edge-line edge-small" data-edge="name">NOVA</span></div></div><div class="edge-marquee" aria-hidden="true"><div class="edge-track"></div></div></div>
     <div class="edge bottom"><div class="edge-inner edge-static"><div class="edge-primary"><span class="edge-line" data-edge="modelCredit">MODEL / YOUR NAME</span><span class="edge-line edge-small" data-edge="bottomText">MAKE SOME NOISE. STAY CUTE.</span></div><div class="edge-secondary"><span class="edge-line edge-highlight" data-edge="designCredit">DESIGN / YOUR STUDIO</span></div></div><div class="edge-marquee" aria-hidden="true"><div class="edge-track"></div></div></div>
   </div></div>
-  <div class="direction-transport"><button class="btn btn-primary" type="button" data-play>暂停动态</button><button class="btn" type="button" data-intro>从片头播放</button><button class="btn" type="button" data-show>展示页</button><button class="btn" type="button" data-swap><i data-lucide="arrow-left-right" aria-hidden="true"></i><span>左右互换</span></button></div>
-  <div class="seek-row"><input class="form-range" type="range" min="0" max="16.5" step=".05" value="4.5" data-seek aria-label="片头、展示与片尾进度"><span class="seek-time" data-time>04.5 / 16.5 s</span></div>
 </template>
-<div class="direction-global">
-  <details><summary class="cursor-interaction">文字包装与播放速度</summary><div class="direction-checks"><label class="form-check form-switch"><input class="form-check-input" id="direction-type" type="checkbox" checked><span class="form-check-label">显示文字包装</span></label></div><div class="direction-settings"><div class="direction-field"><label for="direction-speed" class="range-title">播放速度<output data-speed-value>1.0×</output></label><input class="form-range" type="range" id="direction-speed" min=".5" max="1.8" step=".1" value="1"></div></div></details>
-</div>
 <!-- EXPLORATION_SCRIPTS -->
 </div>

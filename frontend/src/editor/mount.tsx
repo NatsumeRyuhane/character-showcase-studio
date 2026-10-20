@@ -1,21 +1,17 @@
-// Mounts the React editor UI. Panels render through portals into the workspace that
-// studio-workspace.js still builds, so they can move to React one at a time.
+// Mounts the React editor UI around the design sections that the logic module builds.
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import { ContentPanel } from './ContentPanel.tsx';
-import { Inspectors } from './Inspector.tsx';
-import { OutputDialog } from './OutputDialog.tsx';
 import { notifyEditor } from './store.ts';
-import type { DesignKey } from '../studio-state.ts';
+import { Workspace, type WorkspaceView } from './Workspace.tsx';
 
-export function mountEditorUI(root: HTMLElement, views: { key: DesignKey; section: HTMLElement; storyShots?: { textLayoutKey: string }[] }[]): { sync(): void } {
+export function mountEditorUI(root: HTMLElement, views: WorkspaceView[]): { sync(): void } {
+  root.classList.add('studio-editor');
+  root.dataset.panel = 'preview';
+  const carousel = root.querySelector<HTMLElement>('.viz-carousel')!;
+  carousel.className = 'studio-views';
   // The React root itself stays detached; everything it renders is portalled into the page.
   const host = createRoot(document.createElement('div'));
   // Render synchronously, so the controls exist before the logic module's first sync.
-  flushSync(() => host.render(<>
-    <ContentPanel pane={root.querySelector('.studio-content')!} views={views} />
-    <Inspectors views={views} />
-    <OutputDialog headerActions={root.querySelector('.studio-header-actions')!} root={root} views={views} />
-  </>));
+  flushSync(() => host.render(<Workspace root={root} views={views} carousel={carousel} />));
   return { sync: notifyEditor };
 }

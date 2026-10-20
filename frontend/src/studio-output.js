@@ -1,6 +1,7 @@
 import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.ts';
-import { resetLastFrame, setMotionClock, state, update, workspace } from './exploration-full-logic.js';
+import { resetLastFrame, setMotionClock, state, update } from './exploration-full-logic.js';
+import { refreshStudioPreview } from './studio-preview.js';
 // Clean stage previews and the exported page's keyboard shortcuts. Native Spout transport belongs to OBS.
 // The output dialog itself is the React component src/editor/OutputDialog.tsx.
 const exported = globalThis.studioOutput?.enabled === true;
@@ -13,7 +14,7 @@ export function setStudioCleanOutput(enabled) {
   document.body.classList.toggle('studio-output-body', enabled);
   exitHint.hidden = !enabled || exported;
   exitHint.classList.toggle('is-visible', enabled && !exported);
-  workspace.sync();
+  refreshStudioPreview();
 }
 export function mountStudioOutput(editor) {
   root = editor;

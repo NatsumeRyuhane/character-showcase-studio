@@ -1,4 +1,4 @@
-import { studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioShowDuration, studioStoryDuration, studioTotalDuration } from './timeline.ts';
+import { studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioStoryDuration, studioTotalDuration } from './timeline.ts';
 import { images, motionClock, resetLastFrame, state, update } from './exploration-full-logic.js';
 import { drawStudioStoryIntro, mountStudioStoryIntro } from './story-intro.js';
 import { drawStudioPostProcessing, mountStudioPostProcessing } from './studio-post.js';
@@ -26,13 +26,11 @@ export function mountStudioNarrative(views){
     ending.innerHTML='<div class="ending-content"><div class="ending-orbit" aria-hidden="true"></div><div class="ending-spark" aria-hidden="true"></div><div class="ending-lockup"><img class="ending-logo" alt="品牌 Logo"><span class="ending-word"></span><span class="ending-stroke" aria-hidden="true"></span></div></div>';
     view.art.append(ending);view.ending=ending;
     const shutdown=document.createElement('div');shutdown.className='cyber-shutdown';shutdown.setAttribute('aria-hidden','true');shutdown.innerHTML='<div class="shutdown-scan"></div><div class="shutdown-flash"></div><div class="shutdown-shutter shutdown-top"></div><div class="shutdown-shutter shutdown-bottom"></div><div class="shutdown-beam-glow"></div><div class="shutdown-line"></div><div class="shutdown-dot-glow"></div><div class="shutdown-dot"></div>';view.art.append(shutdown);view.shutdown=shutdown;
-    const button=document.createElement('button');button.className='btn';button.type='button';button.textContent='片尾';button.dataset.endingPreview='';view.section.querySelector('[data-show]').after(button);
-    button.addEventListener('click',()=>{state.time=state.introDuration+studioShowDuration(state.narrative);state.playing=true;resetLastFrame();update()});
     if(typeof mountStudioStoryIntro==='function')mountStudioStoryIntro(view);
     if(typeof mountStudioPostProcessing==='function')mountStudioPostProcessing(view);
   }
   return {sync(){
-    const n=state.narrative;for(const view of views){view.section.querySelector('[data-ending-preview]').disabled=!n.outroEnabled;view.ending.dataset.style=n.outroStyle;view.ending.classList.toggle('uses-logo',n.outroContent!=='word'&&!!images.logo);view.ending.querySelector('.ending-word').textContent=state.brand||'YOUR STUDIO';if(images.logo)view.ending.querySelector('img').src=images.logo;}
+    const n=state.narrative;for(const view of views){view.ending.dataset.style=n.outroStyle;view.ending.classList.toggle('uses-logo',n.outroContent!=='word'&&!!images.logo);view.ending.querySelector('.ending-word').textContent=state.brand||'YOUR STUDIO';if(images.logo)view.ending.querySelector('img').src=images.logo;}
   }};
 }
 export function drawStudioNarrative(view,pose){

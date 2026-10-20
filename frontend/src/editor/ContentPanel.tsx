@@ -1,7 +1,6 @@
 // Left pane: content shared by every design. Series, character and brand, the sequence and
 // post-processing panels, typography, images, delivery formats and badges, link and codes.
 import { useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { clearStudioImage, currentSeries, imageNames, images, loadStudioImage, state, studioError, update } from '../exploration-full-logic.js';
 import type { ImageKey } from '../output-payload.ts';
 import { badgeCatalog, cleanSeries, seriesDefaults, type SeriesEntry, type SeriesKey, type StudioState } from '../studio-state.ts';
@@ -27,7 +26,7 @@ function TextField({ field, id, label, max, type }: { field: TextKey; id: string
   );
 }
 
-export function ContentPanel({ pane, views }: { pane: Element; views: { storyShots?: { textLayoutKey: string }[] }[] }) {
+export function ContentPanel({ views }: { views: { storyShots?: { textLayoutKey: string }[] }[] }) {
   useEditorRevision();
   const files = useRef<Partial<Record<ImageKey, HTMLInputElement | null>>>({});
   const series = currentSeries() as SeriesEntry;
@@ -52,7 +51,7 @@ export function ContentPanel({ pane, views }: { pane: Element; views: { storySho
       {clear(kind, clearLabel, true)}
     </div>
   );
-  return createPortal(<>
+  return <>
     <div className="studio-panel-title"><h2>作品内容</h2><span className="studio-scope-label">所有方案共用</span></div>
     <p className="studio-note">先准备作品资料，再调整画面。</p>
     <details className="studio-group" data-studio-group="series" open>
@@ -146,5 +145,5 @@ export function ContentPanel({ pane, views }: { pane: Element; views: { storySho
       {clear('barcode', '恢复编号条码')}
     </details>
     <div className="direction-error" role="alert" hidden={!studioError}>{studioError}</div>
-  </>, pane);
+  </>;
 }
