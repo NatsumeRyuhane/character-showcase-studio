@@ -1,6 +1,6 @@
 # 更新记录
 
-格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。0.11.0 及更早的版本均在仓库建立前完成，记录整理自原 README 与开发文档。各版本的验证记录见 [docs/qa/](docs/qa/)。
+格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。0.11.0 及更早的版本均在仓库建立前完成，记录整理自原 README 与开发文档。各版本的验证记录见 [docs/qa/](qa/)。
 
 **导出的 HTML、OBS 包与 AE 模板都是快照，升级后需要用新版工作台重新导出，旧文件不会自动更新。**
 
@@ -9,8 +9,8 @@
 ### 文档
 - 新增 AI 助手协作规范 `AGENTS.md`（Claude Code 通过 `CLAUDE.md` 读取同一份内容）。
 - AI 助手的配置统一放在 `.agents/`，`.claude` 为指向它的符号链接。
-- 新增中文协作指南 `CONTRIBUTING.md`，以及 Issue、PR 模板。
-- 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，版本记录移入本文件。
+- 新增中文协作指南 `.github/CONTRIBUTING.md`，以及 Issue、PR 模板。
+- 文档按读者重新整理：使用说明移入 `docs/user/`（中文），开发文档以英文重写并移入 `docs/dev/`，历史验证记录归档到 `docs/qa/`，版本记录移入 `docs/CHANGELOG.md`。
 - AE 手动验证脚本移至 `tests/ae/`。
 
 ### 修复

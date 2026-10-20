@@ -28,15 +28,15 @@
 | [docs/user/editor.md](docs/user/editor.md) | 工作台使用说明：界面、视觉方案、片头片尾、后处理、输出 |
 | [docs/user/obs.md](docs/user/obs.md) | 导入 OBS：一体源与三层源 |
 | [docs/user/ae-export.md](docs/user/ae-export.md) | AE 可编辑模板的使用方法与效果范围 |
-| [CHANGELOG.md](CHANGELOG.md) | 版本更新记录 |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | 协作方式：如何提出需求、如何与 AI 助手一起修改项目 |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | 版本更新记录 |
+| [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) | 协作方式：如何提出需求、如何与 AI 助手一起修改项目 |
 | [docs/dev/](docs/dev/) | 开发文档（英文）：架构、状态与时间轴、导出、构建与测试、部署 |
 | [docs/qa/](docs/qa/) | 历史验证记录 |
 | [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) | 第三方代码、字体与图形的来源和许可 |
 
 ## 参与开发
 
-修改源码前请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。AI 助手（Codex、Claude Code 等）会自动读取 [AGENTS.md](AGENTS.md)。
+修改源码前请先阅读 [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)。AI 助手（Codex、Claude Code 等）会自动读取 [AGENTS.md](AGENTS.md)。
 
 开发只需要 Node.js 18 或更新版本，无需 `npm install`：
 

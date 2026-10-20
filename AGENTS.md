@@ -1,6 +1,6 @@
 # Agent guide
 
-This file is for AI coding agents (Codex, Claude Code and others) working in this repository. Read it fully before you change anything. Human contributors should read [CONTRIBUTING.md](CONTRIBUTING.md), which is in Chinese.
+This file is for AI coding agents (Codex, Claude Code and others) working in this repository. Read it fully before you change anything. Human contributors should read [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md), which is in Chinese.
 
 ## The project
 
@@ -38,7 +38,7 @@ When the person you are working for may be the owner, or you are not sure:
 
 | Chinese | English |
 | --- | --- |
-| User-facing docs (`README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `docs/user/`), UI text | Technical docs (`AGENTS.md`, `docs/dev/`, `docs/qa/`, `tests/**/README.md`) |
+| User-facing docs (`README.md`, `docs/CHANGELOG.md`, `.github/CONTRIBUTING.md`, `docs/user/`), UI text | Technical docs (`AGENTS.md`, `docs/dev/`, `docs/qa/`, `tests/**/README.md`) |
 | GitHub issues, PR titles and descriptions | Code, identifiers, code comments |
 | Commit messages | Replies to English-language comments or reviews |
 | Conversation with the owner | |
@@ -129,7 +129,7 @@ Update docs in the same branch as the change:
 
 | Change | Update |
 | --- | --- |
-| Anything users notice | The `## 未发布` section of `CHANGELOG.md`, and the relevant page in `docs/user/` (Chinese) |
+| Anything users notice | The `## 未发布` section of `docs/CHANGELOG.md`, and the relevant page in `docs/user/` (Chinese) |
 | Architecture, state fields, timing, export internals, build or deploy | The relevant page in `docs/dev/` (English) |
 | A notable manual or native-app verification | A new record in `docs/qa/` (`<version>-<topic>.md`, English) plus a row in its README |
 
@@ -149,6 +149,6 @@ Deploying (`npx wrangler deploy`) updates the public site and needs the owner's 
 
 - [ ] Build and check pass; UI changes were also checked in the browser.
 - [ ] Each commit is focused, with a Conventional Commits message in Chinese.
-- [ ] Docs and `CHANGELOG.md` are updated where needed.
+- [ ] Docs and `docs/CHANGELOG.md` are updated where needed.
 - [ ] You told the person, in plain words, what changed, what you checked, and what you did **not** check.
 - [ ] You asked before pushing, opening a PR or deploying, and did not merge or deploy without explicit approval.

@@ -2,7 +2,7 @@
 
 这份文档写给参与这个项目的每一个人，尤其是不熟悉编程和 Git 的成员。它说明我们怎样一起修改项目，以及怎样借助 AI 助手（Codex、Claude Code 等）安全地完成修改。
 
-AI 助手遵守的详细规则在 [AGENTS.md](AGENTS.md)（英文），助手会自动读取，你不需要逐条记住。下面只讲你需要知道的部分。
+AI 助手遵守的详细规则在 [AGENTS.md](../AGENTS.md)（英文），助手会自动读取，你不需要逐条记住。下面只讲你需要知道的部分。
 
 ## 先认识几个词
 
@@ -30,7 +30,7 @@ AI 助手遵守的详细规则在 [AGENTS.md](AGENTS.md)（英文），助手会
 4. **推送并发起 PR**：确认没问题后，助手会**先征求你的同意**，再推送分支并在 GitHub 发起 PR。
 5. **审阅**：其他成员在 PR 中查看修改、提出意见。有意见时，助手会继续在同一分支上修改。
 6. **合并**：审阅通过后，在 GitHub 的 PR 页面点击合并。
-7. **部署**：合并不会自动更新线上网站。需要上线时，由有 Cloudflare 权限的人手动部署（见 [docs/dev/deploy.md](docs/dev/deploy.md)）。
+7. **部署**：合并不会自动更新线上网站。需要上线时，由有 Cloudflare 权限的人手动部署（见 [docs/dev/deploy.md](../docs/dev/deploy.md)）。
 
 ## 为什么不要直接改 `main`
 
@@ -99,4 +99,4 @@ node tools/check.mjs    # 自动检查（构建后运行）
 node tools/server.mjs   # 本机预览 http://127.0.0.1:8768/
 ```
 
-请先阅读 [docs/dev/architecture.md](docs/dev/architecture.md)，并遵守 [AGENTS.md](AGENTS.md) 中的 Git 流程与代码规则。
+请先阅读 [docs/dev/architecture.md](../docs/dev/architecture.md)，并遵守 [AGENTS.md](../AGENTS.md) 中的 Git 流程与代码规则。

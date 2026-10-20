@@ -10,7 +10,7 @@
 
 - [ ] `node tools/build.mjs` 与 `node tools/check.mjs` 通过
 - [ ] 已在浏览器中实际查看（界面或画面有变化时）
-- [ ] 已更新 `CHANGELOG.md` 的「未发布」部分（用户能感知到的变化）
+- [ ] 已更新 `docs/CHANGELOG.md` 的「未发布」部分（用户能感知到的变化）
 - [ ] 已更新相关文档（`docs/user/` 或 `docs/dev/`）
 
 <!-- 写明检查了哪些方案、画幅或导出方式，以及哪些没有检查。 -->
