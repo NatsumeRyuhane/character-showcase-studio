@@ -50,7 +50,7 @@ for(const [name,markup]of [['output',result.html],['frame',frame]])for(const mat
   if(/type="application\/json"/.test(match[1]))continue;
   new vm.Script(match[2],{filename:name+'-'+scripts++});
 }
-assert.ok(scripts>=9);
+assert.ok(scripts>=4);
 payload.config.includeCharacters=true;
 const included=build(payload);assert.ok(included.html.includes('data:image/png'));
 const includedGlobals=JSON.parse(decode(included.html.match(/\bdata-srcdoc="([^"]*)"/)[1]).match(/id="codex-visualization-widget-state">([\s\S]*?)<\/script>/)[1]);

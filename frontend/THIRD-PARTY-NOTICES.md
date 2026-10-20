@@ -5,8 +5,7 @@
 | 内容 | 来源与许可位置 |
 | --- | --- |
 | React、React DOM 19 | 由 npm 安装（`package-lock.json` 锁定版本），打包进页面；MIT，许可文本保留在打包代码的注释中 |
-| Lucide 1.17.0 | `vendor/lucide.js`；ISC 与部分 Feather 图标 MIT，见 `vendor/LUCIDE-LICENSE.txt` |
-| Floating UI Core 1.7.3、DOM 1.7.4 | `vendor/`；MIT，见 `vendor/FLOATING-UI-LICENSE.txt` |
+| Lucide 1.17.0 中的 7 个图标 | 图形数据复制在 `src/icons.ts`；ISC 与部分 Feather 图标 MIT，见 `vendor/LUCIDE-LICENSE.txt` |
 | JsBarcode 3.12.1 | `src/barcode-code128.min.js`；MIT，见 `vendor/JSBARCODE-LICENSE.txt` |
 | QR Code Generator | `src/qrcode-generator.js`；MIT，见 `vendor/QRCODE-LICENSE.txt`；作者 Kazuhiko Arase |
 | Barlow Condensed、Cormorant Garamond、Manrope、Nunito、Space Grotesk | `assets/fonts/`；SIL Open Font License，见各字体的 `*-OFL.txt` |

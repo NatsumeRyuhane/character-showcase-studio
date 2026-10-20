@@ -71,13 +71,9 @@ if (ids.length !== new Set(ids).size) throw new Error('Duplicate IDs in generate
 if (/<(?:html|head|body|!doctype)\b/i.test(fragment)) throw new Error('Source fragment contains document markup.');
 if (/\/\* STUDIO_STYLES \*\/|<!-- DUAL_LANGUAGE_MARKUP -->/.test(fragment)) throw new Error('Unreplaced source marker.');
 
-let kit = await read('runtime', 'visualize.html');
-kit = replaceRequired(kit, '<script src="https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js"></script>', `<script>${inlineScript(await read('vendor', 'floating-ui-core.min.js'))}</script>`);
-kit = replaceRequired(kit, '<script src="https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js"></script>', `<script>${inlineScript(await read('vendor', 'floating-ui-dom.min.js'))}</script>`);
-kit = replaceRequired(kit, '<script id="codex-visualization-lucide" async src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js"></script>', `<script id="codex-visualization-lucide">${inlineScript(await read('vendor', 'lucide.js'))}</script>`);
-kit = replaceRequired(kit, '<!--__INLINE_VISUALIZATION_FRAGMENT__-->', fragment);
-if (/<script\b[^>]*\bsrc\s*=/i.test(kit) || /@import\b/i.test(fragment)) throw new Error('A runtime network dependency remains.');
-const stylesheet = await read('runtime', 'visualize.css');
+// The fragment is the frame document's body and embeds every script it needs.
+if (/<script\b[^>]*\bsrc\s*=/i.test(fragment) || /@import\b/i.test(fragment)) throw new Error('A runtime network dependency remains.');
+const stylesheet = await read('runtime', 'frame.css');
 const bridge = inlineScript(await read('runtime', 'standalone-host-bridge.js'));
 const shell = inlineScript(await read('runtime', 'standalone-shell.js'));
 // Published starting point is data only, never imported markup or scripts.
@@ -94,7 +90,7 @@ const title = '角色展示设计工作台 · Character Showcase Studio';
 const frameHtml = `<!doctype html>
 <html lang="zh-CN" data-visualize-standalone>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="${frameCsp}"><title>${title}</title><style>${stylesheet}\nhtml>body{padding:0}</style></head>
-<body><script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__</script><script>${bridge}</script>${kit}</body></html>`;
+<body><script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__</script><script>${bridge}</script>${fragment}</body></html>`;
 const document = `<!doctype html>
 <html lang="zh-CN" data-visualize-standalone>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="${shellCsp}"><title>${title}</title><style>:root{color-scheme:light;background:#edf0e9}html,body{margin:0;height:100%;overflow:hidden}body{box-sizing:border-box;background:inherit}iframe{display:block;width:100%;height:100dvh;margin:0 auto;border:0}</style></head>
