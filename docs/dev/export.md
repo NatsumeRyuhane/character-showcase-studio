@@ -5,8 +5,8 @@ How the three outputs (standalone HTML, OBS package, After Effects template) are
 ## Shared rules
 
 - **Exports are snapshots.** Each one carries the design and images as they were at export time. Nothing syncs back, and old exports never update; they must be re-exported.
-- **The sandbox only sends data.** `src/studio-output.js` collects state and images and sends them to the shell (`studio-output-export`). `runtime/export-packages.js` validates them and builds the files. It never accepts HTML, script, expressions or file paths from the frame.
-- **Limits.** State is at most 16 KiB, sent with the same `tuple-v1` encoding as persistence and expanded through the same `restore` path. Images must be PNG, JPEG or WebP base64, at most 18 MiB encoded each (shot uploads are capped at 12 MB). AE scene data is at most 48 MiB. JSON is written with `<` escaped.
+- **The sandbox only sends data.** `src/studio-output.js` collects state and images and sends them to the shell (`studio-output-export`). `runtime/export-packages.ts` validates them and builds the files. It never accepts HTML, script, expressions or file paths from the frame.
+- **Limits.** State is at most 16 KiB, sent with the same `tuple-v1` encoding as persistence and expanded through the same restore path (`restoreStudioState`). Images must be PNG, JPEG or WebP base64, at most 18 MiB encoded each (shot uploads are capped at 12 MB). AE scene data is at most 48 MiB. JSON is written with `<` escaped.
 - **The user clicks to download.** Downloads go through the shell and need user activation. AE is two clicks: "generate" for the slow sampling, then "download".
 - **Image filtering.** `includeCharacters:false` drops all four character and shot images. `storyPackagingOnly:true` drops only the two shot images. The sandbox and the host apply the same filter.
 - **Resolution.** `src/export-layout.js` fixes the logical size at 1920×1080 or 1080×1920. 4K only scales: coordinates, font sizes, strokes, radii, icons and shapes, plus their animation samples. Colour, opacity, time and speed are never scaled. Paths and samples can share references, so the scaler must create new arrays.
@@ -23,14 +23,14 @@ A clean-output page: `.is-clean-output` hides the editor chrome. Its initial glo
 
 ## OBS package
 
-Built by `runtime/export-packages.js`. There are two structures.
+Built by `runtime/export-packages.ts`. There are two structures.
 
 **Single source** (no Node needed): `output.html`, `scene.json`, `PREPARE-OBS.cmd` (writes `IMPORT-IN-OBS.json` with this folder's absolute path; never touches a running OBS), `README.txt` and `ASSET-NOTICES.txt`.
 
 **Three synchronized layers** (0.11.0): `picture.html`, `effects.html` and `borders.html`, stacked bottom to top in OBS. External character sources can be inserted between them.
 - `START-LAYERS.cmd` / `START-OBS-LAYERS.cmd` run `OBS-LAYERS-SERVER.mjs` (packaged from `runtime/obs-layer-server.mjs`). It is dependency-free Node 18+ and listens on `127.0.0.1` with an OS-assigned port. It reads `studio-sync.json` (a random key plus the three layer file names), writes `IMPORT-IN-OBS.json` from `scene-template.json`, and opens `control.html` (from `runtime/obs-layer-control.html`). Starting it again reuses a service that is already running.
 - Endpoints: `/__studio_clock` (layers poll the shared clock), `/__studio_control` (play, pause, replay, show, ending).
-- `runtime/obs-layer-host.js` runs in each layer's trusted shell. It only talks to the same origin, polls the clock, and forwards `studio:layer-clock` messages to the sandbox. `src/obs-layer-sync.js` applies them: all three layers sample one absolute clock, so a reloaded layer catches up instead of replaying.
+- `runtime/obs-layer-host.ts` runs in each layer's trusted shell. It only talks to the same origin, polls the clock, and forwards `studio:layer-clock` messages to the sandbox. `src/obs-layer-sync.js` applies them: all three layers sample one absolute clock, so a reloaded layer catches up instead of replaying.
 - The effects layer can only add light (scan lines, ripples, light leaks, flares). It cannot read other OBS sources' pixels. Real glow, chromatic aberration and distortion stay inside the picture layer.
 
 Spout2 is not implemented by the page. Users add the obs-spout2-plugin filter in OBS. That path has never been tested end to end.
@@ -74,9 +74,13 @@ Rich web textures (metal, cloud, plush gradients, CSS filters, frosted glass, gr
 
 | File | Role |
 | --- | --- |
-| `runtime/export-packages.js` | Validate sandbox data, build OBS and AE file lists |
-| `runtime/export-zip.js` | Dependency-free ZIP writer |
-| `runtime/studio-output-host.js` | Shell side of the export request |
+| `runtime/output-host.ts` | Entry of the shell's output host bundle |
+| `runtime/export-packages.ts` | Validate sandbox data, build OBS and AE file lists |
+| `runtime/export-zip.ts` | Dependency-free ZIP writer |
+| `runtime/studio-output-host.ts` | Shell side of the export request: validate, build the output page, download |
+| `runtime/obs-layer-host.ts` | Clock bootstrap copied into synchronized OBS layer pages |
+| `tools/output-host-defines.mjs` | Files embedded in exports, as build-time constants |
+| `tests/unit/export-packages.test.ts` | ZIP writer, AE validation, output page, OBS file lists |
 | `tests/check-export-packages.cjs` | Production geometry, data bounds, script syntax, OBS scenes, ZIP integrity |
 | `tests/check-ae-geometry-motion.cjs` | Rigid ring radius, production fixtures, intro transition, in-between error, static spans |
 | `tests/check-ae-transitions.cjs`, `check-ae-postprocessing.cjs` | AE timing controls and post-processing data |

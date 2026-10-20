@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'vite';
+import { outputHostDefines, readBadgeNotices } from './output-host-defines.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (directory, name) => fs.readFile(path.join(root, directory, name), 'utf8');
@@ -28,6 +29,20 @@ const bundle = await build({
 });
 const outputs = (Array.isArray(bundle) ? bundle[0] : bundle).output;
 const script = outputs.find(item => item.type === 'chunk').code;
+// The shell's output host is a second, separate bundle (entry runtime/output-host.ts). It runs
+// outside the sandbox, so it shares no code with the frame. The files it embeds in exports
+// come in as build-time constants.
+const hostBundle = await build({
+  root, configFile: false, publicDir: false, logLevel: 'warn',
+  define: await outputHostDefines(root),
+  build: {
+    write: false, target: 'esnext', minify: false,
+    rolldownOptions: { cwd: root },
+    lib: { entry: path.join(root, 'runtime', 'output-host.ts'), formats: ['iife'], name: 'studioOutputHostBundle', fileName: () => 'output-host.js' },
+  },
+});
+const hostScript = (Array.isArray(hostBundle) ? hostBundle[0] : hostBundle).output.find(item => item.type === 'chunk').code;
+if (/__STUDIO_(?:AE_TEMPLATE|ASSET_NOTICES|OBS_LAYER_SERVER|OBS_LAYER_CONTROL)__/.test(hostScript)) throw new Error('Unreplaced output host constant.');
 const styles = outputs.find(item => item.fileName.endsWith('.css'))?.source;
 if (typeof styles !== 'string') throw new Error('Vite produced no stylesheet.');
 let fragment = await read('src', 'exploration-full-template.html');
@@ -46,7 +61,7 @@ fontCss = await (async () => {
 fragment = fragment.replace(/@import\s+url\(['"]https:\/\/fonts\.googleapis\.com[^;]+;/, () => fontCss);
 fragment = fragment.replaceAll("'Noto Sans SC'", "'Microsoft YaHei UI','Microsoft YaHei','PingFang SC'");
 const vendor = `${await read('src', 'barcode-code128.min.js')}\n${await read('src', 'qrcode-generator.js')}`;
-const notices = (await read('src/badge-assets', 'SOURCE-NOTICES.txt')).replaceAll('-->', '-- >');
+const notices = await readBadgeNotices(root);
 fragment = replaceRequired(fragment, '<!-- EXPLORATION_SCRIPTS -->',
   `<!-- Badge source notices\n${notices}\n-->\n<script>\n${inlineScript(vendor)}\n</script>\n<script>\n${inlineScript(script)}\n</script>`);
 const ids = [...fragment.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
@@ -67,15 +82,7 @@ const shell = inlineScript(await read('runtime', 'standalone-shell.js'));
 const startupDefaults = JSON.parse(await read('runtime', 'startup-defaults.json'));
 if (typeof startupDefaults.revision !== 'string' || !startupDefaults.widgetState?.privateContent || Buffer.byteLength(JSON.stringify(startupDefaults.widgetState)) > 16384) throw new Error('Invalid startup defaults.');
 const startupJson = JSON.stringify(startupDefaults).replaceAll('<', '\\u003c');
-let exportPackages = await read('runtime', 'export-packages.js');
-// ExtendScript (ES3) has no modules: the shared CRT function goes into the AE template without its export keyword.
-const crtMotion = (await read('runtime', 'crt-motion.js')).replace(/^export (?=function )/m, '');
-if (/^\s*(?:import|export)\b/m.test(crtMotion)) throw new Error('runtime/crt-motion.js must stay a single exported function.');
-exportPackages = replaceRequired(exportPackages, '__STUDIO_AE_TEMPLATE__', JSON.stringify(replaceRequired(await read('runtime', 'ae-import-template.jsx'), '/* CRT_MOTION_FUNCTION */', crtMotion)));
-exportPackages = replaceRequired(exportPackages, '__STUDIO_ASSET_NOTICES__', JSON.stringify(notices));
-exportPackages = replaceRequired(exportPackages, '__STUDIO_OBS_LAYER_SERVER__', JSON.stringify(await read('runtime', 'obs-layer-server.mjs')));
-exportPackages = replaceRequired(exportPackages, '__STUDIO_OBS_LAYER_CONTROL__', JSON.stringify(await read('runtime', 'obs-layer-control.html')));
-const outputHost = inlineScript(`${await read('runtime', 'export-zip.js')}\n${exportPackages}\n${await read('runtime', 'obs-layer-host.js')}\n${await read('runtime', 'studio-output-host.js')}`);
+const outputHost = inlineScript(hostScript);
 // The original sandbox and CSP policies are retained. The generated page embeds
 // all required scripts, styles, icons and Latin fonts, so they need no connection.
 const sources = 'blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com';

@@ -1,4 +1,4 @@
-import { studioContinuousShow, studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioShowDuration, studioStoryDuration, studioTotalDuration } from './timeline.js';
+import { studioContinuousShow, studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioShowDuration, studioStoryDuration, studioTotalDuration } from './timeline.ts';
 import { images, motionClock, resetLastFrame, state, update } from './exploration-full-logic.js';
 import { drawStudioStoryIntro, mountStudioStoryIntro } from './story-intro.js';
 import { drawStudioPostProcessing, mountStudioPostProcessing } from './studio-post.js';

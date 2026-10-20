@@ -9,6 +9,7 @@
     "start": "node tools/server.mjs",
     "check": "node tools/check.mjs",
     "typecheck": "tsc",
+    "test": "vitest run",
     "test:visual": "node tools/visual-docker.mjs"
   },
   "engines": {
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   }
 }

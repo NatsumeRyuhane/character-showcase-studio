@@ -1,5 +1,5 @@
-import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.js';
-import { createMotionClock } from './motion-clock.js';
+import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.ts';
+import { createMotionClock } from './motion-clock.ts';
 import { root, setMotionClock, state } from './exploration-full-logic.js';
 
 // All three OBS sources sample one clock. Reloading / reactivating one source

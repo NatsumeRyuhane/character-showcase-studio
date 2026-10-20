@@ -4,7 +4,7 @@
 
 Node.js 22.12 or newer, with npm (it ships with Node.js). Run every command below from `frontend/`.
 
-Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. The dependencies (Vite, TypeScript) are build-time only; the built page loads nothing.
+Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. The dependencies (Vite, TypeScript, Vitest, Playwright) are development tools only; the built page loads nothing.
 
 ## Commands
 
@@ -14,30 +14,41 @@ Install the build dependencies with `npm ci` once, and again whenever `package-l
 | `node tools/build.mjs` (`npm run build`) | Builds `dist/` from `src/`, `runtime/`, `assets/`, `vendor/` |
 | `node tools/check.mjs` (`npm run check`) | Runs all automated checks against the **built** output. Build first. |
 | `npm run typecheck` | Runs `tsc` alone; `check.mjs` runs it too |
+| `npm test` | Runs the [unit tests](#unit-tests) alone; `check.mjs` runs them too. `npx vitest` keeps them running in watch mode. |
 | `npm run test:visual` | Builds and runs the [visual regression tests](#visual-regression-tests) in Docker. Add `-- --update-snapshots` to rewrite the baseline. |
 | `node tools/server.mjs [port]` (`npm start`) | Serves `dist/` read-only on `http://127.0.0.1:8768/` in the foreground. Build first. |
 | `./start.sh <command>` / `start.cmd <command>` (repository root) | The [launcher](launcher.md): `start`, `stop`, `restart`, `status`, `build`, `check`, `doctor`, `upgrade` |
 
 Always run **build, then check**, and commit only when the check prints its final `PASS` line. The check:
 
-1. Parses `dist/exploration-full-source.js` and the syntax of the tool and visual-test scripts, and runs the TypeScript check (`tsc`, see `tsconfig.json`; JavaScript is allowed but not type-checked yet).
+1. Parses `dist/exploration-full-source.js` and the syntax of the tool and test configuration scripts, runs the TypeScript check (`tsc`, see `tsconfig.json`; JavaScript is allowed but not type-checked yet), and runs the [unit tests](#unit-tests).
 2. Decodes the shell and the sandboxed frame from `dist/index.html` and parses every embedded script; at least 9 must be present.
 3. Asserts the sandbox and CSP are still there, all 13 designs are present, there are no external `<script src>` or `@import`, and no machine-specific paths such as `C:\Users\…` or `.codex/`.
-4. Runs every regression script in `tests/check-*.cjs`.
+4. Runs every regression script listed in it from `tests/check-*.cjs`.
 
 ## Tests
 
-Tests are plain Node scripts using `node:assert` and `node:vm`. Most load source files into a VM context and call the production functions directly. There is no test framework yet (Vitest arrives in phase 3 of the rewrite).
+There are two kinds of automated tests, and `node tools/check.mjs` runs both. They are moving from the second kind to the first during the rewrite (issue #3, phase 3).
 
-Source files are ES modules, so tests load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else.
+### Unit tests
 
-To add a test:
-1. Create `tests/check-<topic>.cjs` that exits non-zero on failure and prints a one-line `PASS: …` summary.
-2. Add its file name to the list in `tools/check.mjs`. **It does not run otherwise.**
+`tests/unit/*.test.ts` are [Vitest](https://vitest.dev/) tests. They import the source modules directly, as the bundle does, and test their exported functions. `vitest.config.mjs` limits Vitest to this folder. `tsconfig.json` includes it, so the tests are type-checked too.
 
-To add a source module, create it in `src/` (`.js` or `.ts`) and import it where it is used. Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
+To add one, create `tests/unit/<module>.test.ts`. Vitest finds it automatically; nothing needs registering. Write new tests here.
+
+### Older regression scripts
+
+`tests/check-*.cjs` are plain Node scripts using `node:assert` and `node:vm`. Most load source files into a VM context and call the production functions directly, and several stub just enough DOM to run parts of the editor module.
+
+Source files are ES modules, so these scripts load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It strips the types from `.ts` files with the transformer Vite uses, drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. A `.ts` file keeps its own scope, as a module does: only its exports become globals of the context, while `.js` files share one scope. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else.
+
+A script that only tests a module's exports moves to `tests/unit/` when that module is converted. The scripts that need the editor module or the shell scripts stay until those are split up. To change the list, edit `tools/check.mjs`: **a script that is not listed there does not run.** Each script exits non-zero on failure and prints a one-line `PASS: …` summary.
 
 `tests/ae/` holds manual After Effects harnesses; see its README.
+
+### Adding a source module
+
+Create it in `src/`, in TypeScript for new code, and import it where it is used. Imports name the file with its extension, `.ts` included (`import { … } from './variant-codec.ts'`). Import new CSS from `src/main.js`, in cascade order. `tools/build.mjs` needs no change (see [architecture.md](architecture.md#build-pipeline)).
 
 ## Visual regression tests
 

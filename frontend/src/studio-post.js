@@ -1,4 +1,4 @@
-import { studioStoryDuration } from './timeline.js';
+import { studioStoryDuration } from './timeline.ts';
 import { motionClock, reduced, state } from './exploration-full-logic.js';
 
 // One optical surface for every scene. Borders stay outside this surface;

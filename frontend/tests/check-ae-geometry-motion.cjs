@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=req
 const {load,moduleScript}=require('./support/module-script.cjs');
 const scope={structuredClone};vm.createContext(scope);const read=file=>fs.readFileSync(path.join(root,'src',file),'utf8');
 load(scope,'runtime/crt-motion.js');
-for(const name of ['ae-canvas-recorder.js','ae-geometry-motion.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','timeline.js'])load(scope,'src/'+name);
+for(const name of ['ae-canvas-recorder.js','ae-geometry-motion.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','timeline.ts'])load(scope,'src/'+name);
 load(scope,'src/studio-geometry.js','src/exploration-full-scene.js');
 const capture=(paint,duration,options={})=>scope.captureStudioAEGeometry(paint,duration,{yield:async()=>{},...options});
 function interpolate(op,time){const list=op.samples;let n=0;while(n+1<list.length&&list[n+1].time<time)n++;const a=list[n],b=list[Math.min(n+1,list.length-1)],f=b.time>a.time?(time-a.time)/(b.time-a.time):0,mix=(x,y)=>x+(y-x)*f;

@@ -11,9 +11,11 @@
     "checkJs": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Imports name the .ts file, which Vite and Vitest resolve as written.
+    "allowImportingTsExtensions": true,
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src", "runtime/**/*.ts", "tests/unit"]
 }

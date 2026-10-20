@@ -1,25 +1,7 @@
 import { currentSeries, state, update } from './exploration-full-logic.js';
+import { studioTypographySettings } from './typography.ts';
 
-// Shared text overrides. Empty values retain the visual language of each design.
-export function studioTypographySettings(value={}){
-  const source=value&&typeof value==='object'?value:{};
-  const pick=(v,list,fallback)=>list.includes(v)?v:fallback;
-  const bounded=(v,a,b,fallback)=>Number.isFinite(v)?Math.max(a,Math.min(b,v)):fallback;
-  const clean=(v,max=64)=>typeof v==='string'?v.replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,max):'';
-  const result={};
-  for(const key of ['name','character','author','caption','subtitle']){
-    const item=source[key]&&typeof source[key]==='object'?source[key]:{};
-    result[key]={text:clean(item.text),font:pick(item.font,['auto','manrope','grotesk','condensed','serif','rounded','system'],'auto'),scale:bounded(item.scale,.6,1.5,1),tracking:Number.isFinite(item.tracking)?bounded(item.tracking,-.12,.25,0):null,weight:pick(item.weight,['auto','400','500','600','700','800','900'],'auto'),italic:pick(item.italic,['auto','normal','italic'],'auto'),colorMode:pick(item.colorMode,['auto','custom'],'auto'),color:/^#[0-9a-f]{6}$/i.test(item.color)?item.color:'#f3f0e5',case:pick(item.case,['original','uppercase','lowercase'],'original')};
-  }
-  result.copy={};for(const role of ['character','author']){const item=source.copy?.[role]||{};result.copy[role]={kicker:clean(item.kicker,80),label:clean(item.label,80),meta:clean(item.meta,120)};}
-  return result;
-}
-export function studioTypographyValue(settings,key,fallback){
-  const item=settings?.[key]||{},text=(item.text||'').trim()||fallback||'';
-  return item.case==='uppercase'?text.toUpperCase():item.case==='lowercase'?text.toLowerCase():text;
-}
-export function studioTypographyCopy(settings,role,key,fallback){return (settings?.copy?.[role]?.[key]||'').trim()||fallback||'';}
-export function studioTypographyLayoutChanged(settings){return ['name','caption','subtitle'].some(key=>{const item=settings?.[key];return item&&(item.scale!==1||item.font!=='auto'||item.weight!=='auto'||item.italic!=='auto'||item.tracking!==null||item.text||item.case!=='original');});}
+// Editor controls and DOM styling for the shared text overrides (settings: typography.ts).
 export function studioTypographyStyle(el,key){
   if(!el)return;const item=state.typography[key],fonts={manrope:'"Manrope","Microsoft YaHei UI",sans-serif',grotesk:'"Space Grotesk","Microsoft YaHei UI",sans-serif',condensed:'"Barlow Condensed","Microsoft YaHei UI",sans-serif',serif:'"Cormorant Garamond","Noto Serif SC","Songti SC",SimSun,serif',rounded:'"Nunito","Microsoft YaHei UI",sans-serif',system:'"Microsoft YaHei UI","PingFang SC",sans-serif'};
   for(const[property,value]of Object.entries({'font-family':fonts[item.font]||'','font-weight':item.weight==='auto'?'':item.weight,'font-style':item.italic==='auto'?'':item.italic,'letter-spacing':item.tracking===null?'':item.tracking+'em',color:item.colorMode==='custom'?item.color:''}))value?el.style.setProperty(property,value):el.style.removeProperty(property);

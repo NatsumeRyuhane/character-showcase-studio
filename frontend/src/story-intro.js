@@ -1,5 +1,6 @@
 import { currentSeries, images, state } from './exploration-full-logic.js';
-import { applyStudioStoryTypography, studioTypographyCopy, studioTypographyValue } from './studio-text.js';
+import { applyStudioStoryTypography } from './studio-text.js';
+import { studioTypographyCopy, studioTypographyValue } from './typography.ts';
 
 // Seekable opening overlays. Every effect is painted from the shot's local time.
 function studioPaintStoryEffect(ctx,w,h,options={}){

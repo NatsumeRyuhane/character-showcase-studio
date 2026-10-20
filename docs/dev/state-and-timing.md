@@ -6,6 +6,8 @@ How settings are stored, encoded and restored, and how the timeline and motion c
 
 The editor state is one JSON snapshot: `privateContent` with `design: "character-explorations"` and `version: 6`. New fields are optional additions to version 6. Older snapshots, including the early exploration and old Studio formats, still restore.
 
+`src/studio-state.ts` holds the state's types and defaults and its pure functions: `createStudioState` (a new project), `restoreStudioState(state, saved)` (validates a saved snapshot and applies it in place; `false` and no change for a missing or foreign one), `studioSnapshot` and `studioModelContent` (what is saved), and `stateSignature`. The editor module (`exploration-full-logic.js`) owns the one live `state` and the glue: when to save, recognising its own echoes, and rebuilding the motion clock after a restore. Typography settings are validated by `src/typography.ts`.
+
 ### Scopes
 
 | Scope | Data |
@@ -29,20 +31,20 @@ The shell rejects snapshots over **16 KiB**. To fit 13 designs, per-design setti
 ```js
 snapshot.variantEncoding = 'tuple-v1';
 snapshot.variants = encodeStudioVariants(state.variants);
-// On restore, expand before the usual field validation:
-expanded = decodeStudioVariants(source.variants, variantBaseline);
+// On restore, expand over fresh defaults before the usual field validation:
+expanded = decodeStudioVariants(source.variants, createDefaultVariants());
 ```
 
 - In memory, `state.variants` is always the readable object form. Encoding only happens on save.
 - Each design is a fixed-order array of **51 slots**: 27 main fields, 16 `effects`, 5 `shadows` and 3 `geometryBySeries`. Missing optional values are written as `null`.
 - **Slots are append-only.** Changing the meaning or order of an existing slot needs a new encoding marker. Never derive the slot order from object key order.
-- Decoding starts from a deep copy of `variantBaseline`, captured after init, and then applies known non-null scalars. Settings that another snapshot omits do not inherit the current session's edits. Unknown designs, future slots and non-scalar slots are ignored, and the expanded values still go through the usual enum, colour and range validation.
+- Decoding starts from a fresh copy of the default variants (`createDefaultVariants`) and then applies known non-null scalars. Settings that another snapshot omits do not inherit the current session's edits. Unknown designs, future slots and non-scalar slots are ignored, and the expanded values still go through the usual enum, colour and range validation.
 - Untagged v6 and older snapshots restore through the old object path and keep its merge behaviour.
 - `ownSnapshots` stores signatures of the encoded snapshots actually sent. `stateSignature` sorts object keys recursively, so when the host echoes the state back with reordered keys, it does not trigger a restore or reset the motion clocks.
 
 Measured sizes at 0.9.0: default snapshot 10,493 bytes; every text field at its maximum, 12,005 bytes.
 
-**When you add a field:** update the codec if it is per-design, and add or extend tests for old-object migration, default restoration from encoded snapshots, and maximum-length capacity (`tests/check-variant-codec.cjs`, `tests/check-motion-state.cjs`).
+**When you add a field:** update the codec if it is per-design, and add or extend tests for old-object migration, default restoration from encoded snapshots, and maximum-length capacity (`tests/unit/variant-codec.test.ts`, `tests/unit/studio-state.test.ts`).
 
 ### Storage
 
@@ -64,7 +66,7 @@ To publish a new preset, take the plain configuration JSON from an HTML export o
 
 There are two independent families of time. Keep them separate.
 
-### 1. Narrative time (`src/timeline.js`)
+### 1. Narrative time (`src/timeline.ts`)
 
 Narrative time is seekable, pausable and replayable. Every pose is a pure function of `(time, intro, narrative)`:
 
@@ -109,7 +111,7 @@ Story intro fields, stored in `narrative`:
 
 A disabled shot takes no time, and with both disabled the page goes straight to the show. During the two shots the main info, model layer and rings are hidden; the whole poster layer uses `display:none` when inactive, so child `visibility` cannot override it. Shot images fall back: character shot → main image → secondary image; creator shot → secondary image → main image; with no image, only the text packaging shows. `studioPaintStoryEffect(ctx, w, h, {effect, time, strength, speed, accent, dark})` is deterministic for the same input.
 
-### 2. Continuous motion clocks (`src/motion-clock.js`)
+### 2. Continuous motion clocks (`src/motion-clock.ts`)
 
 The ring, text and border clocks, and the background `t` / `gridMoving` clock, **only ever advance**. They never reset on replay, loop, phase change or speed change. Rings move from the first intro frame (`ringTime`). Speed changes must not cause phase jumps.
 

@@ -1,8 +1,9 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
 const {load,moduleScript}=require('./support/module-script.cjs');
+const {outputHostConstants}=require('./support/output-host.cjs');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const scope={};vm.createContext(scope);
-for(const file of ['runtime/crt-motion.js','src/timeline.js','src/motion-clock.js','src/studio-text.js','src/story-intro.js'])load(scope,file);
+for(const file of ['runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/typography.ts','src/studio-text.js','src/story-intro.js'])load(scope,file);
 const json=value=>JSON.parse(JSON.stringify(value));
 const near=(actual,expected,tolerance=1e-9)=>assert.ok(Math.abs(actual-expected)<tolerance,`${actual} != ${expected}`);
 const n=scope.studioNarrativeSettings({introStyle:'story'}),intro=scope.studioStoryDuration(n);
@@ -140,7 +141,7 @@ assert.equal(paintCalls(effectTrace({effect:'none',time:1,strength:1,speed:1,acc
 // primary showcase. The real host validator and JSX serialization are used.
 const aeScope={TextEncoder,Uint8Array,DataView,Blob,structuredClone,atob};vm.createContext(aeScope);
 const jsx=read('runtime/ae-import-template.jsx').replace('/* CRT_MOTION_FUNCTION */',()=>moduleScript('runtime/crt-motion.js'));
-vm.runInContext(read('runtime/export-packages.js').replace('__STUDIO_AE_TEMPLATE__',()=>JSON.stringify(jsx)).replace('__STUDIO_ASSET_NOTICES__',()=>JSON.stringify('QA notices')).replace('__STUDIO_OBS_LAYER_SERVER__',()=>JSON.stringify(read('runtime/obs-layer-server.mjs'))).replace('__STUDIO_OBS_LAYER_CONTROL__',()=>JSON.stringify(read('runtime/obs-layer-control.html'))),aeScope);
+Object.assign(aeScope,outputHostConstants({aeTemplate:jsx,notices:'QA notices'}));load(aeScope,'runtime/export-packages.ts');
 const textLayer=(name,text)=>({kind:'text',name,text,fontFamily:'Arial',fontSize:80,weight:700,tracking:0,x:400,y:200,w:600,h:100,entry:0,opacity:1,color:[1,1,1,1]});
 const scene={version:1,name:'Story QA',design:'district',width:1920,height:1080,fps:30,intro:5.1,duration:17.1,showDuration:12,speed:1,offset:0,background:[.1,.1,.1,1],ink:[1,1,1,1],accent:[1,.2,.3,1],transparent:false,frame:'horizontal',frameThickness:60,layers:[textLayer('角色名字','NOVA')],geometry:[],warnings:[],motion:{enabled:true,style:'refined',amount:.55,speed:1},shadow:{enabled:true,color:[0,0,0,1],strength:.5,depth:1,soft:false},pattern:{kind:'dots',opacity:.05,moving:true,amount:.15},edges:{top:{direction:'negative',duration:32},bottom:{direction:'positive',duration:38}},borderText:{top:'TEST',bottom:'TEST'},narrative:{introStyle:'story',nameReveal:'show',nameDelay:.65,transitionStart:4.5,transitionDuration:.6,infoDuration:.6,endingTransitionDuration:.8},story:{enabled:true,transitionStart:4.5,transitionDuration:.6,packagingOnly:false,flash:false,shots:[{role:'character',start:0,duration:2.5,corner:'tl-br',effect:'polar',strength:.3,effectSpeed:.7,layers:[textLayer('片头角色 · 名字','NOVA')]},{role:'author',start:2.5,duration:2,corner:'tr-bl',effect:'holo',strength:.3,effectSpeed:.7,layers:[textLayer('片头作者 · 名字','YOUR STUDIO')]}]}};
 const built=aeScope.buildStudioAEFiles({scene,assets:[]});

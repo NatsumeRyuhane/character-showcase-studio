@@ -5,7 +5,7 @@ const assert=require('assert/strict');
 const root=__dirname+'/..';
 const scope={TextEncoder,document:{getElementById:()=>null,querySelector:()=>null}};
 vm.createContext(scope);
-vm.runInContext(moduleScript('runtime/crt-motion.js')+'\n'+moduleScript('src/timeline.js')+'\n'+fs.readFileSync(root+'/runtime/studio-output-host.js','utf8'),scope);
+load(scope,'runtime/crt-motion.js','src/timeline.ts','runtime/obs-layer-host.ts','runtime/studio-output-host.ts');
 const run=source=>vm.runInContext(source,scope);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 for(const duration of [0,1,4.5,8,30]){
@@ -73,7 +73,7 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
 const logic=moduleScript('src/exploration-full-logic.js');
 // The logic module's imports share the VM context, standing in for the module graph.
-const prefix=[moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.js'),moduleScript('src/motion-clock.js'),moduleScript('src/variant-codec.js'),logic.slice(0,logic.indexOf('const template='))].join('\n');
+const prefix=[moduleScript('src/typography.ts'),moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.ts'),moduleScript('src/motion-clock.ts'),moduleScript('src/variant-codec.ts'),moduleScript('src/studio-state.ts'),logic.slice(0,logic.indexOf('const template='))].join('\n');
 const outputLogic=moduleScript('src/studio-output.js'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
 assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
 function editorFixture(widgetState,globals={},reducedMotion=false){

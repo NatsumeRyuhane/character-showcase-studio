@@ -16,5 +16,6 @@ Paths these records mention, such as `outputs/…`, `work/…` and `archives/…
 | [`0.9.0-story-intro.md`](0.9.0-story-intro.md) | 0.9.0 | Two-shot poster intro |
 | [`0.11.0-rewrite-phase-1.md`](0.11.0-rewrite-phase-1.md) | after 0.11.0 | Frontend rewrite phase 1 (ES modules + Vite) compared with `frontend-legacy/`: free names, check output, page bytes, 78 seeked browser frames |
 | [`0.11.0-rewrite-phase-2.md`](0.11.0-rewrite-phase-2.md) | after 0.11.0 | Frontend rewrite phase 2 screenshot baseline: determinism across runs and CPU architectures, sensitivity to injected changes |
+| [`0.11.0-rewrite-phase-3.md`](0.11.0-rewrite-phase-3.md) | after 0.11.0 | Frontend rewrite phase 3 typed modules: old-vs-new state and export parity on fuzzed inputs, real browser exports |
 
 New records go in this folder in English, named `<version>-<topic>.md`, and get a row in this table.

@@ -1,6 +1,6 @@
 # Manual After Effects harnesses
 
-These scripts run inside Adobe After Effects (ExtendScript, ES3). `node tools/check.mjs` does **not** run them, and nothing in the build depends on them. They are kept to repeat native AE checks by hand after changes to the AE export (`src/ae-export.js`, `runtime/ae-import-template.jsx`, `runtime/export-packages.js`).
+These scripts run inside Adobe After Effects (ExtendScript, ES3). `node tools/check.mjs` does **not** run them, and nothing in the build depends on them. They are kept to repeat native AE checks by hand after changes to the AE export (`src/ae-export.js`, `runtime/ae-import-template.jsx`, `runtime/export-packages.ts`).
 
 Run a script from AE with **File → Scripts → Run Script File…**. Each one writes its result as a text file next to itself and then quits AE, so run it in a separate AE instance, not one with unsaved work.
 

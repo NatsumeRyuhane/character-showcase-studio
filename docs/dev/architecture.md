@@ -2,7 +2,7 @@
 
 Character Showcase Studio is a browser editor for animated character showcase screens. The editor UI and its content are Chinese. Users pick one of 13 visual designs, fill in character and brand content, tune motion and effects, and export the result as a standalone HTML page, an OBS browser-source package, or an editable After Effects template.
 
-This document describes the code **as it is today**, partway through the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling) and phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
+This document describes the code **as it is today**, partway through the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling), phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)) and phase 3 (the pure logic as typed TypeScript modules with Vitest unit tests) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
 
 Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [build-and-test.md](build-and-test.md), [deploy.md](deploy.md).
 
@@ -23,7 +23,7 @@ Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [bu
 ## Shape of the product
 
 - **One self-contained HTML file.** `node tools/build.mjs` writes `dist/index.html` (about 2.6 MB). Scripts, styles, icons, barcode/QR libraries and Latin fonts are all inlined. The page makes no network requests at runtime. Chinese text uses system fonts (Microsoft YaHei, PingFang SC).
-- **Vite-bundled ES modules, no framework yet.** The editor's frame script is an ES module graph with entry `src/main.js`, which Vite bundles into one classic script; the same entry imports the CSS. `tools/build.mjs` then assembles the page. npm dependencies (Vite, TypeScript) are build-time only and locked in `package-lock.json`; nothing is fetched at runtime.
+- **Vite-bundled ES modules, no framework yet.** The editor's frame script is an ES module graph with entry `src/main.js`, which Vite bundles into one classic script; the same entry imports the CSS. `tools/build.mjs` then assembles the page. npm dependencies (Vite, TypeScript, and the test tools) are development-time only and locked in `package-lock.json`; nothing is fetched at runtime.
 - **No backend.** Settings live in the browser's `localStorage`. Uploaded images exist only for the current page session.
 - **Origin.** The project started as an OpenAI Codex "visualization" widget and was later exported to run standalone. That is why the runtime still uses identifiers such as `codex-visualization`, `codex:visualization-widget-state-v2` and `widgetState`. `runtime/visualize.html`, `runtime/visualize.css`, `runtime/standalone-shell.js` and `runtime/standalone-host-bridge.js` are that exported widget runtime.
 
@@ -42,7 +42,7 @@ dist/index.html  (shell document, strict CSP)
 │              ├─ bundled CSS (imported by src/main.js: design languages, workspace, output, narrative, …)
 │              ├─ vendor script: barcode + QR generator
 │              └─ main script: Vite bundle of src/main.js → src/exploration-full-logic.js and its imports
-├─ output host script   runtime/export-zip.js + export-packages.js + obs-layer-host.js + studio-output-host.js
+├─ output host script   Vite bundle of runtime/output-host.ts → studio-output-host.ts, export-packages.ts, export-zip.ts, obs-layer-host.ts
 └─ runtime/standalone-shell.js   storage, sizing, startup preset, srcdoc boot
 ```
 
@@ -55,10 +55,11 @@ dist/index.html  (shell document, strict CSP)
 `tools/build.mjs` does the following, in order:
 
 1. Runs Vite (library mode, IIFE output, unminified, `target: 'esnext'`) on `src/main.js`. The result is one classic script with every imported module hoisted into a single function scope, plus one stylesheet built from the CSS that `src/main.js` imports, in import order. Nothing is lowered or minified, so the bundle runs the same code as the sources.
+   It runs Vite a second time, the same way, on `runtime/output-host.ts`: the shell's output host, a separate script that shares no code with the frame. The files it embeds in exports come in as build-time constants through Vite's `define` (see step 5).
 2. Inserts that stylesheet into `src/exploration-full-template.html` at `/* STUDIO_STYLES */`, and `src/dual-language-markup.html` at `<!-- DUAL_LANGUAGE_MARKUP -->`.
 3. Replaces the Google Fonts `@import` with `assets/fonts/fonts.css`, with every font inlined as base64, and swaps `'Noto Sans SC'` for system CJK fonts.
 4. Inlines Floating UI and Lucide from `vendor/` in place of their unpkg `<script src>` tags.
-5. Fills the export packager's placeholders: `__STUDIO_AE_TEMPLATE__` (the AE template, with `crt-motion.js` at `/* CRT_MOTION_FUNCTION */`, its `export` keyword removed because ExtendScript is ES3), `__STUDIO_ASSET_NOTICES__`, `__STUDIO_OBS_LAYER_SERVER__` and `__STUDIO_OBS_LAYER_CONTROL__`.
+5. Supplies the export packager's constants, from `tools/output-host-defines.mjs` (which `vitest.config.mjs` uses too): `__STUDIO_AE_TEMPLATE__` (the AE template, with `crt-motion.js` at `/* CRT_MOTION_FUNCTION */`, its `export` keyword removed because ExtendScript is ES3), `__STUDIO_ASSET_NOTICES__`, `__STUDIO_OBS_LAYER_SERVER__` and `__STUDIO_OBS_LAYER_CONTROL__`.
 6. Validates the result. A missing or unreplaced marker, duplicate element IDs, document markup inside the fragment, any remaining `<script src>` or `@import`, or an invalid `runtime/startup-defaults.json` (over 16 KiB, or missing `revision`) all fail the build.
 7. Writes `dist/index.html`. It also writes `dist/character-explorations.fragment.html` and `dist/exploration-full-source.js`; `tools/check.mjs` parses those two.
 
@@ -66,8 +67,9 @@ Consequences:
 
 - **Modules import what they use.** A new module needs no change to `build.mjs`; import it where it is used. New CSS is imported from `src/main.js`, whose import order is the cascade order. Modules may be `.ts`; `tools/check.mjs` type-checks TypeScript (JavaScript is not type-checked yet).
 - **Imported bindings are read-only.** Modules that need to replace the logic module's `motionClock` or restart frame timing call `setMotionClock` / `resetLastFrame`.
-- **The shell-side scripts are still plain concatenation.** The output host (`runtime/export-zip.js`, `export-packages.js`, `obs-layer-host.js`, `studio-output-host.js`) and its `__STUDIO_*__` placeholders, the bridge, the shell and the kit are classic scripts assembled by `build.mjs`.
-- **A new test must be added to the list in `tools/check.mjs`.**
+- **Two bundles, plus classic scripts.** The frame script and the output host are Vite bundles. The bridge (`runtime/standalone-host-bridge.js`), the shell (`runtime/standalone-shell.js`) and the kit are still classic scripts that `build.mjs` inserts as they are. The output host installs `globalThis.studioOutputHost`, the only name the shell uses from it.
+- **`studioOBSLayerBootstrap` is copied by source text** into synchronized OBS layer pages, so it must stay self-contained (`runtime/obs-layer-host.ts`).
+- **Tests:** Vitest unit tests in `tests/unit/` are found automatically; an older `tests/check-*.cjs` script runs only if it is listed in `tools/check.mjs` (see [build-and-test.md](build-and-test.md#tests)).
 - **`dist/` is build output.** It is gitignored. Never edit or commit it.
 
 ## Source map (`src/`)
@@ -76,21 +78,23 @@ Consequences:
 | --- | --- |
 | `main.js` | Entry of the frame script: imports the CSS in cascade order, then `exploration-full-logic.js` |
 | `exploration-full-template.html` | Preview canvas, global and per-design controls, base styles. Holds the 13 `section[data-design]` views. |
-| `exploration-full-logic.js` | The main module: defaults, validation and restore, form binding, the shared paint loop, image reading. It imports the other modules and exports the shared editor state (`state`, `images`, `motionClock`, `update`, `draw`, …) that the UI modules import back. |
+| `exploration-full-logic.js` | The main module: the live editor state and its persistence glue, form binding, the shared paint loop, image reading. It imports the other modules and exports the shared editor state (`state`, `images`, `motionClock`, `update`, `draw`, …) that the UI modules import back. |
 | `studio-workspace.js` / `.css` | Turns the original controls into the three-pane editor: shared content (left), preview and playback (centre), current design's inspector (right). Tabs below 1120 px, focus mode. Styles are scoped under `.studio-editor`. |
 | `exploration-full-scene.js` | Base scene, geometry and background painting |
 | `design-language-scene.js` / `design-language-styles.css` | Fashion, avant-garde, plush, relaxed, cute and paper designs |
 | `urban-language-scene.js` / `urban-language-styles.css` | The three urban designs, `district`, `tuner` and `arcade`: palettes, recommended geometry, animated backgrounds, typography |
 | `dual-language-scene.js` / `-styles.css` / `-markup.html` | The two-panel `dual` design |
 | `studio-geometry.js` | Series geometry devices (`facet`, `ribbon`, `blocks`), drawn by `paintExploration` with its canvas and helpers passed in |
-| `motion-clock.js` | Continuous ring, text and border clocks that never reset |
-| `information-motion.js` | Text entrance and subtle idle motion |
-| `timeline.js` | Narrative timing: intro / show / outro poses, looping, retiming |
+| `motion-clock.ts` | Continuous ring, text and border clocks that never reset |
+| `information-motion.ts` | Text entrance and subtle idle motion |
+| `timeline.ts` | Narrative timing: intro / show / outro poses, looping, retiming |
 | `story-intro.js` / `.css` | Two-shot poster intro (character shot → creator shot) and its deterministic overlay effects |
 | `studio-narrative.js` / `.css` | Intro and outro controls, brand ending |
 | `studio-post.js` / `.css` | Post-processing (polar, CRT, holo, bloom, anamorphic, prism, film) over one shared optical surface. Borders stay outside it. |
-| `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) |
-| `variant-codec.js` | `tuple-v1` compact encoding of per-design settings |
+| `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) and their DOM styling |
+| `typography.ts` | Typography settings: validation and defaults, override text with letter case |
+| `studio-state.ts` | Editor state types and defaults, restore and validation of saved snapshots, the saved snapshot (see [state-and-timing.md](state-and-timing.md#state)) |
+| `variant-codec.ts` | `tuple-v1` compact encoding of per-design settings |
 | `studio-output.js` / `.css` | Output dialog, clean-output mode, export requests to the shell |
 | `export-layout.js` | Logical layout size and output scaling |
 | `ae-canvas-recorder.js`, `ae-geometry-motion.js`, `ae-export.js` | AE export: record canvas paths, sample motion adaptively, measure layout and collect text and assets |
@@ -124,7 +128,7 @@ Design-specific layout logic exists too. For example, `fitPosterCopy` in `explor
 
 `runtime/` holds the shell and frame runtime, the export packager, the ZIP writer, the AE ExtendScript template, the OBS layer server and control page, `crt-motion.js` (shared by the web page and AE), and `startup-defaults.json`.
 
-`tools/` holds `build.mjs`, `check.mjs`, `server.mjs` (a read-only static server for `dist/` on 127.0.0.1, port 8768 by default) and `prepare-vendor.py` (one-off vendor refresh, needs the network). Deploy scripts live in `deploy/cloudflare/`.
+`tools/` holds `build.mjs` and `output-host-defines.mjs`, `check.mjs`, `server.mjs` (a read-only static server for `dist/` on 127.0.0.1, port 8768 by default) and `prepare-vendor.py` (one-off vendor refresh, needs the network). Deploy scripts live in `deploy/cloudflare/`.
 
 ## Invariants
 
@@ -155,5 +159,5 @@ The planned frontend restructure is meant to fix these. The plan (a staged move 
 
 - Source files are written in a dense, minified-looking style, with single lines up to about 1,700 characters. Line-based diffs and merges are hard to use.
 - The UI modules (`studio-workspace.js`, `studio-narrative.js`, `studio-output.js`, `ae-export.js`, …) import mutable editor state from `exploration-full-logic.js`, which imports them back. The cycle is safe because every cross-module access happens inside functions called after startup, but it is still one shared state in disguise. Phase 4 (React editor) removes it.
-- `exploration-full-logic.js` mixes defaults, validation, persistence, form binding and painting.
+- `exploration-full-logic.js` still mixes form binding, painting and DOM measurement. Defaults, validation and restore have moved to `studio-state.ts`.
 - The runtime still carries Codex widget naming. The `localStorage` key includes the page path (see [state-and-timing.md](state-and-timing.md#storage)), so **moving or renaming the served page loses every user's saved settings** unless a migration is added. The local server serves `dist/` at `/` to keep that path stable.
