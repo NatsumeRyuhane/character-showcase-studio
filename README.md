@@ -40,9 +40,10 @@
 
 修改源码前请先阅读 [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)。AI 助手（Codex、Claude Code 等）会自动读取 [AGENTS.md](AGENTS.md)。
 
-开发只需要 Node.js 18 或更新版本，无需 `npm install`。在 `frontend/` 中运行：
+开发需要 Node.js 22.12 或更新版本（自带 npm）。在 `frontend/` 中运行：
 
 ```sh
+npm ci                  # 安装构建依赖，需要联网；首次和依赖更新后运行
 node tools/build.mjs    # 构建，输出到 frontend/dist/
 node tools/check.mjs    # 自动检查，需在构建后运行
 node tools/server.mjs   # 本机预览（也可用根目录的启动器）
