@@ -1,5 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
-const root=path.join(__dirname,'..'),scope={};vm.createContext(scope);vm.runInContext(fs.readFileSync(path.join(root,'src/studio-text.js'),'utf8'),scope);
+const {load,moduleScript}=require('./support/module-script.cjs');
+const root=path.join(__dirname,'..'),scope={};vm.createContext(scope);load(scope,'src/studio-text.js');
 const plain=x=>JSON.parse(JSON.stringify(x)),defaults=scope.studioTypographySettings();
 assert.deepEqual(plain(scope.studioTypographySettings(null)),plain(defaults));
 assert.equal(scope.studioTypographyLayoutChanged(defaults),false,'old saved projects retain the original layout');

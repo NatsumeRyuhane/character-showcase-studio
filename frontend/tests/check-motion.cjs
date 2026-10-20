@@ -1,9 +1,10 @@
 const fs=require('fs');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const scope={};
 vm.createContext(scope);
-vm.runInContext(fs.readFileSync(__dirname+'/../src/motion-clock.js','utf8'),scope);
+load(scope,'src/motion-clock.js');
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
 const variants={couture:{ringSpeed:.65},orbit:{ringSpeed:1.37},still:{ringSpeed:0}};
 const clock=scope.createMotionClock(0,variants);

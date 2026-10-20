@@ -1,8 +1,9 @@
 const fs=require('fs');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const scope=vm.createContext({});
-vm.runInContext(fs.readFileSync(__dirname+'/../src/variant-codec.js','utf8'),scope);
+load(scope,'src/variant-codec.js');
 const encode=value=>JSON.parse(JSON.stringify(scope.encodeStudioVariants(value)));
 const decode=(value,defaults)=>JSON.parse(JSON.stringify(scope.decodeStudioVariants(value,defaults)));
 const copy=value=>JSON.parse(JSON.stringify(value));

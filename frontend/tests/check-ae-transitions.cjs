@@ -1,6 +1,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8'),scope={structuredClone};vm.createContext(scope);
-for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','export-layout.js'])vm.runInContext(read('src/'+file),scope);
+for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','export-layout.js'])load(scope,'src/'+file);
 vm.runInContext(read('src/exploration-full-scene.js').replace('/* LEGACY_SERIES_GEOMETRY */',()=>read('src/studio-geometry.js')),scope);
 const fixtures=[...['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade'].map(key=>({key,style:'signature'})),...['orbit','slices','wave','flow','facet','ribbon','blocks','ring','burst','cut','rays','none'].flatMap(style=>['poster','dual'].map(key=>({key,style})))];
 let max=0,checks=0;

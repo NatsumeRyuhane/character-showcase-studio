@@ -1,7 +1,8 @@
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),scope={structuredClone};vm.createContext(scope);
 const read=name=>fs.readFileSync(path.join(root,'src',name),'utf8');
-for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js'])vm.runInContext(read(file),scope);
+for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js'])load(scope,'src/'+file);
 vm.runInContext(read('exploration-full-scene.js').replace('/* LEGACY_SERIES_GEOMETRY */',()=>read('studio-geometry.js')),scope);
 const names=['district','tuner','arcade'];
 const plain=value=>JSON.parse(JSON.stringify(value));
