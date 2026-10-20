@@ -9,7 +9,9 @@ export default {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
     }
-    url.pathname = '/index.html';
+    // Asset hosting canonicalizes /index.html to /. Request / internally so
+    // that redirect never escapes the public /showcase-generator mount.
+    url.pathname = '/';
     const asset = await env.ASSETS.fetch(new Request(url, request));
     const headers = new Headers(asset.headers);
     headers.set('Cache-Control', 'no-cache');
