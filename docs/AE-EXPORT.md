@@ -113,7 +113,7 @@ AE 后处理由内置效果与原生形状近似实现，不烘焙整段画面�
 - runtime/crt-motion.js：网页与 AE 共用的确定性老电视关机包络；构建时注入两端。
 - runtime/export-zip.js：无依赖 ZIP writer。
 - tests/check-export-packages.cjs：生产几何、数据边界、脚本语法、OBS 场景和 ZIP 校验。
-- tests/check-ae-geometry-motion.cjs：旋转圆环半径、28 组生产几何、片头过渡、中间帧误差与静止段检查。实际 AE 核对记录见 `RING-MOTION-QA.md`。
+- tests/check-ae-geometry-motion.cjs：旋转圆环半径、28 组生产几何、片头过渡、中间帧误差与静止段检查。实际 AE 核对记录见 `qa/0.8.4-ring-motion.md`。
 
 所有脚本来自本地可信模板；参数以 JSON 数据字面量写入，不接受用户传入可执行表达式、脚本正文或任意素材路径。
 
