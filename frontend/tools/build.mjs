@@ -20,6 +20,8 @@ const replaceRequired = (text, marker, replacement) => {
 // classic script, and its CSS imports into one stylesheet, both unminified.
 const bundle = await build({
   root, configFile: false, publicDir: false, logLevel: 'warn',
+  // React picks its production build from NODE_ENV, which library mode leaves alone.
+  define: { 'process.env.NODE_ENV': JSON.stringify('production') },
   build: {
     write: false, target: 'esnext', minify: false, cssMinify: false,
     // Region comments carry module paths relative to cwd; pin it so output never depends on where the build runs.

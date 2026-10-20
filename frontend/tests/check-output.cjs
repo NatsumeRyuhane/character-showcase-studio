@@ -73,9 +73,9 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
 const logic=moduleScript('src/exploration-full-logic.js');
 // The logic module's imports share the VM context, standing in for the module graph.
-const prefix=[moduleScript('src/typography.ts'),moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.ts'),moduleScript('src/motion-clock.ts'),moduleScript('src/variant-codec.ts'),moduleScript('src/studio-state.ts'),logic.slice(0,logic.indexOf('const template='))].join('\n');
-const outputLogic=moduleScript('src/studio-output.js'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
-assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
+const prefix=[moduleScript('src/typography.ts'),moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.ts'),moduleScript('src/motion-clock.ts'),moduleScript('src/variant-codec.ts'),moduleScript('src/studio-state.ts'),moduleScript('src/output-payload.ts'),logic.slice(0,logic.indexOf('const template='))].join('\n');
+// The production payload, with each fixture's own config: the host's config handling is tested separately.
+const payloadSource="function htmlPayload(kind){return {...studioOutputPayload(state,images,kind),config:config(kind)}}";
 function editorFixture(widgetState,globals={},reducedMotion=false){
   const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState}}};
   vm.createContext(app);vm.runInContext(prefix,app);return app;
@@ -95,7 +95,7 @@ for(const v of Object.values(state.variants)){
  for(const key of Object.keys(v.geometryBySeries))v.geometryBySeries[key]='signature';
 }
 function config(){return {width:1920,start:'intro',transparent:false,includeCharacters:false,fit:'contain'}}
-${outputLogic.slice(payloadStart,payloadEnd)}
+${payloadSource}
 `,editor);
 const expanded=JSON.parse(vm.runInContext('JSON.stringify(state)',editor));
 const expandedBytes=Buffer.byteLength(JSON.stringify(expanded),'utf8');let compactBytes=0;
@@ -119,7 +119,7 @@ assert.equal(JSON.parse(vm.runInContext('JSON.stringify(state)',editor)).variant
 // opt-in boundary; packaging-only removes just the two dedicated poster shots.
 const storyEditor=editorFixture();
 const storySettings={introStyle:'story',characterShotEnabled:true,authorShotEnabled:true,characterShotDuration:3.125,authorShotDuration:2.375,storyTransitionDuration:.625,characterCorner:'br-tl',authorCorner:'bl-tr',characterEffect:'holo',authorEffect:'crt',characterEffectStrength:.45,authorEffectStrength:.65,characterEffectSpeed:1.2,authorEffectSpeed:.8,storyPackagingOnly:false,storyFlash:true,characterScale:1.2,authorScale:1.4,characterX:33,characterY:65,authorX:72,authorY:38};
-vm.runInContext(`state.narrative=studioNarrativeSettings(${JSON.stringify(storySettings)});state.introDuration=studioStoryDuration(state.narrative);state.time=1.125;Object.assign(images,${JSON.stringify(payload.images)});function config(){return {width:1920,start:state.output.start,transparent:false,includeCharacters:state.output.includeCharacters,fit:'contain'}}\n${outputLogic.slice(payloadStart,payloadEnd)}`,storyEditor);
+vm.runInContext(`state.narrative=studioNarrativeSettings(${JSON.stringify(storySettings)});state.introDuration=studioStoryDuration(state.narrative);state.time=1.125;Object.assign(images,${JSON.stringify(payload.images)});function config(){return {width:1920,start:state.output.start,transparent:false,includeCharacters:state.output.includeCharacters,fit:'contain'}}\n${payloadSource}`,storyEditor);
 for(const kind of ['html','obs'])for(const includeCharacters of [false,true])for(const storyPackagingOnly of [false,true])for(const start of ['intro','show']){
   vm.runInContext(`state.output.includeCharacters=${includeCharacters};state.output.start='${start}';state.narrative.storyPackagingOnly=${storyPackagingOnly}`,storyEditor);
   const compact=vm.runInContext(`htmlPayload('${kind}')`,storyEditor),keys=['barcode','logo','qr',...(includeCharacters?['model','portrait']:[]),...(includeCharacters&&!storyPackagingOnly?['introCharacter','introAuthor']:[])].sort();
@@ -143,12 +143,10 @@ assert.equal(vm.runInContext('state.narrative.outroTrigger',completeApp),'auto')
 vm.runInContext('for(let i=0;i<2000;i++)state.time=studioAdvanceTime(state.time,.02,state.introDuration,state.narrative)',completeApp);
 assert.equal(vm.runInContext('studioPhase(state.time,state.introDuration,state.narrative)',completeApp),'outro');
 // Exercise the actual config producer, rather than the fixture's mock config.
-const configSource=outputLogic.slice(outputLogic.indexOf('function config('),outputLogic.indexOf('  function downloadLabel'));
-vm.runInContext("function dimensions(){return [1920,1080]}"+configSource,storyEditor);
 vm.runInContext("state.output.start='show'",storyEditor);
-assert.equal(vm.runInContext("config('html').start",storyEditor),'intro');
-assert.equal(vm.runInContext("config('html').playback",storyEditor),'complete');
-assert.equal(vm.runInContext("config('obs').start",storyEditor),'show');
+assert.equal(vm.runInContext("studioOutputConfig(state,'html').start",storyEditor),'intro');
+assert.equal(vm.runInContext("studioOutputConfig(state,'html').playback",storyEditor),'complete');
+assert.equal(vm.runInContext("studioOutputConfig(state,'obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
 for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])load(scope,'src/'+file);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){

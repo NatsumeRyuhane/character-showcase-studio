@@ -1,6 +1,7 @@
 import { currentSeries, draw, imageNames, images, measure, state, update } from './exploration-full-logic.js';
 import { seriesDefaults } from './studio-state.ts';
 import { studioOutputLayout } from './export-layout.js';
+import { loopNote } from './editor/format.ts';
 
 // Editor chrome only. Existing inputs and listeners are retained, never cloned.
 export function mountStudioWorkspace(root,views){
@@ -152,6 +153,7 @@ export function mountStudioWorkspace(root,views){
     seriesSummary.textContent='当前系列  '+(currentSeries().label||'EDITION')+' / '+(currentSeries().prefix||'ID')+'-'+(currentSeries().serial||'001');
     for(const[key,el]of Object.entries(uploadNames)){el.textContent=images[key]?(imageNames[key]||'已载入图片'):'尚未选择图片';el.classList.toggle('has-file',!!images[key]);root.querySelector('[data-clear="'+key+'"]').disabled=!images[key]}
     const frameDirection=state.frame==='vertical';root.querySelector('label[for="direction-top-text"]').textContent=frameDirection?'左边框文字':'上边框文字';root.querySelector('label[for="direction-bottom-text"]').textContent=frameDirection?'右边框文字':'下边框文字';
+    root.querySelector('.studio-loop-note').textContent=loopNote(state);
     requestAnimationFrame(()=>sizePreview(selected));
   }};
   ui.sync();return ui;
