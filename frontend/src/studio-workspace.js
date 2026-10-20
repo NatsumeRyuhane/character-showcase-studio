@@ -7,15 +7,10 @@ export function mountStudioWorkspace(root,views){
   root.classList.add('studio-editor');root.dataset.panel='preview';
   const make=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text)el.textContent=text;return el};
   const button=(text,aria)=>{const el=make('button','btn',text);el.type='button';if(aria)el.setAttribute('aria-label',aria);return el};
-  const note=text=>make('p','studio-note',text);
-  const group=(title,open=false)=>{const el=make('details','studio-group');el.open=open;el.append(make('summary','cursor-interaction',title));return el};
-  const fields=items=>{const box=make('div','direction-settings');for(const el of items)if(el)box.append(el);return box};
   const field=id=>root.querySelector('#'+id)?.closest('.direction-field');
   const global=root.querySelector('.direction-global');
   const oldHeading=root.querySelector('.direction-heading'),oldCanvasOptions=oldHeading.nextElementSibling;
   const phase=oldHeading.querySelector('[data-phase]');
-  const sourceGroups=[...global.querySelectorAll(':scope > details')];
-  const findGroup=text=>sourceGroups.find(el=>el.querySelector('summary').textContent===text);
   const originalViews=root.querySelector('.viz-carousel');originalViews.className='studio-views';
 
   const header=make('header','studio-header');
@@ -44,46 +39,17 @@ export function mountStudioWorkspace(root,views){
   const previewMeta=make('div','studio-preview-meta');previewMeta.append(make('span','','实时预览'),phase,make('span','studio-loop-note','片头 4.5s · 展示循环 12s'));
   toolbar.append(designRow,canvasOptions,previewMeta);
   const sharedPlayback=make('div','studio-playback-settings');const speedField=field('direction-speed');speedField.classList.add('studio-speed');speedField.querySelector('label').firstChild.textContent='播放速度';sharedPlayback.append(speedField);
-  const scopeNote=note('视觉设置随方案保存；几何样式可按系列分别选择。');
-
-  // Split the old combined controls into task-based sections, moving real nodes.
+  // Preview and playback per design. The inspector beside them is the React component src/editor/Inspector.tsx.
   function reorganizeInspector(view){
     const section=view.section;
     const preview=make('div','studio-preview');const stage=section.querySelector('.stage-viewport'),transport=section.querySelector('.direction-transport'),seek=section.querySelector('.seek-row');
-    const playback=make('div','studio-playback');playback.append(transport,seek);preview.append(stage,playback);section.append(preview);
-    const inspector=make('aside','studio-inspector');inspector.setAttribute('aria-label','当前方案画面样式');
-    const title=make('div','studio-panel-title');title.append(make('h2','','画面样式'),make('span','studio-scope-label','仅当前方案'));
-    inspector.append(title,make('div','studio-active-design',section.dataset.variant),scopeNote.cloneNode(true));if(section.dataset.description)inspector.append(note(section.dataset.description));
-    const original=[...section.querySelectorAll(':scope > details')];
-    const old=text=>original.find(el=>el.querySelector('summary').textContent===text);
-    const take=selector=>section.querySelector(selector)?.closest('.direction-field');
-    const takeCheck=selector=>section.querySelector(selector)?.closest('label.form-check');
-    const styleGroup=(name,items,checks=[],open=false)=>{const box=group(name,open);box.append(fields(items));if(checks.length){const row=make('div','direction-checks');for(const el of checks)if(el)row.append(el);box.append(row)}inspector.append(box);return box};
-    const dual=section.querySelector('[data-dual-controls]');if(dual){dual.classList.add('studio-group');dual.open=true;inspector.append(dual)}
-    styleGroup('配色与字体',['palette','background','accent','typeface'].map(key=>take('[data-vfield="'+key+'"],[data-vcolor="'+key+'"]')),[],true);
-    const geometry=styleGroup('圆环与几何',['ringStyle','ringScale','ringSpeed'].map(key=>take('[data-vfield="'+key+'"],[data-vrange="'+key+'"]')),[],true);
-    const geometryAdvanced=group('线条与装饰细节');geometryAdvanced.classList.add('studio-subgroup');geometryAdvanced.append(fields(['geometryStrength','cutStrength'].map(key=>take('[data-vrange="'+key+'"]'))));
-    const opacity=make('div','direction-field');opacity.innerHTML='<label class="range-title">几何装饰不透明度<output data-value="geometryOpacity">100%</output></label><input class="form-range" type="range" min="30" max="100" step="5" data-vrange="geometryOpacity" data-factor="100" aria-label="几何装饰不透明度">';geometryAdvanced.querySelector('.direction-settings').append(opacity);geometry.append(geometryAdvanced);
-    const background=styleGroup('动态背景',['pattern','gridOpacity','gridMotion'].map(key=>take('[data-vfield="'+key+'"],[data-vrange="'+key+'"]')),['grid','gridMoving','parallax'].map(key=>takeCheck('[data-vbool="'+key+'"]')));background.dataset.studioGroup='background';
-    const motion=old('文字与信息动效');motion.classList.add('studio-group');motion.querySelector('summary').textContent='文字与信息动效';inspector.append(motion);
-    const badge=old('标识颜色与样式');badge.classList.add('studio-group');badge.querySelector('summary').textContent='标识外观';badge.insertBefore(note('添加或移除标识，请在左侧「交付格式与适配标识」勾选。'),badge.children[1]);inspector.append(badge);
-    const shadows=old('阴影与空间层次');shadows.classList.add('studio-group');const shadowSwitch=takeCheck('[data-effect="shadowEnabled"]');shadows.insertBefore(shadowSwitch,shadows.children[1]);inspector.append(shadows);
-    const effects=old('滤镜、影调与渐变');effects.classList.add('studio-group');effects.querySelector('summary').textContent='滤镜与画面质感';inspector.append(effects);
-    const model=old('角色素材与动效调节');model.classList.add('studio-group');model.querySelector('summary').textContent='角色图片大小';inspector.append(model);
-    const edge=group('边框文字与滚动 · 全局');edge.dataset.studioGroup='edges';
-    // Borders are shared settings; the single source panel follows the active inspector.
-    inspector.append(edge);edge.append(note('边框文字与滚动由所有方案共用，片头至片尾持续显示。AE 导出后，每侧边框的底板与文字可分别编辑。'));
-    for(const el of original)if(el.parentElement===section)el.remove();
-    section.append(preview,inspector);view.preview=preview;view.inspector=inspector;view.playback=playback;view.edgePanel=edge;
+    const playback=make('div','studio-playback');playback.append(transport,seek);preview.append(stage,playback);section.append(preview);view.preview=preview;view.playback=playback;
   }
   for(const view of views)reorganizeInspector(view);
-  const edgeControls=make('div','studio-shared-edges');const edgeSource=findGroup('边框滚动');edgeControls.append(fields([field('direction-top-text'),field('direction-bottom-text')]));for(const el of [...edgeSource.children].slice(1))edgeControls.append(el);
   layout.append(left,toolbar,originalViews);oldHeading.remove();oldCanvasOptions.remove();global.remove();root.append(header,tabs,layout);
 
   const rename={'direction-frame':'信息边框','direction-ratio':'画幅'};
   for(const[id,label]of Object.entries(rename)){const el=root.querySelector('label[for="'+id+'"]');if(el)el.firstChild.textContent=label}
-  const labelByField={ringStyle:'几何样式',cutStrength:'装饰丰富度',geometryStrength:'线条粗细',shadowDepth:'阴影偏移'};
-  for(const view of views)for(const [key,text]of Object.entries(labelByField)){const input=view.section.querySelector('[data-vfield="'+key+'"],[data-vrange="'+key+'"],[data-erange="'+key+'"]');const label=input?.closest('label')||input?.closest('.direction-field')?.querySelector('label');if(label?.firstChild?.nodeType===3)label.firstChild.textContent=text;}
 
   function setPanel(panel){root.dataset.panel=panel;for(const el of tabs.querySelectorAll('button'))el.setAttribute('aria-pressed',String(el.dataset.panelTab===panel));requestAnimationFrame(()=>{const view=views.find(v=>!v.section.hidden);if(view)sizePreview(view)})}
   function setDesign(key){state.activeDesign=key;update()}
@@ -109,16 +75,6 @@ export function mountStudioWorkspace(root,views){
     const selected=views.find(v=>v.key===state.activeDesign)||views[0];state.activeDesign=selected.key;designSelect.value=selected.key;
     for(const view of views)view.section.hidden=view!==selected;
     if(sharedPlayback.parentElement!==selected.playback)selected.playback.append(sharedPlayback);
-    if(edgeControls.parentElement!==selected.edgePanel)selected.edgePanel.append(edgeControls);
-    for(const view of views){view.edgePanel.hidden=state.frame==='none';const variant=state.variants[view.key];
-      const disable=(selector,value)=>view.section.querySelectorAll(selector).forEach(el=>el.disabled=value);
-      disable('[data-vrange="gridOpacity"]',!variant.grid||variant.pattern==='none');disable('[data-vrange="gridMotion"]',!variant.grid||variant.pattern==='none'||!variant.gridMoving);
-      disable('[data-vfield="textMotionStyle"],[data-vrange="textMotionAmount"],[data-vrange="textMotionSpeed"]',!variant.textMotion);
-      disable('[data-efield="shadowStyle"],[data-ecolor="shadowColor"],[data-erange="shadowStrength"],[data-erange="shadowDepth"],[data-shadow]',!variant.effects.shadowEnabled);
-      disable('[data-efield="grade"],[data-erange="gradeStrength"],[data-effect="gradeModel"]',!variant.effects.gradeEnabled);
-      disable('[data-erange="gradientStrength"],[data-ecolor="gradientColor"],[data-effect="gradientMotion"]',variant.effects.gradient==='none');
-    }
-    const frameDirection=state.frame==='vertical';root.querySelector('label[for="direction-top-text"]').textContent=frameDirection?'左边框文字':'上边框文字';root.querySelector('label[for="direction-bottom-text"]').textContent=frameDirection?'右边框文字':'下边框文字';
     root.querySelector('.studio-loop-note').textContent=loopNote(state);
     requestAnimationFrame(()=>sizePreview(selected));
   }};
