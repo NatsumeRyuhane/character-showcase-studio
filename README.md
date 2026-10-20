@@ -126,7 +126,7 @@ node tools/server.mjs
 | `tools/server.mjs` | 仅监听本机的静态预览服务器 |
 | `tests/` | 连续动画时钟、文字与边框动态、状态恢复的回归检查 |
 | `dist/` | 构建结果，可复制到静态服务器 |
-| `docs/DEVELOPER.md` | 源码结构与后续开发说明 |
+| `docs/dev/` | 开发文档（英文）：架构、状态与时间轴、导出、构建与测试、部署 |
 | `docs/user/ae-export.md` | 可编辑 AE 导出用法与效果边界 |
 | `THIRD-PARTY-NOTICES.md` | 第三方素材与代码来源 |
 

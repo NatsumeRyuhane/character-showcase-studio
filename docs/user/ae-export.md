@@ -103,18 +103,6 @@ AE 后处理由内置效果与原生形状近似实现，不烘焙整段画面�
 - 合成长度为所选片头时长加自定义的 1–60 秒展示段，再加已启用的片尾，并按当前整体播放速度换算。手动触发只影响网页 / OBS，AE 始终生成完整有限段落。长时间连续输出仍推荐 OBS 浏览器源。
 - 代码与生成包检查不能代替对每种设计、字体、效果组合的 AE 人工审片。
 
-## 开发入口
+## 开发说明
 
-- src/ae-canvas-recorder.js：将生产绘图器的 Canvas 路径记录为贝塞尔顶点。
-- src/ae-geometry-motion.js：比较路径顶点、控制点、透明度与描边宽度，按误差细分关键帧；后台标签页也可完成导出。
-- src/ae-export.js：按导出尺寸测量当前布局、提取文字和独立素材、采样几何。
-- runtime/export-packages.js：校验沙盒传来的纯数据、生成 ZIP 文件清单。
-- runtime/ae-import-template.jsx：可信 ExtendScript 模板，用原生 AE API 创建合成。
-- runtime/crt-motion.js：网页与 AE 共用的确定性老电视关机包络；构建时注入两端。
-- runtime/export-zip.js：无依赖 ZIP writer。
-- tests/check-export-packages.cjs：生产几何、数据边界、脚本语法、OBS 场景和 ZIP 校验。
-- tests/check-ae-geometry-motion.cjs：旋转圆环半径、28 组生产几何、片头过渡、中间帧误差与静止段检查。实际 AE 核对记录见 `../qa/0.8.4-ring-motion.md`。
-
-所有脚本来自本地可信模板；参数以 JSON 数据字面量写入，不接受用户传入可执行表达式、脚本正文或任意素材路径。
-
-官方脚本说明：https://helpx.adobe.com/ca/after-effects/desktop/automate-in-after-effects/automate-animation/scripts.html
+导出的实现原理、数据边界与相关测试见 [docs/dev/export.md](../dev/export.md)（英文）。
