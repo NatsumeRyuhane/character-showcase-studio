@@ -12,10 +12,12 @@
 
 最简单的方式是直接访问线上地址，不需要安装任何软件。
 
-在本机运行需要 [Node.js](https://nodejs.org/) 18 或更新版本：
+在本机运行需要 [Python](https://www.python.org/downloads/) 3.9 与 [Node.js](https://nodejs.org/) 18 或更新版本：
 
-- **Windows**：双击根目录的 `start.cmd`，保持弹出的窗口开启，然后在浏览器打开 `http://127.0.0.1:8768/`。
-- **其他系统**：在 `frontend/` 中依次运行 `node tools/build.mjs` 与 `node tools/server.mjs`，然后打开同一地址。
+- **Windows**：双击根目录的 `start.cmd`；
+- **macOS / Linux**：在终端运行 `./start.sh`。
+
+会打开一个中文菜单，选择「启动预览」即可，浏览器会自动打开 `http://127.0.0.1:8768/`。首次运行时会自动用 pip 安装启动器所需的 Python 依赖；安装失败时会说明原因。菜单中还可以停止或重启预览、诊断环境、更新到最新版本。也可以直接带参数运行，例如 `./start.sh start`、`./start.sh doctor`。
 
 建议使用较新的 Chrome 或 Edge。
 
@@ -43,7 +45,7 @@
 ```sh
 node tools/build.mjs    # 构建，输出到 frontend/dist/
 node tools/check.mjs    # 自动检查，需在构建后运行
-node tools/server.mjs   # 本机预览
+node tools/server.mjs   # 本机预览（也可用根目录的启动器）
 ```
 
 `frontend/dist/` 是构建产物，不提交到仓库，也不要手动修改。
@@ -53,11 +55,12 @@ node tools/server.mjs   # 本机预览
 | 文件或目录 | 用途 |
 | --- | --- |
 | `frontend/` | 网页工作台：`src/` 源码、`runtime/` 运行时与导出、`assets/` 字体、`vendor/` 第三方库、`tests/` 检查脚本、`tools/` 构建与预览工具；构建结果在 `frontend/dist/` |
+| `deploy/launcher/` | 本机启动器（Python） |
 | `deploy/cloudflare/` | Cloudflare 部署配置 |
 | `docs/` | 使用说明、开发文档、验证记录、更新记录 |
 | `.github/` | 协作指南、Issue 与 PR 模板 |
 | `AGENTS.md`、`.agents/` | AI 助手的协作规范与配置 |
-| `start.cmd`、`build.cmd` | Windows 下双击启动预览 / 只构建 |
+| `start.cmd`、`start.sh` | 启动器的快捷入口（Windows / macOS、Linux） |
 
 ## 当前限制
 

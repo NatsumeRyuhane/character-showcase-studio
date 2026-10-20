@@ -13,6 +13,7 @@ Character Showcase Studio is a browser editor for animated character showcase sc
 | [docs/dev/export.md](docs/dev/export.md) | Touching HTML / OBS / AE export |
 | [docs/dev/build-and-test.md](docs/dev/build-and-test.md) | Building, testing, adding modules or tests |
 | [docs/dev/deploy.md](docs/dev/deploy.md) | Anything about the live site |
+| [docs/dev/launcher.md](docs/dev/launcher.md) | The local launcher (`start.sh` / `start.cmd`) |
 | [docs/user/](docs/user/) | What users see and are told (Chinese) |
 
 ## Agent files
@@ -108,7 +109,7 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 Work in small, focused steps:
 
 1. Make one focused change.
-2. In `frontend/`: `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass.
+2. In `frontend/`: `node tools/build.mjs`, then `node tools/check.mjs`. Both must pass. If you changed the launcher, also run its tests (see [launcher.md](docs/dev/launcher.md#tests-and-ci)).
 3. For UI or visual changes, open the page and check it as well (see [build-and-test.md](docs/dev/build-and-test.md#manual-verification)).
 4. Check `git status` and `git diff --stat`. Stage only files that belong to this change, and never blindly stage everything (`git add -A` / `git add .`).
 5. Commit. Never commit `frontend/dist/`; it is gitignored build output.
@@ -133,7 +134,7 @@ Never bundle unrelated changes in one commit.
 ### Push and pull request
 
 1. **Ask before pushing.** Then push the branch with `git push -u origin <branch>`.
-2. Open a PR into `main` with `gh pr create`. The title and description are in Chinese and follow [the template](.github/pull_request_template.md): what changed, why, how it was checked, and screenshots for visual changes.
+2. Open a PR into `main` with `gh pr create`. CI runs on every PR, and it must pass before merging. If it fails, read the log with `gh pr checks` / `gh run view --log-failed`, fix the cause, and tell the person. The title and description are in Chinese and follow [the template](.github/pull_request_template.md): what changed, why, how it was checked, and screenshots for visual changes.
 3. **Merge only through GitHub**, after review, and only when the owner or a maintainer says to. Never merge into `main` locally.
 4. To bring a pushed branch up to date with `main`, use `git merge origin/main`, not rebase, so no force-push is needed.
 
@@ -175,9 +176,9 @@ Deploying (`npx wrangler deploy` in `deploy/cloudflare/`) updates the public sit
 
 ## Environment notes
 
-- Node.js 18+ is the only requirement. There is no `npm install`.
-- The owner works on Windows. `start.cmd` (build and serve) and `build.cmd` at the root are double-click shortcuts, so keep them working.
-- `.gitattributes` forces LF line endings. A Windows checkout made before it existed needs a one-time refresh; see [build-and-test.md](docs/dev/build-and-test.md#generated-files-and-line-endings). If a fresh build changes `index.html` with no source changes, suspect line endings first.
+- The frontend needs only Node.js 18+; there is no `npm install`. The launcher needs Python 3.9+ with pip; `start.sh` / `start.cmd` install its dependencies automatically.
+- `start.cmd` / `start.sh` at the root run the launcher `deploy/launcher/studio.py` (see [launcher.md](docs/dev/launcher.md)). Always call it with a subcommand: subcommands are a pure, non-interactive CLI, while running it without arguments opens a menu meant for people. To preview, use `./start.sh start --no-open` and `./start.sh stop`; run `./start.sh doctor` when the environment seems broken. The owner works on Windows and double-clicks `start.cmd`, so keep it working.
+- `.gitattributes` forces LF line endings. A Windows checkout made before it existed needs a one-time refresh; see [build-and-test.md](docs/dev/build-and-test.md#generated-files-and-line-endings). `./start.sh doctor` reports CRLF files.
 
 ## Before you report a task as done
 

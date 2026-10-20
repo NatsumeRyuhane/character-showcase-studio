@@ -10,8 +10,8 @@ Node.js 18 or newer. Nothing to install: there is no `npm install` and no `node_
 | --- | --- |
 | `node tools/build.mjs` (`npm run build`) | Builds `dist/` from `src/`, `runtime/`, `assets/`, `vendor/` |
 | `node tools/check.mjs` (`npm run check`) | Runs all automated checks against the **built** output. Build first. |
-| `node tools/server.mjs [port]` (`npm start`) | Serves `dist/` read-only on `http://127.0.0.1:8768/`. Build first. |
-| `start.cmd` / `build.cmd` (repository root) | Windows double-click shortcuts: build then serve / build only |
+| `node tools/server.mjs [port]` (`npm start`) | Serves `dist/` read-only on `http://127.0.0.1:8768/` in the foreground. Build first. |
+| `./start.sh <command>` / `start.cmd <command>` (repository root) | The [launcher](launcher.md): `start`, `stop`, `restart`, `status`, `build`, `check`, `doctor`, `upgrade` |
 
 Always run **build, then check**, and commit only when the check prints its final `PASS` line. The check:
 
@@ -34,9 +34,18 @@ To add a source module:
 
 `tests/ae/` holds manual After Effects harnesses; see its README.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and every push to `main`:
+
+- **Frontend:** build and check on Ubuntu and Windows with Node 18 and 22. The Windows run also confirms the line-ending setup produces a working build.
+- **Launcher:** the launcher test suite on Ubuntu, macOS and Windows, plus the `start.sh` / `start.cmd` shims (see [launcher.md](launcher.md#tests-and-ci)).
+
+A PR should not be merged with failing CI.
+
 ## Manual verification
 
-The automated checks cover pure functions and generated data. They do not open a browser. After a UI or visual change, open the page (`npm start`) and check:
+The automated checks cover pure functions and generated data. They do not open a browser. After a UI or visual change, open the page (`./start.sh start` from the root) and check:
 
 - The browser console has no errors.
 - All 13 designs can be selected; inputs update the preview immediately; settings survive a reload.

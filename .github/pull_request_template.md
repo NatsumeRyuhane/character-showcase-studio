@@ -9,6 +9,7 @@
 ## 检查情况
 
 - [ ] 在 `frontend/` 中运行 `node tools/build.mjs` 与 `node tools/check.mjs` 均通过
+- [ ] GitHub 上的自动检查（CI）全部通过
 - [ ] 已在浏览器中实际查看（界面或画面有变化时）
 - [ ] 已更新 `docs/CHANGELOG.md` 的「未发布」部分（用户能感知到的变化）
 - [ ] 已更新相关文档（`docs/user/` 或 `docs/dev/`）
