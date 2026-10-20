@@ -7,3 +7,5 @@ dist-cloudflare/
 .dev.vars
 .env
 .env.*
+.idea/
+.vscode/

@@ -1,0 +1,14 @@
+# Keep working-tree line endings identical on every OS so builds are reproducible.
+# Without this, a Windows checkout converts text to CRLF and the build embeds it
+# into index.html, producing a diff that only comes from the platform.
+* text=auto eol=lf
+
+# Windows batch files need CRLF for labels and goto to work reliably.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.zip binary
