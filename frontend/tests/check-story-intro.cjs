@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=req
 const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const scope={};vm.createContext(scope);
-for(const file of ['runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/studio-text.js','src/story-intro.js'])load(scope,file);
+for(const file of ['runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/typography.ts','src/studio-text.js','src/story-intro.js'])load(scope,file);
 const json=value=>JSON.parse(JSON.stringify(value));
 const near=(actual,expected,tolerance=1e-9)=>assert.ok(Math.abs(actual-expected)<tolerance,`${actual} != ${expected}`);
 const n=scope.studioNarrativeSettings({introStyle:'story'}),intro=scope.studioStoryDuration(n);

@@ -89,7 +89,8 @@ Consequences:
 | `story-intro.js` / `.css` | Two-shot poster intro (character shot → creator shot) and its deterministic overlay effects |
 | `studio-narrative.js` / `.css` | Intro and outro controls, brand ending |
 | `studio-post.js` / `.css` | Post-processing (polar, CRT, holo, bloom, anamorphic, prism, film) over one shared optical surface. Borders stay outside it. |
-| `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) |
+| `studio-text.js` / `.css` | Typography controls (name font, size ratio, tracking, weight, italic, colour, intro titles) and their DOM styling |
+| `typography.ts` | Typography settings: validation and defaults, override text with letter case |
 | `variant-codec.ts` | `tuple-v1` compact encoding of per-design settings |
 | `studio-output.js` / `.css` | Output dialog, clean-output mode, export requests to the shell |
 | `export-layout.js` | Logical layout size and output scaling |
