@@ -31,6 +31,9 @@ from pathlib import Path
 ROOT = Path(os.environ.get("STUDIO_ROOT") or Path(__file__).resolve().parents[2]).resolve()
 FRONTEND = ROOT / "frontend"
 DIST_PAGE = FRONTEND / "dist" / "index.html"
+LOCKFILE = FRONTEND / "package-lock.json"
+# npm writes this copy of the lockfile on every install; it tells us what is installed.
+INSTALLED_LOCK = FRONTEND / "node_modules" / ".package-lock.json"
 STATE_DIR = ROOT / ".studio"
 STATE_FILE = STATE_DIR / "server.json"
 LOG_FILE = STATE_DIR / "server.log"
@@ -42,7 +45,8 @@ HOST = "127.0.0.1"
 DEFAULT_PORT = 8768
 PAGE_MARKER = "Character Showcase Studio"
 MIN_PYTHON = (3, 9)
-MIN_NODE = 18
+# Vite needs Node.js 22.12+ (frontend/package.json "engines").
+MIN_NODE = (22, 12)
 WINDOWS = os.name == "nt"
 
 try:
@@ -98,12 +102,35 @@ def node_version() -> tuple[int, ...] | None:
     return tuple(int(part) for part in match.groups()) if match else None
 
 
+NODE_HINT = f"需要 Node.js {MIN_NODE[0]}.{MIN_NODE[1]} 或更新版本：https://nodejs.org/"
+
+
 def require_node() -> None:
     version = node_version()
     if version is None:
-        raise LauncherError("没有找到 Node.js。请先安装 Node.js 18 或更新版本：https://nodejs.org/")
-    if version[0] < MIN_NODE:
-        raise LauncherError(f"Node.js 版本过低（{version[0]}.{version[1]}），需要 18 或更新版本：https://nodejs.org/")
+        raise LauncherError(f"没有找到 Node.js。{NODE_HINT}")
+    if version < MIN_NODE:
+        raise LauncherError(f"Node.js 版本过低（{version[0]}.{version[1]}），{NODE_HINT}")
+
+
+def dependencies_stale() -> bool:
+    """True when frontend/node_modules is missing or older than package-lock.json."""
+    return not INSTALLED_LOCK.exists() or LOCKFILE.stat().st_mtime > INSTALLED_LOCK.stat().st_mtime
+
+
+def ensure_dependencies() -> None:
+    if not dependencies_stale():
+        return
+    # On Windows npm is npm.cmd, which subprocess only finds by its full path.
+    npm = shutil.which("npm")
+    if npm is None:
+        raise LauncherError("没有找到 npm（它随 Node.js 一起安装）。请重新安装 Node.js：https://nodejs.org/")
+    say("正在安装前端依赖（需要联网，只在首次或依赖更新后进行）……")
+    result = run([npm, "ci", "--no-audit", "--no-fund"], cwd=FRONTEND)
+    if result.returncode != 0:
+        say(result.stdout + result.stderr)
+        raise LauncherError("安装前端依赖失败，请检查网络后重试，详细信息见上方输出。")
+    ok("前端依赖已安装")
 
 
 def url(port: int) -> str:
@@ -164,7 +191,7 @@ def dist_is_stale() -> bool:
         return True
     built = DIST_PAGE.stat().st_mtime
     sources = [FRONTEND / name for name in ("src", "runtime", "assets", "vendor")]
-    sources.append(FRONTEND / "tools" / "build.mjs")
+    sources += [FRONTEND / "tools" / "build.mjs", LOCKFILE]
     for source in sources:
         files = source.rglob("*") if source.is_dir() else [source]
         if any(path.is_file() and path.stat().st_mtime > built for path in files):
@@ -176,6 +203,7 @@ def dist_is_stale() -> bool:
 
 def cmd_build(_args: argparse.Namespace | None = None) -> None:
     require_node()
+    ensure_dependencies()
     say("正在构建页面……")
     result = run(["node", "tools/build.mjs"], cwd=FRONTEND)
     if result.returncode != 0:
@@ -347,8 +375,13 @@ def cmd_doctor(_args: argparse.Namespace | None = None) -> None:
     say("[bold]运行环境[/bold]")
     check(sys.version_info >= MIN_PYTHON, f"Python {sys.version.split()[0]}", "需要 Python 3.9 或更新版本")
     version = node_version()
-    check(version is not None and version[0] >= MIN_NODE,
-          f"Node.js {'.'.join(map(str, version)) if version else '未安装'}", "需要 Node.js 18 或更新版本：https://nodejs.org/")
+    check(version is not None and version >= MIN_NODE,
+          f"Node.js {'.'.join(map(str, version)) if version else '未安装'}", NODE_HINT)
+    npm = shutil.which("npm")
+    check(npm is not None, "npm" if npm else "没有找到 npm", "npm 随 Node.js 一起安装，请重新安装 Node.js")
+    stale = dependencies_stale()
+    check(None if stale else True, "前端依赖未安装或已过期" if stale else "前端依赖已安装",
+          "下次构建时会自动安装（需要联网）")
 
     say("\n[bold]Git 与 GitHub[/bold]")
     if not shutil.which("git"):
