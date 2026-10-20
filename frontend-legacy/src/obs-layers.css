@@ -1,0 +1,10 @@
+/* The top border source owns the full-frame shutdown, covering every OBS layer. */
+#character-directions:is([data-output-layer="picture"],[data-output-layer="effects"]) .cyber-shutdown{display:none!important}
+/* Hide surfaces without removing their measurement containers. Every source
+   keeps the same logical canvas, safe area and responsive typography. */
+#character-directions[data-output-layer="picture"] .edge{visibility:hidden!important}
+#character-directions[data-output-layer="picture"] .studio-post-optics{display:none!important}
+#character-directions:is([data-output-layer="effects"],[data-output-layer="borders"]) .design-art{background:transparent!important;box-shadow:none!important}
+#character-directions[data-output-layer="effects"] :is(.edge,.studio-show-foreground){visibility:hidden!important;opacity:0!important}
+#character-directions[data-output-layer="effects"] .studio-post-surface{opacity:0!important;filter:none!important;background:transparent!important}
+#character-directions[data-output-layer="borders"] :is(.studio-post-viewport,.studio-show-foreground){visibility:hidden!important;opacity:0!important}
