@@ -162,7 +162,7 @@ Keep these when changing or restructuring code. Most have regression tests in `t
 
 ## Known structural debt
 
-The planned frontend restructure is meant to fix these:
+The planned frontend restructure is meant to fix these. The plan (a staged move to Vite + React + TypeScript) is in [issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3); read it before starting any part of the rewrite.
 
 - Source files are written in a dense, minified-looking style, with single lines up to about 1,700 characters. Line-based diffs and merges are hard to use.
 - Modules communicate through one shared closure scope, not imports.
