@@ -1,6 +1,6 @@
 // Starts the editor: builds the design views, mounts the editor UI and the other page parts around
-// them, registers the sync that update() runs, and drives the shared paint loop. Nothing imports
-// this module; src/main.js runs it.
+// them, connects them to the session (the sync that update() runs), and drives the shared paint
+// loop. Nothing imports this module; src/main.js runs it.
 import { studioAdvanceTime, studioTotalDuration } from './timeline.ts';
 import { advanceMotionClock } from './motion-clock.ts';
 import { mountStudioPreview, refreshStudioPreview } from './studio-preview.js';
@@ -9,7 +9,7 @@ import { mountStudioOutput } from './studio-output.js';
 import { mountEditorUI } from './editor/mount.tsx';
 import { mountStudioLayerSync, studioApplyLayerClock } from './obs-layer-sync.js';
 import { createViews, draw, measure, paintGrain, syncView } from './studio-views.js';
-import { frame, images, motionClock, onStudioSync, reduced, root, saveStudio, showStudioError, state } from './studio-session.js';
+import { connectStudio, frame, images, motionClock, reduced, root, saveStudio, showStudioError, state } from './studio-session.js';
 
 const views = createViews();
 mountStudioPreview(root, views);
@@ -29,7 +29,7 @@ function sync() {
   for (const view of views) syncView(view);
   showStudioError(views.some(v => v.qrError) && !images.qr ? '请输入完整的 http:// 或 https:// 链接，或上传二维码图片。' : '');
 }
-onStudioSync(sync);
+connectStudio({ sync, notify: editorUI.sync });
 
 for (const view of views) {
   // The pointer moves the artwork slightly (parallax); draw() eases towards it.

@@ -21,7 +21,7 @@ function harness(widgetState){
     }
   };
   vm.createContext(scope);
-  vm.runInContext(prefix+'\nframe.last=123;let syncCount=0;onStudioSync(()=>syncCount++);',scope);
+  vm.runInContext(prefix+'\nframe.last=123;let syncCount=0;connectStudio({sync:()=>syncCount++,notify(){}});',scope);
   return {
     run:source=>vm.runInContext(source,scope),
     inspect:()=>JSON.parse(vm.runInContext('JSON.stringify({state,motionClock,last:frame.last,syncCount})',scope)),
