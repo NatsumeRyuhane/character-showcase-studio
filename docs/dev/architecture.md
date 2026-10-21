@@ -2,7 +2,7 @@
 
 Character Showcase Studio is a browser editor for animated character showcase screens. The editor UI and its content are Chinese. Users pick one of 13 visual designs, fill in character and brand content, tune motion and effects, and export the result as a standalone HTML page, an OBS browser-source package, or an editable After Effects template.
 
-This document describes the code **as it is today**, partway through the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling), phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)), phase 3 (the pure logic as typed TypeScript modules with Vitest unit tests) and phase 4 (the editor UI as React components, without the Codex widget's UI kit) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
+This document describes the code **as it is today**, after the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling), phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)), phase 3 (the pure logic as typed TypeScript modules with Vitest unit tests), phase 4 (the editor UI as React components, without the Codex widget's UI kit) and phase 5 (one module per design, and the editor's old main module split into session, views and app modules) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
 
 Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [build-and-test.md](build-and-test.md), [deploy.md](deploy.md).
 
@@ -40,7 +40,7 @@ dist/index.html  (shell document, strict CSP)
 │    └─ fragment = src/exploration-full-template.html
 │         ├─ bundled CSS (imported by src/main.js: design languages, workspace, output, narrative, …)
 │         ├─ vendor script: barcode + QR generator
-│         └─ main script: Vite bundle of src/main.js → src/exploration-full-logic.js and its imports,
+│         └─ main script: Vite bundle of src/main.js → src/studio-app.js and its imports,
 │                         including React and the editor components in src/editor/
 ├─ output host script   Vite bundle of runtime/output-host.ts → studio-output-host.ts, export-packages.ts, export-zip.ts, obs-layer-host.ts
 └─ runtime/standalone-shell.js   storage, sizing, startup preset, srcdoc boot
@@ -65,7 +65,7 @@ dist/index.html  (shell document, strict CSP)
 Consequences:
 
 - **Modules import what they use.** A new module needs no change to `build.mjs`; import it where it is used. New CSS is imported from `src/main.js`, whose import order is the cascade order. Modules may be `.ts`, or `.tsx` for React components; `tools/check.mjs` type-checks TypeScript (JavaScript is not type-checked yet).
-- **Imported bindings are read-only.** Modules that need to replace the logic module's `motionClock` or restart frame timing call `setMotionClock` / `resetLastFrame`.
+- **Imported bindings are read-only.** Modules that need to replace the session's `motionClock` or restart frame timing call `setMotionClock` / `resetLastFrame` (`studio-session.js`).
 - **Two bundles, plus classic scripts.** The frame script and the output host are Vite bundles. The bridge (`runtime/standalone-host-bridge.js`) and the shell (`runtime/standalone-shell.js`) are still classic scripts that `build.mjs` inserts as they are. The output host installs `globalThis.studioOutputHost`, the only name the shell uses from it.
 - **`studioOBSLayerBootstrap` is copied by source text** into synchronized OBS layer pages, so it must stay self-contained (`runtime/obs-layer-host.ts`).
 - **Tests:** Vitest unit tests in `tests/unit/` are found automatically; an older `tests/check-*.cjs` script runs only if it is listed in `tools/check.mjs` (see [build-and-test.md](build-and-test.md#tests)).
@@ -75,18 +75,19 @@ Consequences:
 
 | File | Responsibility |
 | --- | --- |
-| `main.js` | Entry of the frame script: imports the CSS in cascade order, then `exploration-full-logic.js` |
+| `main.js` | Entry of the frame script: imports the CSS in cascade order, then `studio-app.js` |
 | `exploration-full-template.html` | Base styles, the 13 empty `section[data-design]` views and the artwork template each one is filled from. No controls: those are React components. |
-| `exploration-full-logic.js` | The main module: the live editor state and its persistence glue, building the design views, syncing the artwork with the state, the shared paint loop, image reading. It imports the other modules, mounts the editor UI, and exports the shared editor state (`state`, `images`, `motionClock`, `update`, `draw`, …) that the UI modules import back. |
+| `studio-app.js` | Starts the editor: builds the views, mounts the editor UI and the other page parts, registers the sync that `update()` runs, and drives the shared paint loop. Nothing imports it. |
+| `studio-session.js` | The live session: `state`, the session-only `images`, the continuous `motionClock`, saving and restoring through the widget host, frame timing and image reading. It imports no UI or artwork module (see [Module layers](#module-layers)). |
+| `studio-views.js` | The 13 design views: built from the template, synced with the state (`syncView`), laid out (`measure`) and drawn each frame (`draw`). Text fitting, badges, codes, borders and CSS effects. |
+| `designs/` | The canvas artwork, one module per design (see [Designs](#designs)) |
 | `editor/` | The editor UI as React components (see [Editor workspace](#editor-workspace)) |
 | `studio-workspace.css` | Styles of the three-pane editor, scoped under `.studio-editor` |
 | `studio-preview.js` | Fits each design's artwork into its preview area, in the editor and in clean-output mode |
 | `icons.ts` | The seven Lucide icons the studio uses, as the same `<svg>` Lucide produced |
-| `exploration-full-scene.js` | Base scene, geometry and background painting |
-| `design-language-scene.js` / `design-language-styles.css` | Fashion, avant-garde, plush, relaxed, cute and paper designs |
-| `urban-language-scene.js` / `urban-language-styles.css` | The three urban designs, `district`, `tuner` and `arcade`: palettes, recommended geometry, animated backgrounds, typography |
-| `dual-language-scene.js` / `-styles.css` / `-markup.html` | The two-panel `dual` design |
-| `studio-geometry.js` | Series geometry devices (`facet`, `ribbon`, `blocks`), drawn by `paintExploration` with its canvas and helpers passed in |
+| `design-language-styles.css` | Styles of the six language designs: fashion, avant-garde, plush, relaxed, cute and paper |
+| `urban-language-styles.css` | Styles of the three urban designs, `district`, `tuner` and `arcade` |
+| `dual-language-styles.css` / `dual-language-markup.html` | Styles and extra markup of the two-panel `dual` design |
 | `motion-clock.ts` | Continuous ring, text and border clocks that never reset |
 | `information-motion.ts` | Text entrance and subtle idle motion |
 | `timeline.ts` | Narrative timing: intro / show / outro poses, looping, retiming |
@@ -107,12 +108,30 @@ Consequences:
 
 Design keys (`section[data-design]`): `couture` (the code's default), `brutalist`, `cloud`, `orbit`, `play`, `plush`, `poster`, `sticker`, `wave`, `dual`, `district`, `tuner`, `arcade`.
 
+### Module layers
+
+The frame script's modules import each other without cycles, in three layers:
+
+- **`studio-session.js`** holds the state every module reads and changes. It imports only pure modules (`studio-state.ts`, `motion-clock.ts`) and `editor/store.ts`, so any module can import it. Its `update()` runs the sync that `studio-app.js` registers with `onStudioSync`, so it never imports the views.
+- **The page parts** import the session and each other, but never the app: `studio-views.js`, `designs/`, `studio-narrative.js` (with `story-intro.js` and `studio-post.js`), `studio-text.js`, `studio-preview.js`, `studio-output.js`, `obs-layer-sync.js`, `ae-export.js` and the React components in `editor/`.
+- **`studio-app.js`** imports the page parts and wires them together. `main.js` imports it, and nothing else does.
+
+Keep it that way: a module that needs to trigger a sync calls `update()` or `syncStudio()` from the session rather than importing the app.
+
+### Designs
+
+`src/designs/` holds the canvas artwork, one module per design, registered in `designs/index.ts`. Each exports a `Design` (`designs/types.ts`): its palette, caption text (`note`, `hello`), whether its copy moves below the name block (`copyBelowTitle`), and how it is painted. `paintExploration(ctx, w, h, t, key, settings)` paints one frame and depends only on its arguments; the paint loop and the AE export both call it.
+
+- **Own painter.** The six language designs (`couture`, `brutalist`, `cloud`, `plush`, `play`, `sticker`) are built with `languageDesign` (`language.ts`), the three urban designs with `urbanDesign` (`urban.ts`). The scaffold paints the paper, background pattern, floor shadow and intro transform; the design module supplies its palette, accent and `signature` geometry, plus optional `backdrop`, `accents` or `crop` hooks. These painters cover only the `signature` geometry. `dual.ts` has its own painter for every geometry (`ownsEveryGeometry`).
+- **Shared scene.** `shared-scene.ts` paints every other case: `orbit`, `poster` and `wave`, and any design with a non-signature geometry style. Its defaults are orbit's look; `poster.ts` and `wave.ts` set only `shared` (ring centre, paper, which geometry `signature` means, landscape corner cuts). `series-geometry.ts` draws the `facet`, `ribbon` and `blocks` devices for it.
+- The painters keep their own small helpers (`line`, `poly`, `cast`, …), which differ slightly between scaffolds; changing one changes that family's frames. `kit.ts` holds the number and colour helpers they share.
+
 ### Editor workspace
 
-The controls are React components in `src/editor/`. The artwork is not: `exploration-full-logic.js` builds the 13 design views from the template, and the paint loop draws them every frame. Then it calls `mountEditorUI(root, views)` (`editor/mount.tsx`), which renders `Workspace.tsx` synchronously.
+The controls are React components in `src/editor/`. The artwork is not: `studio-views.js` builds the 13 design views from the template, and the paint loop in `studio-app.js` draws them every frame. `studio-app.js` then calls `mountEditorUI(root, views)` (`editor/mount.tsx`), which renders `Workspace.tsx` synchronously.
 
 - **One React root, rendered through portals.** The root itself is a detached element. The header, mobile tabs and `.studio-layout` are portalled into `#character-directions`; the layout adopts the `.studio-views` element that holds the sections. Each section gets its playback controls (portalled into its `.studio-preview`) and its own inspector (portalled into the section), so every design keeps its own open groups and scroll position. The output dialog is portalled into the root as well.
-- **State bridge.** The logic module still owns the mutable `state` and mutates it in place. Components read it during render, change it in their event handlers and call `update()` (sync and save). Every sync calls `notifyEditor()` (`editor/store.ts`), and components re-render through `useEditorRevision()`. Hidden inspectors receive no new revision, so only the visible one re-renders.
+- **State bridge.** The session (`studio-session.js`) owns the mutable `state`, and everything mutates it in place. Components read it during render, change it in their event handlers and call `update()` (sync and save). Every sync calls `notifyEditor()` (`editor/store.ts`), and components re-render through `useEditorRevision()`. Hidden inspectors receive no new revision, so only the visible one re-renders.
 - **Per-frame values stay imperative.** The seek bar's value, the time readout and the phase label change every frame; the paint loop writes them into elements that React renders but never updates.
 - **Panels.** `ContentPanel.tsx` (left: series, character and brand, `NarrativePanel.tsx` with the sequence and post-processing, `TypographyPanel.tsx`, images, delivery formats and badges, link and codes), `Workspace.tsx` (header, toolbar, playback), `Inspector.tsx` (right: the current design's look, plus the shared border settings), `OutputDialog.tsx`. Shared pieces are in `controls.tsx`; display text derived from the state in `format.ts`.
 - The desktop layout is `.studio-header` plus `.studio-layout`: a 260 px left pane, a flexible centre and a 280 px right pane. The side panes scroll independently. The root is `.studio-editor` at `100dvh`. `studio-preview.js` computes `--preview-width` to keep 16:9 or 9:16. Below 1120 px the panes become tabs; focus mode hides both side panes.
@@ -120,15 +139,15 @@ The controls are React components in `src/editor/`. The artwork is not: `explora
 
 ### Adding a design
 
-The 0.8.8 urban designs are the most recent example:
-- Register the key in `variantDefaults`, `languageKeys` and `languageNotes`, with its own font, colour, badge, shadow, ring-speed and background defaults.
+The urban designs (`district.ts`, `tuner.ts`, `arcade.ts`) are the most recent example:
+- Register the key in `variantDefaults` in `studio-state.ts`, with its own font, colour, badge, shadow, ring-speed and background defaults, and in `languageKeys` if it has its own palette.
+- Add a module in `src/designs/` and register it in `designs/index.ts` (see [Designs](#designs)): `languageDesign` or `urbanDesign` for a design with its own artwork, its own `paint` as in `dual.ts`, or only `shared` settings as in `poster.ts`.
 - Add a `section[data-design]` to the template. The design picker lists every section; `urbanDesigns` in `src/editor/Workspace.tsx` decides which group it is in.
-- Add painting: `urbanLanguagePalette(variant, dark)` and `paintUrbanLanguage(ctx, w, h, t, variant, settings)`. `paintExploration` dispatches to that module first; only the `signature` geometry uses the design's own rings, and other geometry choices fall back to the shared painters.
 - Add typography and layout rules for landscape, portrait and swapped layouts.
 - Keep path topology fixed and record `studioIntroTransform`, so the AE export keeps continuous motion separate from editable transitions.
-- Extend the tests: `check-urban-designs.cjs` (topology, clocks, transparency, palettes, ratios), plus the design count asserted in `tools/check.mjs`.
+- Extend the tests: `tests/unit/designs.test.ts` checks every key has a module; `check-urban-designs.cjs` covers topology, clocks, transparency, palettes and ratios; `tools/check.mjs` asserts the design count; and the screenshot baseline needs the new design's frames (see [build-and-test.md](build-and-test.md#visual-regression-tests)).
 
-Design-specific layout logic exists too. For example, `fitPosterCopy` in `exploration-full-logic.js` pushes the `poster` taglines below the skewed name block. It projects the name and its pseudo-elements through their CSS transforms in un-animated layout coordinates, adding margins for shadow and motion. AE capture goes through the same `measure` path.
+Design-specific layout logic exists too. For example, `fitPosterCopy` in `studio-views.js` pushes the taglines below the skewed name block for designs with `copyBelowTitle`. It projects the name and its pseudo-elements through their CSS transforms in un-animated layout coordinates, adding margins for shadow and motion. AE capture goes through the same `measure` path.
 
 `runtime/` holds the shell and frame runtime, the export packager, the ZIP writer, the AE ExtendScript template, the OBS layer server and control page, `crt-motion.js` (shared by the web page and AE), and `startup-defaults.json`.
 
@@ -159,10 +178,10 @@ Keep these when changing or restructuring code. Most have regression tests in `t
 
 ## Known structural debt
 
-The planned frontend restructure is meant to fix these. The plan (a staged move to Vite + React + TypeScript) is in [issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3); read it before starting any part of the rewrite.
+What the frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)) left as it was. None of it blocks work; fix it alongside a change that touches it.
 
-- Source files are written in a dense, minified-looking style, with single lines up to about 1,700 characters. Line-based diffs and merges are hard to use.
-- The editor components and the remaining plain UI modules (`studio-narrative.js`, `studio-output.js`, `studio-preview.js`, `ae-export.js`, …) import mutable editor state from `exploration-full-logic.js`, which imports them back. The cycle is safe because every cross-module access happens inside functions called after startup, but it is still one shared state in disguise. It goes when phase 5 splits the logic module.
-- `exploration-full-logic.js` still mixes state glue, painting and DOM measurement. Form binding has moved to the React components; defaults, validation and restore to `studio-state.ts`.
+- Several plain JavaScript modules are still written in the old dense style and are not type-checked: `ae-export.js` (lines up to about 1,400 characters), `studio-narrative.js`, `story-intro.js`, `studio-post.js`, `studio-text.js`, `export-layout.js` and `ae-canvas-recorder.js`. Convert one to TypeScript when you next need to change it substantially.
+- The shared state is still one mutable object (`state` in `studio-session.js`) that every module reads and writes in place, rather than state passed in or changed through actions.
+- The design CSS is not split per design: `design-language-styles.css` and `urban-language-styles.css` interleave rules for all their designs (shared portrait and swap sections, multi-design selectors), so splitting them would reorder the cascade.
 - Exports are still the whole editor page in clean-output mode, React included. A separate player build (an export without the editor) is still to be decided ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)).
 - The runtime still carries Codex widget naming. The `localStorage` key includes the page path (see [state-and-timing.md](state-and-timing.md#storage)), so **moving or renaming the served page loses every user's saved settings** unless a migration is added. The local server serves `dist/` at `/` to keep that path stable.
