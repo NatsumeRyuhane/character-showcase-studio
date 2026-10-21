@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "00000000-0000-4000-8000-0000000000a1",
+      "name": "background.mp4",
+      "status": "ready",
+      "duration": 10,
+      "width": 1920,
+      "height": 1080,
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "alpha": false,
+      "audio": true,
+      "image": false,
+      "fps": 30
+    },
+    {
+      "id": "00000000-0000-4000-8000-0000000000a2",
+      "name": "character.mov",
+      "status": "ready",
+      "duration": 4,
+      "width": 1920,
+      "height": 1080,
+      "codec": "prores",
+      "pixelFormat": "yuva444p12le",
+      "alpha": true,
+      "audio": false,
+      "image": false,
+      "fps": 29.97002997002997
+    },
+    {
+      "id": "00000000-0000-4000-8000-0000000000a4",
+      "name": "music.mp3",
+      "kind": "audio",
+      "status": "ready",
+      "duration": 30,
+      "codec": "mp3",
+      "audio": true,
+      "image": false,
+      "alpha": false,
+      "channels": 2,
+      "sampleRate": 44100
+    }
+  ],
+  "clips": [
+    {
+      "id": "00000000-0000-4000-8000-0000000000d1",
+      "assetId": "00000000-0000-4000-8000-0000000000a1",
+      "start": 0,
+      "in": 0,
+      "out": 6,
+      "layer": "under-post",
+      "x": 50,
+      "y": 50,
+      "scale": 100,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3,
+      "transition": "fade",
+      "volume": 1,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-0000000000d2",
+      "assetId": "00000000-0000-4000-8000-0000000000a2",
+      "start": 1.25,
+      "in": 0.5,
+      "out": 3.5,
+      "layer": "under-intro-text",
+      "x": 50,
+      "y": 50,
+      "scale": 100,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 0,
+      "fadeOut": 0,
+      "transition": "fade",
+      "volume": 1,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-0000000000d3",
+      "assetId": "00000000-0000-4000-8000-0000000000a2",
+      "start": 6,
+      "in": 0,
+      "out": 4,
+      "layer": "under-show-text",
+      "x": 50,
+      "y": 50,
+      "scale": 100,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 1,
+      "fadeOut": 0,
+      "transition": "fade",
+      "volume": 1,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-0000000000d4",
+      "assetId": "00000000-0000-4000-8000-0000000000a4",
+      "start": 0,
+      "in": 0,
+      "out": 10,
+      "layer": "audio-1",
+      "x": 50,
+      "y": 50,
+      "scale": 100,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 2,
+      "fadeOut": 2,
+      "transition": "fade",
+      "volume": 1,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      }
+    }
+  ],
+  "grade": {
+    "exposure": 0,
+    "contrast": 1,
+    "saturation": 1,
+    "hue": 0
+  },
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "duration": 10.04,
+    "bitrate": 20,
+    "codec": "h264",
+    "acceleration": "auto"
+  }
+}

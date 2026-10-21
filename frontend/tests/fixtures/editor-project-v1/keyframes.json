@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "00000000-0000-4000-8000-0000000000a2",
+      "name": "character.mov",
+      "status": "ready",
+      "duration": 4,
+      "width": 1920,
+      "height": 1080,
+      "codec": "prores",
+      "pixelFormat": "yuva444p12le",
+      "alpha": true,
+      "audio": false,
+      "image": false,
+      "fps": 29.97002997002997
+    }
+  ],
+  "clips": [
+    {
+      "id": "00000000-0000-4000-8000-0000000000f1",
+      "assetId": "00000000-0000-4000-8000-0000000000a2",
+      "start": 0,
+      "in": 0.5,
+      "out": 4,
+      "layer": "above-text",
+      "x": 50,
+      "y": 50,
+      "scale": -100,
+      "flipY": true,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 0,
+      "fadeOut": 0,
+      "transition": "fade",
+      "volume": 1,
+      "audioFadeIn": 0,
+      "audioFadeOut": 0,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      },
+      "keyframes": {
+        "x": [
+          {
+            "time": 0.5,
+            "value": 20,
+            "easing": "linear"
+          },
+          {
+            "time": 1.0,
+            "value": 40,
+            "easing": "smooth"
+          },
+          {
+            "time": 1.01,
+            "value": 45,
+            "easing": "linear"
+          },
+          {
+            "time": 3.98,
+            "value": 80,
+            "easing": "linear"
+          }
+        ],
+        "y": [
+          {
+            "time": 0.5,
+            "value": 50,
+            "easing": "linear"
+          },
+          {
+            "time": 1.0,
+            "value": 30,
+            "easing": "smooth"
+          },
+          {
+            "time": 1.01,
+            "value": 32,
+            "easing": "linear"
+          },
+          {
+            "time": 3.98,
+            "value": 60,
+            "easing": "linear"
+          }
+        ],
+        "scale": [
+          {
+            "time": 0.5,
+            "value": -100,
+            "easing": "linear"
+          },
+          {
+            "time": 2,
+            "value": 0,
+            "easing": "hold"
+          },
+          {
+            "time": 2.5,
+            "value": 150
+          }
+        ],
+        "rotate": [
+          {
+            "time": 0.75,
+            "value": -360,
+            "easing": "smooth"
+          },
+          {
+            "time": 3.2,
+            "value": 360,
+            "easing": "linear"
+          }
+        ],
+        "opacity": [
+          {
+            "time": 0.5,
+            "value": 0,
+            "easing": "linear"
+          },
+          {
+            "time": 0.9,
+            "value": 100,
+            "easing": "linear"
+          }
+        ]
+      }
+    }
+  ],
+  "grade": {
+    "exposure": 0,
+    "contrast": 1,
+    "saturation": 1,
+    "hue": 0
+  },
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration": 12.5,
+    "durationMode": "auto",
+    "bitrate": 20,
+    "codec": "h264",
+    "acceleration": "auto"
+  },
+  "designSync": false
+}

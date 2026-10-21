@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "assets": [],
+  "clips": [],
+  "grade": {
+    "exposure": 0,
+    "contrast": 1,
+    "saturation": 1,
+    "hue": 0
+  },
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration": 12.5,
+    "durationMode": "auto",
+    "bitrate": 20,
+    "codec": "h264",
+    "acceleration": "auto"
+  },
+  "designSync": false
+}

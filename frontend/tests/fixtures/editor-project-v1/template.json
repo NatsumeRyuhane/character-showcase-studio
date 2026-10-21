@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "00000000-0000-4000-8000-0000000000a2",
+      "name": "character.mov",
+      "status": "ready",
+      "duration": 4,
+      "width": 1920,
+      "height": 1080,
+      "codec": "prores",
+      "pixelFormat": "yuva444p12le",
+      "alpha": true,
+      "audio": false,
+      "image": false,
+      "fps": 29.97002997002997
+    }
+  ],
+  "clips": [
+    {
+      "id": "00000000-0000-4000-8000-000000000111",
+      "assetId": "00000000-0000-4000-8000-0000000000a2",
+      "start": 0,
+      "in": 0,
+      "out": 4,
+      "layer": "under-text",
+      "x": 50,
+      "y": 50,
+      "scale": 100,
+      "flipY": false,
+      "rotate": 0,
+      "opacity": 100,
+      "cropLeft": 0,
+      "cropRight": 0,
+      "cropTop": 0,
+      "cropBottom": 0,
+      "fadeIn": 0,
+      "fadeOut": 0,
+      "transition": "fade",
+      "volume": 1,
+      "audioFadeIn": 0,
+      "audioFadeOut": 0,
+      "grade": {
+        "exposure": 0,
+        "contrast": 1,
+        "saturation": 1,
+        "hue": 0
+      },
+      "key": {
+        "enabled": false,
+        "color": "#00ff00",
+        "tolerance": 0.15,
+        "softness": 0.12,
+        "spill": 0.5
+      }
+    }
+  ],
+  "grade": {
+    "exposure": 0,
+    "contrast": 1,
+    "saturation": 1,
+    "hue": 0
+  },
+  "output": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "duration": 20.2,
+    "durationMode": "custom",
+    "bitrate": 40,
+    "codec": "prores",
+    "acceleration": "cpu"
+  },
+  "designSync": false,
+  "transparent": true,
+  "template": {
+    "version": 1,
+    "design": {
+      "design": "character-explorations",
+      "version": 6,
+      "activeDesign": "poster",
+      "ratio": "portrait",
+      "name": "NOVA",
+      "playing": false,
+      "time": 3.25
+    },
+    "images": {
+      "logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==",
+      "qr": ""
+    },
+    "imageNames": {
+      "logo": "logo.png"
+    }
+  }
+}
