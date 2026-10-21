@@ -14,6 +14,7 @@ Character Showcase Studio is a browser editor for animated character showcase sc
 | [docs/dev/build-and-test.md](docs/dev/build-and-test.md) | Building, testing, adding modules or tests |
 | [docs/dev/deploy.md](docs/dev/deploy.md) | Anything about the live site |
 | [docs/dev/launcher.md](docs/dev/launcher.md) | The local launcher (`start.sh` / `start.cmd`) |
+| [docs/dev/video-editor-port.md](docs/dev/video-editor-port.md) | Working on the video editor port ([issue #11](https://github.com/nekokaii/character-showcase-studio/issues/11)). Reference branch, acceptance checklist, the old project format |
 | [docs/user/](docs/user/) | What users see and are told (Chinese) |
 
 ## Agent files
