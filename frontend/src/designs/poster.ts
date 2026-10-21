@@ -1,9 +1,7 @@
 // Poster: the shared scene with sliced rings, a larger ring, warmer paper and heavy corner cuts.
 // Its taglines are pushed below the skewed name block in the DOM (fitPosterCopy in studio-views.js).
-import { kit } from './kit.ts';
+import { rgba } from './kit.ts';
 import type { Design } from './types.ts';
-
-const { rgba } = kit;
 
 export const posterDesign: Design = {
   key: 'poster',

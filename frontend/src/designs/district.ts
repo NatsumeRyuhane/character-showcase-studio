@@ -1,8 +1,6 @@
 // District: a utility dial, with a condensed italic wordmark, a cut underline and a compact folio.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { urbanDesign } from './urban.ts';
-
-const { mix } = kit;
 
 export const districtDesign = urbanDesign({
   key: 'district',

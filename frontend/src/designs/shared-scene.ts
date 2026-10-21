@@ -2,11 +2,9 @@
 // It paints orbit, poster and wave, and any design whose own painter does not cover the chosen
 // geometry (see paintExploration in index.ts). Its defaults are orbit's look; a design's
 // `shared` settings (SharedLook) change the centre, paper, signature and corner cuts.
-import { kit } from './kit.ts';
+import { clamp, hexOr, num, rgba } from './kit.ts';
 import { renderSeriesGeometry } from './series-geometry.ts';
 import type { Fill, Palette, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 /** What a design's corner cuts can draw with, in landscape. Portrait cuts are the same for every design. */
 export interface SharedCutsScene {
@@ -51,11 +49,11 @@ export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: num
   const finalCx = w * (portrait ? .57 : swapped ? 1 - centre[0] : centre[0]) + num(input.px, 0) * w * .008, finalCy = h * (portrait ? (swapped ? .34 : .59) : centre[1]) + num(input.py, 0) * h * .005;
   const cx = w * .5 + (finalCx - w * .5) * intro, cy = h * .48 + (finalCy - h * .48) * intro;
   const r = (portrait ? Math.min(w * .43, h * .26) : h * centre[2]) * clamp(num(input.ringScale, 1.1), .6, 2.4) * (1 + s2 * .008) * (1 + .44 * (1 - intro));
-  const accent = kit.hex(input.accent, '#bceb45');
+  const accent = hexOr(input.accent, '#bceb45');
   const bg = languagePalette ? languagePalette.paper : dark ? '#141b20' : look.lightPaper || '#eff1e8';
   const fg = languagePalette ? languagePalette.ink : dark ? '#e4ede2' : '#26382e';
   const weight = .66 + .34 * intensity;
-  const shadowColor = kit.hex(input.shadowColor, '#24302c');
+  const shadowColor = hexOr(input.shadowColor, '#24302c');
 
   function stroke(points: Point[], color: Fill, width: number, alpha = 1, cap: CanvasLineCap = 'round') {
     if (points.length < 2) return;

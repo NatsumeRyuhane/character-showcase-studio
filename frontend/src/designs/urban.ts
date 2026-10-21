@@ -2,10 +2,8 @@
 // with no third-party logos, character art or type assets. Paper, background pattern, floor
 // shadow and the intro transform around each design's own geometry, then its crop accents.
 import type { DesignKey } from '../studio-state.ts';
-import { kit, paletteOf } from './kit.ts';
+import { clamp, hexOr, num, paletteOf, rgba } from './kit.ts';
 import type { Design, Fill, PaletteColors, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 /** What an urban design's hooks draw with. `signature` runs centred on the ring, mirrored when swapped. */
 export interface UrbanScene {
@@ -64,8 +62,8 @@ function paintUrban(spec: UrbanDesignSpec, ctx: StudioCanvas, w: number, h: numb
   const input = settings || {};
   const portrait = !!input.portrait, swapped = !!input.swapped, dark = input.background === 'dark', side = swapped ? -1 : 1;
   const [paper, ink, muted] = dark ? spec.palette.dark : spec.palette.light;
-  const accent = kit.hex(input.accent, spec.accent);
-  const shadowColor = kit.hex(input.shadowColor, '#101c20');
+  const accent = hexOr(input.accent, spec.accent);
+  const shadowColor = hexOr(input.shadowColor, '#101c20');
   const unit = Math.min(w, h), strength = clamp(num(input.geometryStrength, 1), .5, 1.5), opacity = clamp(num(input.geometryOpacity, 1), .3, 1), cut = clamp(num(input.cutStrength, .75));
   const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12;
   const ga = input.motion === false || input.gridMoving === false ? 0 : Math.PI * 2 * num(t, 0) / 12, gm = clamp(num(input.gridMotion, .14), 0, .5);

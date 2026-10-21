@@ -1,9 +1,7 @@
 // Brutalist: architectural cuts, a broken angular frame and a single tall condensed shout.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { languageDesign } from './language.ts';
 import type { Point } from './types.ts';
-
-const { mix } = kit;
 
 export const brutalistDesign = languageDesign({
   key: 'brutalist',

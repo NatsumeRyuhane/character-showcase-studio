@@ -2,10 +2,8 @@
 // background pattern, floor shadow and the intro transform around each design's own geometry.
 // Every path is presentation geometry, kept away from the model's central silhouette.
 import type { DesignKey } from '../studio-state.ts';
-import { kit, paletteOf } from './kit.ts';
+import { clamp, hexOr, num, paletteOf, rgba } from './kit.ts';
 import type { Design, Fill, PaletteColors, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 /** What a language design's hooks draw with. `signature` runs centred on the ring, mirrored when swapped. */
 export interface LanguageScene {
@@ -76,8 +74,8 @@ function paintLanguage(spec: LanguageDesignSpec, ctx: StudioCanvas, w: number, h
   const input = settings || {};
   const dark = input.background === 'dark', portrait = !!input.portrait, swapped = !!input.swapped;
   const [paper, ink, muted] = dark ? spec.palette.dark : spec.palette.light;
-  const accent = kit.hex(input.accent, spec.accent);
-  const shadowColor = kit.hex(input.shadowColor, '#282c31');
+  const accent = hexOr(input.accent, spec.accent);
+  const shadowColor = hexOr(input.shadowColor, '#282c31');
   // Background and geometry receive independent continuous clocks. A paused ring
   // must not stop the ambient grid, and neither clock resets at the intro boundary.
   const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12, sa = Math.sin(a), ca = Math.cos(a), s2 = Math.sin(2 * a);

@@ -1,8 +1,6 @@
 // Sticker: paper tabs, paper-cut modules and torn strips, deliberately graphic.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { languageDesign } from './language.ts';
-
-const { mix } = kit;
 
 export const stickerDesign = languageDesign({
   key: 'sticker',

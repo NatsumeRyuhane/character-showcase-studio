@@ -1,8 +1,6 @@
 // Tuner: an after-hours signal orbit, with a horizontal, tactile typographic hierarchy.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { urbanDesign } from './urban.ts';
-
-const { mix } = kit;
 
 export const tunerDesign = urbanDesign({
   key: 'tuner',

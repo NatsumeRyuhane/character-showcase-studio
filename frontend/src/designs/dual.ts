@@ -1,18 +1,16 @@
 // Dual: the archived acid-sticker spread as two panels, rebuilt on the shared continuous clock.
 // It owns only the background, for every geometry style; uploaded characters and editable copy
 // remain DOM (see the dual markup and styles).
-import { kit } from './kit.ts';
+import { clamp, hexOr, num, rgba } from './kit.ts';
 import type { Design, Fill, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 function paintDual(ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
   const input = settings || {};
   const dark = input.background === 'dark', portrait = !!input.portrait, swapped = !!input.swapped;
   const paper = dark ? '#171e1b' : '#eeefdf', ink = dark ? '#eef0df' : '#232b24', muted = dark ? '#9ba995' : '#78816a';
-  const accent = kit.hex(input.accent, '#bceb45');
-  const shadowColor = kit.hex(input.shadowColor, '#24302c');
+  const accent = hexOr(input.accent, '#bceb45');
+  const shadowColor = hexOr(input.shadowColor, '#24302c');
   const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12;
   const ga = input.motion === false || input.gridMoving === false ? 0 : Math.PI * 2 * num(t, 0) / 12;
   const intro = clamp(num(input.introProgress, 1)), split = clamp(num(input.dualSplit, .47), .35, .60), closeStart = swapped ? 1 - split : 0, modelStart = swapped ? 0 : split, modelSize = 1 - split;
