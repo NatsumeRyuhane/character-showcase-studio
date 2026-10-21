@@ -3,7 +3,7 @@
 // geometry (see paintExploration in index.ts). Its defaults are orbit's look; a design's
 // `shared` settings (SharedLook) change the centre, paper, signature and corner cuts.
 import { clamp, hexOr, num, rgba } from './kit.ts';
-import { renderSeriesGeometry } from './series-geometry.ts';
+import { renderSeriesGeometry, seriesKinds } from './series-geometry.ts';
 import type { Fill, Palette, Point, SceneSettings, StudioCanvas } from './types.ts';
 
 /** What a design's corner cuts can draw with, in landscape. Portrait cuts are the same for every design. */
@@ -31,7 +31,6 @@ export interface SharedLook {
   cuts?(scene: SharedCutsScene): void;
 }
 
-const seriesKinds = ['facet', 'ribbon', 'blocks'];
 const classicKinds = ['facet', 'ribbon', 'blocks', 'ring', 'burst', 'cut', 'rays'];
 
 export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings | undefined, look: SharedLook, languagePalette: Palette | null) {
@@ -235,10 +234,9 @@ export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: num
     ellipse(r * 1.23, r * .99, -.035, -2.02, 1.24, fg, r * .005, .20 * weight);
     ctx.restore();
   }
-  const seriesState = { geometryStrength: strength };
   function classic(kind: string) {
     const color = { accent, fg, paper: dark ? '#f5f0e5' : '#f9f6eb', black: '#090b10' };
-    if (seriesKinds.includes(kind)) { cast(() => renderSeriesGeometry(ctx, poly, seriesState, kind, 0, 0, r, a, color, 1)); return; }
+    if (seriesKinds.includes(kind)) { cast(() => renderSeriesGeometry(ctx, poly, kind, r, a, color, strength)); return; }
     if (kind === 'ring') { ellipse(r, r, 0, 0, Math.PI * 2, accent, r * .065 * strength, .78); ellipse(r * 1.12, r * 1.12, 0, a, a + 4.5, fg, r * .006, .28); return; }
     if (kind === 'cut') {
       ctx.save(); ctx.rotate(a * .5);
