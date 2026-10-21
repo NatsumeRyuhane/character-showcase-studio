@@ -34,17 +34,17 @@ There are two kinds of automated tests, and `node tools/check.mjs` runs both. Th
 
 `tests/unit/*.test.ts` are [Vitest](https://vitest.dev/) tests. They import the source modules directly, as the bundle does, and test their exported functions. `vitest.config.mjs` limits Vitest to this folder. `tsconfig.json` includes it, so the tests are type-checked too.
 
-`tests/unit/*.test.tsx` test the React editor components. They start with `// @vitest-environment jsdom`, render the components into jsdom, and replace `src/exploration-full-logic.js` with a stand-in (`vi.mock`) that holds a fresh `createStudioState()`, so each control can be checked against the setting it writes (see `editor-panels.test.tsx`).
+`tests/unit/*.test.tsx` test the React editor components. They start with `// @vitest-environment jsdom`, render the components into jsdom, and replace `src/studio-session.js` (and `src/studio-views.js` where needed) with a stand-in (`vi.mock`) that holds a fresh `createStudioState()`, so each control can be checked against the setting it writes (see `editor-panels.test.tsx`).
 
 To add one, create `tests/unit/<module>.test.ts` (`.test.tsx` for components). Vitest finds it automatically; nothing needs registering. Write new tests here.
 
 ### Older regression scripts
 
-`tests/check-*.cjs` are plain Node scripts using `node:assert` and `node:vm`. Most load source files into a VM context and call the production functions directly, and several stub just enough DOM to run parts of the editor module.
+`tests/check-*.cjs` are plain Node scripts using `node:assert` and `node:vm`. Most load source files into a VM context and call the production functions directly, and several stub just enough DOM to run parts of the session or views modules (`studio-session.js`, `studio-views.js`).
 
-Source files are ES modules, so these scripts load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It strips the types from `.ts` files with the transformer Vite uses, drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. A `.ts` file keeps its own scope, as a module does: only its exports become globals of the context, while `.js` files share one scope. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else.
+Source files are ES modules, so these scripts load them through `tests/support/module-script.cjs`: `load(scope, ...files)` runs each file as a classic script in the shared context, and `moduleScript(file)` returns that script text for tests that slice it. It strips the types from `.ts` files with the transformer Vite uses, drops imports of other modules (load those into the same context yourself), inlines JSON imports and removes `export` keywords. A `.ts` file keeps its own scope, as a module does: only its exports become globals of the context, while `.js` files share one scope. It supports only the import and export forms the sources use, at the start of a line, and throws on anything else. `designModules` lists the `src/designs/` modules in load order, for scripts that paint (`load(scope, ...designModules)`).
 
-A script that only tests a module's exports moves to `tests/unit/` when that module is converted. The scripts that need the editor module or the shell scripts stay until those are split up. To change the list, edit `tools/check.mjs`: **a script that is not listed there does not run.** Each script exits non-zero on failure and prints a one-line `PASS: …` summary.
+A script that only tests a module's exports moves to `tests/unit/` when that module is converted. The scripts that run the session, the views or the shell scripts stay until those are TypeScript. To change the list, edit `tools/check.mjs`: **a script that is not listed there does not run.** Each script exits non-zero on failure and prints a one-line `PASS: …` summary.
 
 `tests/ae/` holds manual After Effects harnesses; see its README.
 

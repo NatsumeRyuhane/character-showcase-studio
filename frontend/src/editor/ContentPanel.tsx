@@ -1,7 +1,7 @@
 // Left pane: content shared by every design. Series, character and brand, the sequence and
 // post-processing panels, typography, images, delivery formats and badges, link and codes.
 import { useRef } from 'react';
-import { clearStudioImage, currentSeries, imageNames, images, loadStudioImage, state, studioError, update } from '../exploration-full-logic.js';
+import { clearStudioImage, currentSeries, imageNames, images, loadStudioImage, state, studioError, update } from '../studio-session.js';
 import type { ImageKey } from '../output-payload.ts';
 import { badgeCatalog, cleanSeries, seriesDefaults, type SeriesEntry, type SeriesKey, type StudioState } from '../studio-state.ts';
 import { NarrativePanel, PostPanel } from './NarrativePanel.tsx';

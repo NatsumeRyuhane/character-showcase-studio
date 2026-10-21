@@ -11,4 +11,4 @@ import './studio-narrative.css';
 import './story-intro.css';
 import './studio-post.css';
 import './studio-text.css';
-import './exploration-full-logic.js';
+import './studio-app.js';

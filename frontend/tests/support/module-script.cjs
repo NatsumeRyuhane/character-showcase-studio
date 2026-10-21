@@ -60,4 +60,9 @@ function load(scope, ...files) {
   for (const file of files) vm.runInContext(moduleScript(file), scope, { filename: file });
 }
 
-module.exports = { moduleScript, load };
+// The design modules (src/designs/), in an order where each one's dependencies load first.
+const designModules = ['catalog', 'kit', 'series-geometry', 'shared-scene', 'ring-scene', 'language', 'urban',
+  'couture', 'brutalist', 'cloud', 'plush', 'play', 'sticker', 'district', 'tuner', 'arcade', 'orbit', 'poster', 'wave', 'dual', 'index']
+  .map(name => `src/designs/${name}.ts`);
+
+module.exports = { moduleScript, load, designModules };

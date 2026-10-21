@@ -1,9 +1,9 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path'),root=path.join(__dirname,'..');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const scope={structuredClone};vm.createContext(scope);const read=file=>fs.readFileSync(path.join(root,'src',file),'utf8');
 load(scope,'runtime/crt-motion.js');
-for(const name of ['ae-canvas-recorder.js','ae-geometry-motion.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','timeline.ts'])load(scope,'src/'+name);
-load(scope,'src/studio-geometry.js','src/exploration-full-scene.js');
+for(const name of ['ae-canvas-recorder.js','ae-geometry-motion.js','timeline.ts'])load(scope,'src/'+name);
+load(scope,...designModules);
 const capture=(paint,duration,options={})=>scope.captureStudioAEGeometry(paint,duration,{yield:async()=>{},...options});
 function interpolate(op,time){const list=op.samples;let n=0;while(n+1<list.length&&list[n+1].time<time)n++;const a=list[n],b=list[Math.min(n+1,list.length-1)],f=b.time>a.time?(time-a.time)/(b.time-a.time):0,mix=(x,y)=>x+(y-x)*f;
  return {...op,alpha:mix(a.alpha,b.alpha),width:mix(a.width,b.width),paths:a.paths.map((p,i)=>({...p,...Object.fromEntries(['v','i','o'].map(k=>[k,p[k].map((point,j)=>point.map((x,d)=>mix(x,b.paths[i][k][j][d])))]))}))};

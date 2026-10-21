@@ -1,4 +1,4 @@
-import { state } from './exploration-full-logic.js';
+import { state } from './studio-session.js';
 
 // DOM styling for the shared text overrides (settings: typography.ts).
 export function studioTypographyStyle(el,key){

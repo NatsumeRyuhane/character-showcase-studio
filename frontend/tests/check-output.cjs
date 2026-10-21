@@ -1,5 +1,5 @@
 const fs=require('fs');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const root=__dirname+'/..';
@@ -71,13 +71,12 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // Use the actual editor defaults, output-payload function and restore path. An
 // expanded thirteen-scheme document can exceed the host budget even though its
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
-const logic=moduleScript('src/exploration-full-logic.js');
-// The logic module's imports share the VM context, standing in for the module graph.
-const prefix=[moduleScript('src/typography.ts'),moduleScript('src/studio-text.js'),moduleScript('runtime/crt-motion.js'),moduleScript('src/timeline.ts'),moduleScript('src/motion-clock.ts'),moduleScript('src/variant-codec.ts'),moduleScript('src/studio-state.ts'),moduleScript('src/output-payload.ts'),logic.slice(0,logic.indexOf('const template='))].join('\n');
+// The session module's imports share the VM context, standing in for the module graph.
+const prefix=['src/typography.ts','src/studio-text.js','runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/variant-codec.ts','src/designs/catalog.ts','src/studio-state.ts','src/output-payload.ts','src/studio-session.js'].map(moduleScript).join('\n');
 // The production payload, with each fixture's own config: the host's config handling is tested separately.
 const payloadSource="function htmlPayload(kind){return {...studioOutputPayload(state,images,kind),config:config(kind)}}";
 function editorFixture(widgetState,globals={},reducedMotion=false){
-  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState}}};
+  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState},addEventListener(){}}};
   vm.createContext(app);vm.runInContext(prefix,app);return app;
 }
 const editor=editorFixture();
@@ -148,7 +147,7 @@ assert.equal(vm.runInContext("studioOutputConfig(state,'html').start",storyEdito
 assert.equal(vm.runInContext("studioOutputConfig(state,'html').playback",storyEditor),'complete');
 assert.equal(vm.runInContext("studioOutputConfig(state,'obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
-for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])load(scope,'src/'+file);
+load(scope,...designModules);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){
   for(const transparent of [false,true]){
     const fills=[];

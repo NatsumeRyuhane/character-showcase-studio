@@ -1,4 +1,5 @@
-import { draw, measure, state } from './exploration-full-logic.js';
+import { draw, measure } from './studio-views.js';
+import { state } from './studio-session.js';
 import { studioOutputLayout } from './export-layout.js';
 // Fits each design's artwork into its preview area: 16:9 or 9:16 in the editor, scaled from the
 // logical output size in clean-output mode. The controls around it are src/editor/Workspace.tsx.

@@ -2,7 +2,8 @@
 // The artwork itself (each section's .stage-viewport) stays imperative and is only moved into place.
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { resetLastFrame, saveStudio, setMotionClock, state, syncStudio, update } from '../exploration-full-logic.js';
+import { resetLastFrame, saveStudio, setMotionClock, state, syncStudio, update } from '../studio-session.js';
+import { designFamilies } from '../designs/catalog.ts';
 import { icons, type IconName } from '../icons.ts';
 import { createMotionClock } from '../motion-clock.ts';
 import type { DesignKey } from '../studio-state.ts';
@@ -16,7 +17,7 @@ import { useEditorRevision } from './store.ts';
 
 export interface WorkspaceView { key: DesignKey; section: HTMLElement; preview: HTMLElement; storyShots?: { textLayoutKey: string }[] }
 type Panel = 'content' | 'preview' | 'style';
-const urbanDesigns: readonly DesignKey[] = ['district', 'tuner', 'arcade'];
+const isUrban = (key: DesignKey) => designFamilies[key] === 'urban';
 
 function Icon({ name }: { name: IconName }) {
   return (
@@ -94,8 +95,8 @@ function Toolbar({ views }: { views: WorkspaceView[] }) {
         <label className="studio-design-field">
           <span>视觉方案</span>
           <select className="form-select" id="studio-design" aria-label="视觉方案" value={state.activeDesign} onChange={event => { state.activeDesign = event.target.value as DesignKey; update(); }}>
-            <optgroup label="街头二游 · 新增">{views.filter(view => urbanDesigns.includes(view.key)).map(option)}</optgroup>
-            <optgroup label="原有方案">{views.filter(view => !urbanDesigns.includes(view.key)).map(option)}</optgroup>
+            <optgroup label="街头二游 · 新增">{views.filter(view => isUrban(view.key)).map(option)}</optgroup>
+            <optgroup label="原有方案">{views.filter(view => !isUrban(view.key)).map(option)}</optgroup>
           </select>
         </label>
         <button className="btn studio-design-step" type="button" aria-label="上一个视觉方案" onClick={() => step(-1)}>‹</button>

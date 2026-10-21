@@ -1,4 +1,4 @@
-import { currentSeries, images, state } from './exploration-full-logic.js';
+import { currentSeries, images, state } from './studio-session.js';
 import { applyStudioStoryTypography } from './studio-text.js';
 import { studioTypographyCopy, studioTypographyValue } from './typography.ts';
 

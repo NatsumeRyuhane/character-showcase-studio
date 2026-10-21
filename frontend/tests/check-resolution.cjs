@@ -30,9 +30,11 @@ for(const portrait of [false,true]){
   assert.throws(()=>scope.scaleStudioAEScene(scene,100,100),/比例/);
 }
 // Exercise the real measurement function with transformed (4K) DOM bounds.
-const logic=moduleScript('src/exploration-full-logic.js');
+const views=moduleScript('src/studio-views.js');
 Object.assign(scope,{state:{frame:'horizontal'},devicePixelRatio:1,fitText:()=>{},measureEdgeTracks:()=>{}});
-vm.runInContext(logic.slice(logic.indexOf('function measure(view)'),logic.indexOf('function sync()')),scope);
+const measureStart=views.indexOf('function measure(view)'),measureEnd=views.indexOf('\nfunction ',measureStart+1);
+assert.ok(measureStart>=0&&measureEnd>measureStart,'measure() and the function after it are found in studio-views.js');
+vm.runInContext(views.slice(measureStart,measureEnd),scope);
 for(const scale of [1,2]){
   let transform;
   const properties={},view={outputScale:scale,section:{hidden:false},art:{offsetWidth:1920,offsetHeight:1080,style:{setProperty:(k,v)=>properties[k]=v},getBoundingClientRect:()=>({width:1920*scale,height:1080*scale})},composition:{clientWidth:1920,clientHeight:948,getBoundingClientRect:()=>({width:1920*scale,height:948*scale})},canvas:{},ctx:{setTransform:(...v)=>transform=v}};

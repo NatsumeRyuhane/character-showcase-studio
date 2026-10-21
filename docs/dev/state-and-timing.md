@@ -6,7 +6,7 @@ How settings are stored, encoded and restored, and how the timeline and motion c
 
 The editor state is one JSON snapshot: `privateContent` with `design: "character-explorations"` and `version: 6`. New fields are optional additions to version 6. Older snapshots, including the early exploration and old Studio formats, still restore.
 
-`src/studio-state.ts` holds the state's types and defaults and its pure functions: `createStudioState` (a new project), `restoreStudioState(state, saved)` (validates a saved snapshot and applies it in place; `false` and no change for a missing or foreign one), `studioSnapshot` and `studioModelContent` (what is saved), and `stateSignature`. The editor module (`exploration-full-logic.js`) owns the one live `state` and the glue: when to save, recognising its own echoes, and rebuilding the motion clock after a restore. Typography settings are validated by `src/typography.ts`.
+`src/studio-state.ts` holds the state's types and defaults and its pure functions: `createStudioState` (a new project), `restoreStudioState(state, saved)` (validates a saved snapshot and applies it in place; `false` and no change for a missing or foreign one), `studioSnapshot` and `studioModelContent` (what is saved), and `stateSignature`. The session module (`studio-session.js`) owns the one live `state` and the glue: when to save, recognising its own echoes, and rebuilding the motion clock after a restore. Typography settings are validated by `src/typography.ts`.
 
 ### Scopes
 

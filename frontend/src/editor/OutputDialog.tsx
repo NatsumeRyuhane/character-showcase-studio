@@ -2,7 +2,7 @@
 // Clean-output mode and the exported page's keyboard shortcuts live in studio-output.js.
 import { useImperativeHandle, useRef, useState, type KeyboardEvent, type Ref } from 'react';
 import { createPortal } from 'react-dom';
-import { images, state, update } from '../exploration-full-logic.js';
+import { images, state, update } from '../studio-session.js';
 import { collectStudioAEScene } from '../ae-export.js';
 import { studioOutputDimensions, studioOutputPayload, type OutputKind } from '../output-payload.ts';
 import type { OutputSettings } from '../studio-state.ts';

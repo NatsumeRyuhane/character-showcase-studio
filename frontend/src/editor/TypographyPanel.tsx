@@ -1,7 +1,7 @@
 // Typography controls: the shared text overrides for the show title, the two story shots and the series copy.
 // The DOM styling they drive stays in studio-text.js; the settings themselves are typography.ts.
 import { useState } from 'react';
-import { currentSeries, state, update } from '../exploration-full-logic.js';
+import { currentSeries, state, update } from '../studio-session.js';
 import { studioTypographySettings, type StoryCopy, type TextStyle, type TypographyKey } from '../typography.ts';
 import { optionList, type Options } from './controls.tsx';
 import { useEditorRevision } from './store.ts';
