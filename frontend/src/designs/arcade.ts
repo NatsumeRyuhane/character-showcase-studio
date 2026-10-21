@@ -9,6 +9,8 @@ export const arcadeDesign = urbanDesign({
   key: 'arcade',
   palette: { light: ['#e6f1e3', '#1b3533', '#8baa9f'], dark: ['#172a32', '#eaf3de', '#7baba5'] },
   accent: '#b8ed66',
+  note: 'LITTLE REBEL. BIG PERSONALITY.',
+  hello: 'HEY, ORIGINAL!',
   signature({ ctx, dark, paper, ink, accent, a, r, strength, cut, line, disc, ellipse, roundRect, cast, star }) {
     // A deliberately uneven soft-rectangle is more playful than another circle.
     const loop: Point[] = [];

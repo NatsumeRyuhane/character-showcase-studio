@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
-// The React panels against a stand-in for the logic module: each control writes the setting it names.
+// The React panels against a stand-in for the editor session: each control writes the setting it names.
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { palettes } from '../../src/studio-state.ts';
 
 const logic = vi.hoisted(() => ({ update: vi.fn(), state: null as never }));
-vi.mock('../../src/exploration-full-logic.js', async () => {
+vi.mock('../../src/studio-session.js', async () => {
   const { createStudioState, seriesDefaults } = await vi.importActual<typeof import('../../src/studio-state.ts')>('../../src/studio-state.ts');
   const { notifyEditor } = await vi.importActual<typeof import('../../src/editor/store.ts')>('../../src/editor/store.ts');
   const state = createStudioState();
@@ -19,17 +19,19 @@ vi.mock('../../src/exploration-full-logic.js', async () => {
     studioError: '',
     update: logic.update,
     currentSeries: () => state.seriesData[state.series] ?? seriesDefaults.atelier,
-    badgeColors: (v: { badgeColor: string; badgeInk: string }) => [v.badgeColor, v.badgeInk],
     loadStudioImage: vi.fn(),
     clearStudioImage: vi.fn(),
     resetLastFrame: vi.fn(),
   };
 });
+vi.mock('../../src/studio-views.js', () => ({
+  badgeColors: (v: { badgeColor: string; badgeInk: string }) => [v.badgeColor, v.badgeInk],
+}));
 
 const { ContentPanel } = await import('../../src/editor/ContentPanel.tsx');
 const { Inspectors } = await import('../../src/editor/Inspector.tsx');
 const { NumberInput } = await import('../../src/editor/controls.tsx');
-const { state } = await import('../../src/exploration-full-logic.js');
+const { state } = await import('../../src/studio-session.js');
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 let host: HTMLElement, root: Root;

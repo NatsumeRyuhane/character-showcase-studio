@@ -1,7 +1,7 @@
 // Sequence controls (intro, show, outro) and post-processing. The state changes they make
 // (retiming, switching to and from the story intro) are in studio-narrative.js.
 import type { ReactNode } from 'react';
-import { images, state } from '../exploration-full-logic.js';
+import { images, state } from '../studio-session.js';
 import { jumpToStudioStory, setStudioIntroDuration, setStudioNarrative } from '../studio-narrative.js';
 import { studioContinuousShow, studioStoryDuration, type NarrativeSettings } from '../timeline.ts';
 import { NumberInput, optionList, type Options } from './controls.tsx';

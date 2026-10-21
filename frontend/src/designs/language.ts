@@ -53,6 +53,7 @@ export interface LanguageDesignSpec {
   palette: { light: PaletteColors; dark: PaletteColors };
   /** Accent when the settings have no valid one. */
   accent: string;
+  note: string;
   /** Paints over the paper, before the pattern. Only on an opaque background. */
   backdrop?(scene: LanguageScene): void;
   /** The design's own geometry. */
@@ -64,6 +65,7 @@ export interface LanguageDesignSpec {
 export function languageDesign(spec: LanguageDesignSpec): Design {
   return {
     key: spec.key,
+    note: spec.note,
     palette: dark => paletteOf(dark ? spec.palette.dark : spec.palette.light),
     paint: (ctx, w, h, t, settings) => paintLanguage(spec, ctx, w, h, t, settings),
   };

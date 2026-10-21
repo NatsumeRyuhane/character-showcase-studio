@@ -1,5 +1,5 @@
 import { studioStoryDuration } from './timeline.ts';
-import { motionClock, reduced, state } from './exploration-full-logic.js';
+import { motionClock, reduced, state } from './studio-session.js';
 
 // One optical surface for every scene. Borders stay outside this surface;
 // images, native text and geometry all pass through the same optical filter.

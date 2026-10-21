@@ -8,6 +8,7 @@ export const stickerDesign = languageDesign({
   key: 'sticker',
   palette: { light: ['#f2efdf', '#353936', '#8c9182'], dark: ['#25282d', '#f8efdb', '#b4ae9e'] },
   accent: '#f7bf4f',
+  note: 'HELLO, LITTLE ORIGINAL',
   signature({ ctx, dark, paper, ink, accent, a, sa, r, strength, cut, line, poly, disc, ell, ringBand, roundedPath, cast }) {
     function paperLoop(x: number, y: number, rx: number, ry: number, thickness: number, rotation: number, color: string) {
       ctx.save(); ctx.translate(x, y); ctx.rotate(rotation);

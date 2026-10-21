@@ -9,6 +9,7 @@ export const coutureDesign = languageDesign({
   key: 'couture',
   palette: { light: ['#efede8', '#252522', '#77766f'], dark: ['#17171a', '#eee9e1', '#a09b94'] },
   accent: '#c1b5a5',
+  note: 'FORM / FEELING',
   backdrop({ ctx, w, h, dark, ink, accent }) {
     const wash = ctx.createLinearGradient(0, 0, w, h);
     wash.addColorStop(0, rgba(ink, dark ? .018 : .025)); wash.addColorStop(.57, rgba(accent, .02)); wash.addColorStop(1, rgba(ink, dark ? .025 : .045));

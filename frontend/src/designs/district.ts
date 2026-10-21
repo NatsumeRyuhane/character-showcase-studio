@@ -8,6 +8,8 @@ export const districtDesign = urbanDesign({
   key: 'district',
   palette: { light: ['#efefdf', '#20271e', '#8b947f'], dark: ['#191c19', '#f0f0df', '#8c9986'] },
   accent: '#d4fa32',
+  note: 'OWN YOUR FREQUENCY',
+  hello: 'CHARACTER / SELECT',
   signature({ ctx, dark, paper, ink, muted, accent, a, r, strength, cut, line, poly, ellipse, band, roundRect, cast }) {
     // Coarse, asymmetric dial sectors make a strong silhouette without a starburst.
     const sectors = [[-2.92, -2.05], [-1.92, -1.29], [-1.19, .32], [.43, 1.49], [1.65, 2.33], [2.45, 3.18]];

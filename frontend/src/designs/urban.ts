@@ -40,6 +40,8 @@ export interface UrbanDesignSpec {
   palette: { light: PaletteColors; dark: PaletteColors };
   /** Accent when the settings have no valid one. */
   accent: string;
+  note: string;
+  hello: string;
   /** The design's own geometry. */
   signature(scene: UrbanScene): void;
   /** Accents at the far display-side corners, keeping the information third clear. Faded by the decoration strength. */
@@ -49,6 +51,9 @@ export interface UrbanDesignSpec {
 export function urbanDesign(spec: UrbanDesignSpec): Design {
   return {
     key: spec.key,
+    note: spec.note,
+    hello: spec.hello,
+    copyBelowTitle: true,
     palette: dark => paletteOf(dark ? spec.palette.dark : spec.palette.light),
     paint: (ctx, w, h, t, settings) => paintUrban(spec, ctx, w, h, t, settings),
   };

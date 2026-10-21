@@ -1,6 +1,6 @@
 import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.ts';
-import { root, setMotionClock, state } from './exploration-full-logic.js';
+import { root, setMotionClock, state } from './studio-session.js';
 
 // All three OBS sources sample one clock. Reloading / reactivating one source
 // catches it up to the others instead of replaying its own opening.

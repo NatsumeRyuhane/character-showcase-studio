@@ -1,5 +1,5 @@
 import { studioIntroDuration, studioNarrativeSettings, studioRetime, studioRetimeShow, studioStoryDuration, studioTotalDuration } from './timeline.ts';
-import { images, motionClock, resetLastFrame, state, update } from './exploration-full-logic.js';
+import { images, motionClock, resetLastFrame, state, update } from './studio-session.js';
 import { drawStudioStoryIntro, mountStudioStoryIntro } from './story-intro.js';
 import { drawStudioPostProcessing, mountStudioPostProcessing } from './studio-post.js';
 

@@ -1,18 +1,14 @@
 // Restore, validation and snapshots are unit-tested in tests/unit/studio-state.test.ts.
-// This script exercises the editor's glue around them, which still lives in the editor
-// module (phase 4): the widget-state callback, own-echo detection, rebuilding the
-// motion clock, and keeping session-only images out of what it saves.
+// This script exercises the session's glue around them (src/studio-session.js): the
+// widget-state callback, own-echo detection, rebuilding the motion clock, and keeping
+// session-only images out of what it saves.
 const vm=require('vm');
 const assert=require('assert/strict');
 const {moduleScript}=require('./support/module-script.cjs');
 
-const logic=moduleScript('src/exploration-full-logic.js');
-const start=logic.indexOf("window.addEventListener('openai:set_globals'");
-const end=logic.indexOf(';reduced.addEventListener',start);
-// The logic module's imports share the VM context, standing in for the module graph.
-const prefix=['src/typography.ts','src/studio-text.js','src/variant-codec.ts','src/motion-clock.ts','runtime/crt-motion.js','src/timeline.ts','src/studio-state.ts'].map(moduleScript).concat(logic.slice(0,logic.indexOf('const template='))).join('\n');
-assert.ok(start>=0&&end>start,'production widget-state callback exists');
-assert.ok(prefix.includes('function save('));
+// The session module's imports share the VM context, standing in for the module graph.
+const prefix=['src/typography.ts','src/studio-text.js','src/variant-codec.ts','src/motion-clock.ts','runtime/crt-motion.js','src/timeline.ts','src/studio-state.ts','src/studio-session.js'].map(moduleScript).join('\n');
+assert.ok(prefix.includes("window.addEventListener('openai:set_globals'"),'production widget-state callback exists');
 
 function harness(widgetState){
   const callbacks={},saved=[];
@@ -25,10 +21,10 @@ function harness(widgetState){
     }
   };
   vm.createContext(scope);
-  vm.runInContext(prefix+'\nlet last=123,syncCount=0;function sync(){syncCount++}\n'+logic.slice(start,end)+';',scope);
+  vm.runInContext(prefix+'\nframe.last=123;let syncCount=0;onStudioSync(()=>syncCount++);',scope);
   return {
     run:source=>vm.runInContext(source,scope),
-    inspect:()=>JSON.parse(vm.runInContext('JSON.stringify({state,motionClock,last,syncCount})',scope)),
+    inspect:()=>JSON.parse(vm.runInContext('JSON.stringify({state,motionClock,last:frame.last,syncCount})',scope)),
     emit:value=>callbacks['openai:set_globals']({detail:{globals:{widgetState:value}}}),
     saved
   };

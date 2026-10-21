@@ -9,6 +9,7 @@ export const cloudDesign = languageDesign({
   key: 'cloud',
   palette: { light: ['#f5f0ee', '#4b4b59', '#96909d'], dark: ['#292c36', '#f1e7ed', '#a7a3b4'] },
   accent: '#c3a7e5',
+  note: 'SOFT OBJECTS, SLOW DAYS',
   backdrop({ w, h, dark, accent, cx, cy, unit, halo }) {
     halo(cx + w * .12, cy - h * .10, Math.max(w, h) * .70, accent, dark ? .065 : .09);
     halo(w * .12, h * .08, unit * .72, dark ? '#d9c5df' : '#ffffff', dark ? .016 : .43);

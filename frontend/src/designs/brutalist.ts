@@ -9,6 +9,7 @@ export const brutalistDesign = languageDesign({
   key: 'brutalist',
   palette: { light: ['#e9eae3', '#20241f', '#767d72'], dark: ['#151719', '#f1f0e7', '#969b95'] },
   accent: '#ddfb4b',
+  note: 'OBJECT IN MOTION',
   signature({ ctx, dark, paper, ink, accent, sa, r, strength, cut, line, poly, cast }) {
     // A genuinely angular, broken architectural frame with a generous void.
     const lean = .08 + cut * .14 + sa * .012;

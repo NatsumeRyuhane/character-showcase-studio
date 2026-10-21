@@ -2,7 +2,8 @@
 // keeps its open groups and scroll position; only the visible one re-renders on a change.
 import { memo, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { badgeColors, state, update } from '../exploration-full-logic.js';
+import { state, update } from '../studio-session.js';
+import { badgeColors } from '../studio-views.js';
 import { palettes, type DesignKey, type EdgeSide, type VariantSettings } from '../studio-state.ts';
 import { optionList, type Options } from './controls.tsx';
 import { useEditorRevision } from './store.ts';

@@ -7,6 +7,7 @@ const { rgba } = kit;
 
 export const posterDesign: Design = {
   key: 'poster',
+  copyBelowTitle: true,
   shared: {
     centre: [.74, .43, .40],
     lightPaper: '#edeede',

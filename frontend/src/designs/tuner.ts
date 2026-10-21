@@ -8,6 +8,8 @@ export const tunerDesign = urbanDesign({
   key: 'tuner',
   palette: { light: ['#f2eadc', '#292722', '#a69b86'], dark: ['#1a1918', '#f6e8cf', '#a49a87'] },
   accent: '#ff7a3d',
+  note: 'ORIGINAL SIGNAL / PLAY IT LOUD',
+  hello: 'ORIGINAL SIGNAL',
   signature({ ctx, dark, paper, ink, muted, accent, a, r, strength, cut, line, disc, ellipse, band, roundRect, cast }) {
     // A wide tape orbit, with narrow rail lines instead of a heavy round dial.
     const tilt = -.34, cream = mix(ink, paper, dark ? .06 : .02);

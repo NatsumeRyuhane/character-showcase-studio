@@ -14,6 +14,7 @@ export const plushDesign = languageDesign({
   key: 'plush',
   palette: { light: ['#f1e9dc', '#514a40', '#9c8f7d'], dark: ['#302b29', '#eee4d3', '#b5a593'] },
   accent: '#d8a183',
+  note: 'TACTILE / MADE TO FEEL',
   backdrop({ w, h, dark, accent, cx, cy, halo }) {
     halo(cx, cy, Math.max(w, h) * .65, accent, dark ? .045 : .06);
   },

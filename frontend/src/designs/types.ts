@@ -78,4 +78,10 @@ export interface Design {
   readonly ownsEveryGeometry?: boolean;
   /** How the shared scene draws the design whenever its own painter does not. */
   readonly shared?: SharedLook;
+  /** Small caption in the artwork (`.language-note`). */
+  readonly note?: string;
+  /** Replaces the greeting in the artwork (`.hello`). */
+  readonly hello?: string;
+  /** Push the caption and subtitle below the name block, which this design skews or enlarges (fitPosterCopy in studio-views.js). */
+  readonly copyBelowTitle?: boolean;
 }

@@ -2,7 +2,7 @@
 // The artwork itself (each section's .stage-viewport) stays imperative and is only moved into place.
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { resetLastFrame, saveStudio, setMotionClock, state, syncStudio, update } from '../exploration-full-logic.js';
+import { resetLastFrame, saveStudio, setMotionClock, state, syncStudio, update } from '../studio-session.js';
 import { icons, type IconName } from '../icons.ts';
 import { createMotionClock } from '../motion-clock.ts';
 import type { DesignKey } from '../studio-state.ts';

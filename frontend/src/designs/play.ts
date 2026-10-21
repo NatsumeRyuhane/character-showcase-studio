@@ -8,6 +8,7 @@ export const playDesign = languageDesign({
   key: 'play',
   palette: { light: ['#f4f3e8', '#263c3c', '#819b91'], dark: ['#202c32', '#f5f0dd', '#98b0ac'] },
   accent: '#8bc9a4',
+  note: 'SMALL SHAPE, BIG JOY',
   signature({ ctx, dark, paper, ink, accent, a, sa, r, strength, cut, disc, ell, ringBand, roundRect, cast }) {
     // An oversized cropped toy arc is distinct from Plush's cushion and Sticker's paper loop.
     const mint = mix(accent, paper, dark ? .06 : .08), peach = dark ? '#d6a590' : '#e6bda5', cream = dark ? '#e4e0c8' : '#fffdf0';

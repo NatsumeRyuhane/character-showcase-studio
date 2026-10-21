@@ -1,6 +1,6 @@
 import { studioContinuousShow, studioShowDuration, studioTotalDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.ts';
-import { resetLastFrame, setMotionClock, state, update } from './exploration-full-logic.js';
+import { resetLastFrame, setMotionClock, state, update } from './studio-session.js';
 import { refreshStudioPreview } from './studio-preview.js';
 // Clean stage previews and the exported page's keyboard shortcuts. Native Spout transport belongs to OBS.
 // The output dialog itself is the React component src/editor/OutputDialog.tsx.
