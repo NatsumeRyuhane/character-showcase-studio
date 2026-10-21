@@ -2,10 +2,9 @@
 // with no third-party logos, character art or type assets. Paper, background pattern, floor
 // shadow and the intro transform around each design's own geometry, then its crop accents.
 import type { DesignKey } from '../studio-state.ts';
-import { kit, paletteOf } from './kit.ts';
+import { clamp, hexOr, num, paletteOf, rgba } from './kit.ts';
+import { ringLayout, ringShapes } from './ring-scene.ts';
 import type { Design, Fill, PaletteColors, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 /** What an urban design's hooks draw with. `signature` runs centred on the ring, mirrored when swapped. */
 export interface UrbanScene {
@@ -62,31 +61,17 @@ export function urbanDesign(spec: UrbanDesignSpec): Design {
 function paintUrban(spec: UrbanDesignSpec, ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
   const input = settings || {};
-  const portrait = !!input.portrait, swapped = !!input.swapped, dark = input.background === 'dark', side = swapped ? -1 : 1;
+  const { dark, portrait, swapped, side, a, ga, gm, finalCx, finalCy, cx, cy, baseR, r, unit, strength, opacity, cut, shadowEnabled, shadowStrength, shadowDepth } = ringLayout(input, w, h, t);
   const [paper, ink, muted] = dark ? spec.palette.dark : spec.palette.light;
-  const accent = kit.hex(input.accent, spec.accent);
-  const shadowColor = kit.hex(input.shadowColor, '#101c20');
-  const unit = Math.min(w, h), strength = clamp(num(input.geometryStrength, 1), .5, 1.5), opacity = clamp(num(input.geometryOpacity, 1), .3, 1), cut = clamp(num(input.cutStrength, .75));
-  const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12;
-  const ga = input.motion === false || input.gridMoving === false ? 0 : Math.PI * 2 * num(t, 0) / 12, gm = clamp(num(input.gridMotion, .14), 0, .5);
-  const intro = clamp(num(input.introProgress, 1)), introScale = 1 + .44 * (1 - intro);
-  const finalCx = w * (portrait ? .52 : swapped ? .285 : .715) + num(input.px, 0) * w * .007;
-  const finalCy = h * (portrait ? (swapped ? .34 : .56) : .49) + num(input.py, 0) * h * .005;
-  const cx = w * .5 + (finalCx - w * .5) * intro, cy = h * .48 + (finalCy - h * .48) * intro;
-  const baseR = (portrait ? Math.min(w * .35, h * .26) : h * .38) * clamp(num(input.ringScale, 1.15), .6, 2.4), r = baseR * introScale;
-  const shadowStrength = clamp(num(input.shadowStrength, .8), 0, 1.5), shadowDepth = clamp(num(input.shadowDepth, 1), 0, 2);
-  const shadowEnabled = input.shadow !== false && shadowStrength > 0 && shadowDepth > 0;
+  const accent = hexOr(input.accent, spec.accent);
+  const shadowColor = hexOr(input.shadowColor, '#101c20');
+  const { poly, roundedPath } = ringShapes(ctx);
 
   function line(points: Point[], color: Fill, width: number, alpha = 1, cap: CanvasLineCap = 'butt', closed = false) {
     ctx.save(); ctx.globalAlpha *= alpha; ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = cap; ctx.lineJoin = 'round'; ctx.beginPath();
     points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
     if (closed) ctx.closePath();
     ctx.stroke(); ctx.restore();
-  }
-  function poly(points: Point[], color: Fill, alpha = 1) {
-    ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.beginPath();
-    points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
-    ctx.closePath(); ctx.fill(); ctx.restore();
   }
   function disc(x: number, y: number, radius: number, color: Fill, alpha = 1) {
     ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -106,12 +91,7 @@ function paintUrban(spec: UrbanDesignSpec, ctx: StudioCanvas, w: number, h: numb
     poly(points, color, alpha);
   }
   function roundRect(x: number, y: number, width: number, height: number, radius: number, color: Fill, alpha = 1) {
-    const rr = Math.min(radius, width * .5, height * .5);
-    ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.beginPath();
-    ctx.moveTo(x + rr, y); ctx.lineTo(x + width - rr, y); ctx.quadraticCurveTo(x + width, y, x + width, y + rr);
-    ctx.lineTo(x + width, y + height - rr); ctx.quadraticCurveTo(x + width, y + height, x + width - rr, y + height);
-    ctx.lineTo(x + rr, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - rr);
-    ctx.lineTo(x, y + rr); ctx.quadraticCurveTo(x, y, x + rr, y); ctx.closePath(); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; roundedPath(x, y, width, height, radius); ctx.fill(); ctx.restore();
   }
   function cast(draw: () => void) {
     ctx.save();

@@ -1,9 +1,7 @@
 // Plush: a quiet craft label and a bouclé cord cushion outline, densely textured at its edge.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { languageDesign } from './language.ts';
 import type { Point } from './types.ts';
-
-const { mix } = kit;
 
 function squirclePoint(b: number, radius: number, power = 3.8): Point {
   const c = Math.cos(b), s = Math.sin(b);

@@ -7,7 +7,7 @@ const assert=require('assert/strict');
 const {moduleScript}=require('./support/module-script.cjs');
 
 // The session module's imports share the VM context, standing in for the module graph.
-const prefix=['src/typography.ts','src/studio-text.js','src/variant-codec.ts','src/motion-clock.ts','runtime/crt-motion.js','src/timeline.ts','src/studio-state.ts','src/studio-session.js'].map(moduleScript).join('\n');
+const prefix=['src/typography.ts','src/studio-text.js','src/variant-codec.ts','src/motion-clock.ts','runtime/crt-motion.js','src/timeline.ts','src/designs/catalog.ts','src/studio-state.ts','src/studio-session.js'].map(moduleScript).join('\n');
 assert.ok(prefix.includes("window.addEventListener('openai:set_globals'"),'production widget-state callback exists');
 
 function harness(widgetState){
@@ -21,7 +21,7 @@ function harness(widgetState){
     }
   };
   vm.createContext(scope);
-  vm.runInContext(prefix+'\nframe.last=123;let syncCount=0;onStudioSync(()=>syncCount++);',scope);
+  vm.runInContext(prefix+'\nframe.last=123;let syncCount=0;connectStudio({sync:()=>syncCount++,notify(){}});',scope);
   return {
     run:source=>vm.runInContext(source,scope),
     inspect:()=>JSON.parse(vm.runInContext('JSON.stringify({state,motionClock,last:frame.last,syncCount})',scope)),

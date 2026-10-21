@@ -1,10 +1,9 @@
 // The live editor session: the state every module reads and changes, session-only images,
 // the continuous motion clock, saving and restoring through the widget host, and frame timing.
-// It imports no UI or artwork module, so every module can import it without a cycle.
-// studio-app.js registers the sync that update() runs (onStudioSync).
+// It imports only pure modules, so every module can import it without a cycle.
+// studio-app.js connects the page to it (connectStudio).
 import { createMotionClock } from './motion-clock.ts';
 import { createStudioState, restoreStudioState, stateSignature, studioModelContent, studioSnapshot } from './studio-state.ts';
-import { notifyEditor } from './editor/store.ts';
 
 // Rendered output plays the requested animation regardless of OS UI preferences.
 export const root = document.getElementById('character-directions'), reduced = globalThis.studioOutput?.enabled === true ? { matches: false, addEventListener() {} } : matchMedia('(prefers-reduced-motion: reduce)');
@@ -51,8 +50,11 @@ function save() {
   window.openai?.setWidgetState?.({ modelContent: studioModelContent(state), privateContent: snapshot })?.catch(() => {});
 }
 
-let sync = () => {};
-export function onStudioSync(handler) { sync = handler; }
+// Set by studio-app.js once the page exists: `sync` brings the page in line with the state, and
+// `notify` re-renders the editor controls. A sync before that is a bug, so it fails loudly.
+let sync = () => { throw new Error('The editor session synced before studio-app.js connected it (connectStudio).'); };
+let notify = () => {};
+export function connectStudio(page) { sync = page.sync; notify = page.notify; }
 // Sync the page with the state, then save. syncStudio redraws without saving (while seeking),
 // and saveStudio saves once a seek ends.
 export function update() { sync(); save(); }
@@ -64,7 +66,7 @@ export let studioError = '';
 export function showStudioError(text) {
   if (studioError === text) return;
   studioError = text;
-  notifyEditor();
+  notify();
 }
 
 export function loadStudioImage(kind, file) {

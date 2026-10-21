@@ -1,8 +1,6 @@
 // Wave: the shared scene with layered wave rings, set lower, and light corner cuts.
-import { kit } from './kit.ts';
+import { rgba } from './kit.ts';
 import type { Design } from './types.ts';
-
-const { rgba } = kit;
 
 export const waveDesign: Design = {
   key: 'wave',

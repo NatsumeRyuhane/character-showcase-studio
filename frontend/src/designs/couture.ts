@@ -1,9 +1,7 @@
 // Couture (the default design): a restrained art publication around a single platinum sculpture.
-import { kit } from './kit.ts';
+import { mix, rgba } from './kit.ts';
 import { languageDesign } from './language.ts';
 import type { Point } from './types.ts';
-
-const { mix, rgba } = kit;
 
 export const coutureDesign = languageDesign({
   key: 'couture',

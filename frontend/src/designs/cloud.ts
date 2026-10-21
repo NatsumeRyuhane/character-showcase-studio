@@ -1,9 +1,7 @@
 // Cloud: rounded, low-pressure breathing space, with soft cloud banks at opposite edges.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { languageDesign } from './language.ts';
 import type { Point } from './types.ts';
-
-const { mix } = kit;
 
 export const cloudDesign = languageDesign({
   key: 'cloud',

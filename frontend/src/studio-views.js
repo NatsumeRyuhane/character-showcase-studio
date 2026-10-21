@@ -5,7 +5,8 @@ import { studioContinuousShow, studioNarrativePose, studioNarrativeTime, studioP
 import { informationMotionPose, marqueeOffset } from './information-motion.ts';
 import { badgeCatalog as catalog } from './studio-state.ts';
 import assets from './badge-assets.json';
-import { designPalette, designs, paintExploration } from './designs/index.ts';
+import { designArtColors, designPalette, designs, paintExploration } from './designs/index.ts';
+import { clamp, mix, rgba } from './designs/kit.ts';
 import { applyStudioTypography, studioTypographyFontSize, studioTypographyStyle } from './studio-text.js';
 import { studioTypographyLayoutChanged, studioTypographyValue } from './typography.ts';
 import { drawStudioNarrative } from './studio-narrative.js';
@@ -13,7 +14,7 @@ import { createIcon } from './icons.ts';
 import { studioLayerConfig } from './obs-layer-sync.js';
 import { currentSeries, images, motionClock, reduced, root, state } from './studio-session.js';
 
-const clamp = (n, a = 0, b = 1) => Math.max(a, Math.min(b, n)), lerp = (a, b, p) => a + (b - a) * p;
+const lerp = (a, b, p) => a + (b - a) * p;
 
 // Fills each section[data-design] from the artwork template.
 export function createViews() {
@@ -118,29 +119,23 @@ function renderCodes(view) {
   }
 }
 
-function rgba(hex, alpha) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${alpha})`; }
-function blendHex(a, b, p) {
-  const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
-  return '#' + [16, 8, 0].map(shift => Math.round(((x >> shift) & 255) * (1 - p) + ((y >> shift) & 255) * p).toString(16).padStart(2, '0')).join('');
-}
 // Surface and ink colours of a design's badges.
 export function badgeColors(v) {
   if (v.badgePalette === 'custom') return [v.badgeColor, v.badgeInk];
   if (v.badgePalette === 'mono') return ['#000000', '#ffffff'];
   const key = Object.keys(state.variants).find(key => state.variants[key] === v), p = designPalette(key, v.background === 'dark');
-  if (p) return [blendHex(p.paper, v.accent, v.background === 'dark' ? .13 : .10), p.ink];
+  if (p) return [mix(p.paper, v.accent, v.background === 'dark' ? .13 : .10), p.ink];
   return v.background === 'dark' ? ['#363d41', '#d5d9d3'] : ['#dce2d5', '#405045'];
 }
 
 // CSS colours, grade, atmosphere and shadows of a view's artwork.
 function effects(view) {
   const v = state.variants[view.key], e = v.effects, dark = v.background === 'dark', art = view.art;
-  const palette = designPalette(view.key, dark) || (view.key === 'dual' ? { ink: dark ? '#eef0df' : '#232b24', paper: dark ? '#171e1b' : '#eeefdf' } : { ink: dark ? '#f3f0e5' : '#212a24', paper: dark ? '#141b20' : '#eff1e8' });
+  const colors = designArtColors(view.key, dark);
   art.dataset.background = v.background;
   art.style.setProperty('--accent', v.accent);
-  art.style.setProperty('--ink', palette.ink);
-  art.style.setProperty('--paper', palette.paper);
-  art.style.setProperty('--language-muted', palette.muted || palette.ink);
+  art.style.setProperty('--ink', colors.ink);
+  art.style.setProperty('--paper', colors.paper);
   art.style.setProperty('--ornament-alpha', v.cutStrength);
   art.dataset.typeface = v.typeface;
   art.dataset.badgeStyle = v.badgeStyle;

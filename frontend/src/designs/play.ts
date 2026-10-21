@@ -1,8 +1,6 @@
 // Play: a small friendly identity around an oversized, cropped toy arc.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { languageDesign } from './language.ts';
-
-const { mix } = kit;
 
 export const playDesign = languageDesign({
   key: 'play',

@@ -1,9 +1,7 @@
 // Arcade: a soft arcade loop, rounded heavy lettering and one eccentric label.
-import { kit } from './kit.ts';
+import { mix } from './kit.ts';
 import { urbanDesign } from './urban.ts';
 import type { Point } from './types.ts';
-
-const { mix } = kit;
 
 export const arcadeDesign = urbanDesign({
   key: 'arcade',

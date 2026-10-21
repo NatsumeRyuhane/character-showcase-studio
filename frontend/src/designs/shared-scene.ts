@@ -2,11 +2,9 @@
 // It paints orbit, poster and wave, and any design whose own painter does not cover the chosen
 // geometry (see paintExploration in index.ts). Its defaults are orbit's look; a design's
 // `shared` settings (SharedLook) change the centre, paper, signature and corner cuts.
-import { kit } from './kit.ts';
-import { renderSeriesGeometry } from './series-geometry.ts';
+import { clamp, hexOr, num, rgba } from './kit.ts';
+import { renderSeriesGeometry, seriesKinds } from './series-geometry.ts';
 import type { Fill, Palette, Point, SceneSettings, StudioCanvas } from './types.ts';
-
-const { clamp, num, rgba } = kit;
 
 /** What a design's corner cuts can draw with, in landscape. Portrait cuts are the same for every design. */
 export interface SharedCutsScene {
@@ -33,8 +31,12 @@ export interface SharedLook {
   cuts?(scene: SharedCutsScene): void;
 }
 
-const seriesKinds = ['facet', 'ribbon', 'blocks'];
 const classicKinds = ['facet', 'ribbon', 'blocks', 'ring', 'burst', 'cut', 'rays'];
+
+/** CSS colours of the designs drawn by the shared scene. The canvas uses the same paper, but its own, softer ink. */
+export function sharedArtColors(dark: boolean) {
+  return { paper: dark ? '#141b20' : '#eff1e8', ink: dark ? '#f3f0e5' : '#212a24' };
+}
 
 export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings | undefined, look: SharedLook, languagePalette: Palette | null) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
@@ -51,11 +53,12 @@ export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: num
   const finalCx = w * (portrait ? .57 : swapped ? 1 - centre[0] : centre[0]) + num(input.px, 0) * w * .008, finalCy = h * (portrait ? (swapped ? .34 : .59) : centre[1]) + num(input.py, 0) * h * .005;
   const cx = w * .5 + (finalCx - w * .5) * intro, cy = h * .48 + (finalCy - h * .48) * intro;
   const r = (portrait ? Math.min(w * .43, h * .26) : h * centre[2]) * clamp(num(input.ringScale, 1.1), .6, 2.4) * (1 + s2 * .008) * (1 + .44 * (1 - intro));
-  const accent = kit.hex(input.accent, '#bceb45');
-  const bg = languagePalette ? languagePalette.paper : dark ? '#141b20' : look.lightPaper || '#eff1e8';
+  const accent = hexOr(input.accent, '#bceb45');
+  const sharedPaper = sharedArtColors(dark).paper;
+  const bg = languagePalette ? languagePalette.paper : dark ? sharedPaper : look.lightPaper || sharedPaper;
   const fg = languagePalette ? languagePalette.ink : dark ? '#e4ede2' : '#26382e';
   const weight = .66 + .34 * intensity;
-  const shadowColor = kit.hex(input.shadowColor, '#24302c');
+  const shadowColor = hexOr(input.shadowColor, '#24302c');
 
   function stroke(points: Point[], color: Fill, width: number, alpha = 1, cap: CanvasLineCap = 'round') {
     if (points.length < 2) return;
@@ -237,10 +240,9 @@ export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: num
     ellipse(r * 1.23, r * .99, -.035, -2.02, 1.24, fg, r * .005, .20 * weight);
     ctx.restore();
   }
-  const seriesState = { geometryStrength: strength };
   function classic(kind: string) {
     const color = { accent, fg, paper: dark ? '#f5f0e5' : '#f9f6eb', black: '#090b10' };
-    if (seriesKinds.includes(kind)) { cast(() => renderSeriesGeometry(ctx, poly, seriesState, kind, 0, 0, r, a, color, 1)); return; }
+    if (seriesKinds.includes(kind)) { cast(() => renderSeriesGeometry(ctx, poly, kind, r, a, color, strength)); return; }
     if (kind === 'ring') { ellipse(r, r, 0, 0, Math.PI * 2, accent, r * .065 * strength, .78); ellipse(r * 1.12, r * 1.12, 0, a, a + 4.5, fg, r * .006, .28); return; }
     if (kind === 'cut') {
       ctx.save(); ctx.rotate(a * .5);

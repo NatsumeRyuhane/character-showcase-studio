@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { designFamilies } from '../../src/designs/catalog.ts';
 import { designPalette, designs } from '../../src/designs/index.ts';
 import { designKeys, languageKeys } from '../../src/studio-state.ts';
 
@@ -20,11 +21,14 @@ describe('design registry', () => {
     expect(designPalette('constructor', false)).toBeNull();
   });
 
-  it('paints the signature with the design\'s own painter, other geometry with the shared scene', () => {
+  it('matches each design module to its family in the catalog', () => {
     for (const key of designKeys) {
-      const design = designs[key];
+      const design = designs[key], family = designFamilies[key];
+      expect(typeof design.palette === 'function').toBe(family === 'language' || family === 'urban');
+      expect(typeof design.paint === 'function').toBe(family !== 'shared');
+      expect(!!design.ownsEveryGeometry).toBe(family === 'dual');
       if (design.paint) expect(design.shared).toBeUndefined();
-      if (design.ownsEveryGeometry) expect(design.paint).toBeTypeOf('function');
     }
+    expect(languageKeys).toEqual(designKeys.filter(key => ['language', 'urban'].includes(designFamilies[key])));
   });
 });

@@ -9,10 +9,12 @@ export interface SeriesColors {
   black: string;
 }
 
-export function renderSeriesGeometry(ctx: StudioCanvas, poly: (points: Point[], fill: Fill) => void, state: { geometryStrength?: number }, kind: string, cx: number, cy: number, r: number, a: number, c: SeriesColors, _p?: number) {
-  if (!['facet', 'ribbon', 'blocks'].includes(kind) || !Number.isFinite(r) || r <= 0) return;
+export const seriesKinds: readonly string[] = ['facet', 'ribbon', 'blocks'];
+
+/** Draws one of the `seriesKinds` around the origin, at radius `r` and ring angle `a`; `strength` is 0.5–1.5. */
+export function renderSeriesGeometry(ctx: StudioCanvas, poly: (points: Point[], fill: Fill) => void, kind: string, r: number, a: number, c: SeriesColors, strength: number) {
+  if (!Number.isFinite(r) || r <= 0) return;
   const R = r;
-  const strength = Number.isFinite(state.geometryStrength) ? Math.max(.5, Math.min(1.5, state.geometryStrength!)) : 1;
   const s = Math.sin(a), q = Math.cos(a), s2 = Math.sin(a * 2);
 
   // All coordinates and widths scale with the supplied radius. Only integer
@@ -42,7 +44,7 @@ export function renderSeriesGeometry(ctx: StudioCanvas, poly: (points: Point[], 
     ctx.quadraticCurveTo(X, Y, X + B, Y); ctx.closePath(); ctx.fillStyle = color; ctx.fill(); ctx.restore();
   }
 
-  ctx.save(); ctx.translate(cx, cy);
+  ctx.save();
   if (kind === 'facet') {
     // Three separate, cut-ended rails suggest a garment pattern jig rather
     // than a circular halo. The open centre stays clear to roughly .70 R.
