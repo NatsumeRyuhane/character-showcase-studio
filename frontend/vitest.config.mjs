@@ -10,7 +10,7 @@ export default defineConfig(async () => ({
   // The output host's build-time constants, exactly as tools/build.mjs supplies them.
   define: await outputHostDefines(root),
   test: {
-    // Only the unit tests: tests/visual holds Playwright specs, tests/*.cjs the older vm-based checks.
+    // Only the unit tests: tests/*.cjs are the older vm-based checks.
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     environment: 'node',
   },

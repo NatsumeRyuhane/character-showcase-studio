@@ -11,8 +11,6 @@ dist-cloudflare/
 .vscode/
 .agents/settings.local.json
 frontend/dist/
-frontend/test-results/
-frontend/playwright-report/
 .studio/
 __pycache__/
 *.pyc
