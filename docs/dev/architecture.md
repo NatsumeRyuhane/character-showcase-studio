@@ -78,7 +78,7 @@ Consequences:
 | `main.js` | Entry of the frame script: imports the CSS in cascade order, then `studio-app.js` |
 | `exploration-full-template.html` | Base styles, the 13 empty `section[data-design]` views and the artwork template each one is filled from. No controls: those are React components. |
 | `studio-app.js` | Starts the editor: builds the views, mounts the editor UI and the other page parts, registers the sync that `update()` runs, and drives the shared paint loop. Nothing imports it. |
-| `studio-session.js` | The live session: `state`, the session-only `images`, the continuous `motionClock`, saving and restoring through the widget host, frame timing and image reading. It imports no UI or artwork module (see [Module layers](#module-layers)). |
+| `studio-session.js` | The live session: `state`, the session-only `images`, the continuous `motionClock`, saving and restoring through the widget host, frame timing and image reading. It imports only pure modules (see [Module layers](#module-layers)). |
 | `studio-views.js` | The 13 design views: built from the template, synced with the state (`syncView`), laid out (`measure`) and drawn each frame (`draw`). Text fitting, badges, codes, borders and CSS effects. |
 | `designs/` | The canvas artwork, one module per design (see [Designs](#designs)) |
 | `editor/` | The editor UI as React components (see [Editor workspace](#editor-workspace)) |
@@ -112,7 +112,7 @@ Design keys (`section[data-design]`): `couture` (the code's default), `brutalist
 
 The frame script's modules import each other without cycles, in three layers:
 
-- **`studio-session.js`** holds the state every module reads and changes. It imports only pure modules (`studio-state.ts`, `motion-clock.ts`) and `editor/store.ts`, so any module can import it. Its `update()` runs the sync that `studio-app.js` registers with `onStudioSync`, so it never imports the views.
+- **`studio-session.js`** holds the state every module reads and changes. It imports only pure modules (`studio-state.ts`, `motion-clock.ts`), so any module can import it. `studio-app.js` connects the page to it with `connectStudio({ sync, notify })`: `update()` runs that `sync`, and an error message re-renders the editor through `notify`. A sync before the app has connected throws, so a startup-order mistake cannot pass silently.
 - **The page parts** import the session and each other, but never the app: `studio-views.js`, `designs/`, `studio-narrative.js` (with `story-intro.js` and `studio-post.js`), `studio-text.js`, `studio-preview.js`, `studio-output.js`, `obs-layer-sync.js`, `ae-export.js` and the React components in `editor/`.
 - **`studio-app.js`** imports the page parts and wires them together. `main.js` imports it, and nothing else does.
 
@@ -120,11 +120,11 @@ Keep it that way: a module that needs to trigger a sync calls `update()` or `syn
 
 ### Designs
 
-`src/designs/` holds the canvas artwork, one module per design, registered in `designs/index.ts`. Each exports a `Design` (`designs/types.ts`): its palette, caption text (`note`, `hello`), whether its copy moves below the name block (`copyBelowTitle`), and how it is painted. `paintExploration(ctx, w, h, t, key, settings)` paints one frame and depends only on its arguments; the paint loop and the AE export both call it.
+`src/designs/` holds the canvas artwork, one module per design, registered in `designs/index.ts`. `designs/catalog.ts` lists the 13 designs and the family each belongs to (language, urban, dual or shared); `DesignKey`, `languageKeys` (the designs with their own palette) and the design picker's urban group are derived from it. Each design module exports a `Design` (`designs/types.ts`): its palette or CSS colours (`artColors`; `designArtColors` resolves either), caption text (`note`, `hello`), whether its copy moves below the name block (`copyBelowTitle`), and how it is painted. `paintExploration(ctx, w, h, t, key, settings)` paints one frame and depends only on its arguments; the paint loop and the AE export both call it.
 
-- **Own painter.** The six language designs (`couture`, `brutalist`, `cloud`, `plush`, `play`, `sticker`) are built with `languageDesign` (`language.ts`), the three urban designs with `urbanDesign` (`urban.ts`). The scaffold paints the paper, background pattern, floor shadow and intro transform; the design module supplies its palette, accent and `signature` geometry, plus optional `backdrop`, `accents` or `crop` hooks. These painters cover only the `signature` geometry. `dual.ts` has its own painter for every geometry (`ownsEveryGeometry`).
+- **Own painter.** The six language designs (`couture`, `brutalist`, `cloud`, `plush`, `play`, `sticker`) are built with `languageDesign` (`language.ts`), the three urban designs with `urbanDesign` (`urban.ts`). The scaffold paints the paper, background pattern, floor shadow and intro transform; the design module supplies its palette, accent and `signature` geometry, plus optional `backdrop`, `accents` or `crop` hooks. These painters cover only the `signature` geometry. Both scaffolds take the ring layout, clocks and two shape helpers from `ring-scene.ts`. `dual.ts` has its own painter for every geometry (`ownsEveryGeometry`).
 - **Shared scene.** `shared-scene.ts` paints every other case: `orbit`, `poster` and `wave`, and any design with a non-signature geometry style. Its defaults are orbit's look; `poster.ts` and `wave.ts` set only `shared` (ring centre, paper, which geometry `signature` means, landscape corner cuts). `series-geometry.ts` draws the `facet`, `ribbon` and `blocks` devices for it.
-- The painters keep their own small helpers (`line`, `poly`, `cast`, …), which differ slightly between scaffolds; changing one changes that family's frames. `kit.ts` holds the number and colour helpers they share.
+- The painters keep their own small helpers (`line`, `disc`, `cast`, …), which differ slightly between scaffolds; changing one changes that family's frames. `kit.ts` holds the number and colour helpers shared by the painters and by the artwork's CSS colours in `studio-views.js`.
 
 ### Editor workspace
 
@@ -140,12 +140,12 @@ The controls are React components in `src/editor/`. The artwork is not: `studio-
 ### Adding a design
 
 The urban designs (`district.ts`, `tuner.ts`, `arcade.ts`) are the most recent example:
-- Register the key in `variantDefaults` in `studio-state.ts`, with its own font, colour, badge, shadow, ring-speed and background defaults, and in `languageKeys` if it has its own palette.
+- Add the key and its family to `designs/catalog.ts`, and its defaults (font, colour, badge, shadow, ring speed, background) to `variantDefaults` in `studio-state.ts`.
 - Add a module in `src/designs/` and register it in `designs/index.ts` (see [Designs](#designs)): `languageDesign` or `urbanDesign` for a design with its own artwork, its own `paint` as in `dual.ts`, or only `shared` settings as in `poster.ts`.
-- Add a `section[data-design]` to the template. The design picker lists every section; `urbanDesigns` in `src/editor/Workspace.tsx` decides which group it is in.
+- Add a `section[data-design]` to the template. The design picker lists every section, with the urban family in its own group.
 - Add typography and layout rules for landscape, portrait and swapped layouts.
 - Keep path topology fixed and record `studioIntroTransform`, so the AE export keeps continuous motion separate from editable transitions.
-- Extend the tests: `tests/unit/designs.test.ts` checks every key has a module; `check-urban-designs.cjs` covers topology, clocks, transparency, palettes and ratios; `tools/check.mjs` asserts the design count; and the screenshot baseline needs the new design's frames (see [build-and-test.md](build-and-test.md#visual-regression-tests)).
+- Extend the tests: `tests/unit/designs.test.ts` checks every key has a module that matches its family; `check-urban-designs.cjs` covers topology, clocks, transparency, palettes and ratios; `tools/check.mjs` asserts the design count; and the screenshot baseline needs the new design's frames (see [build-and-test.md](build-and-test.md#visual-regression-tests)).
 
 Design-specific layout logic exists too. For example, `fitPosterCopy` in `studio-views.js` pushes the taglines below the skewed name block for designs with `copyBelowTitle`. It projects the name and its pseudo-elements through their CSS transforms in un-animated layout coordinates, adding margins for shadow and motion. AE capture goes through the same `measure` path.
 
