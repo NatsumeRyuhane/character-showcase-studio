@@ -1,7 +1,7 @@
 import { studioShowDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.ts';
 import assets from './badge-assets.json';
-import { paintExploration } from './exploration-full-scene.js';
+import { paintExploration } from './designs/index.ts';
 import { currentSeries, draw, images, measure, motionClock, setMotionClock, state } from './exploration-full-logic.js';
 import { refreshStudioPreview } from './studio-preview.js';
 import { scaleStudioAEScene, studioReferenceSize } from './export-layout.js';

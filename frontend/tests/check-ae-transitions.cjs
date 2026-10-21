@@ -1,8 +1,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8'),scope={structuredClone};vm.createContext(scope);
-for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','export-layout.js'])load(scope,'src/'+file);
-load(scope,'src/studio-geometry.js','src/exploration-full-scene.js');
+load(scope,'src/ae-canvas-recorder.js','src/export-layout.js',...designModules);
 const fixtures=[...['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade'].map(key=>({key,style:'signature'})),...['orbit','slices','wave','flow','facet','ribbon','blocks','ring','burst','cut','rays','none'].flatMap(style=>['poster','dual'].map(key=>({key,style})))];
 let max=0,checks=0;
 for(const {key,style}of fixtures)for(const portrait of [false,true])for(const swapped of [false,true])for(const time of [.13,2.71,8.39]){

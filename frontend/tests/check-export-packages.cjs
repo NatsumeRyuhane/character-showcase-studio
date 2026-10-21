@@ -1,12 +1,11 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const {outputHostConstants}=require('./support/output-host.cjs');
 const root=path.join(__dirname,'..'),scope={TextEncoder,Uint8Array,DataView,Blob,structuredClone,atob,document:{getElementById:()=>null,querySelector:()=>null}};vm.createContext(scope);
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const template=read('runtime/ae-import-template.jsx').replace('/* CRT_MOTION_FUNCTION */',()=>moduleScript('runtime/crt-motion.js'));
 Object.assign(scope,outputHostConstants({aeTemplate:template}));load(scope,'runtime/export-zip.ts','runtime/export-packages.ts');
-for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js'])load(scope,'src/'+file);
-load(scope,'src/studio-geometry.js','src/exploration-full-scene.js');
+load(scope,'src/ae-canvas-recorder.js',...designModules);
 const recorder=scope.createAECanvasRecorder(),ctx=recorder.ctx;ctx.translate(12,20);ctx.scale(2,3);ctx.beginPath();ctx.moveTo(1,2);ctx.bezierCurveTo(2,2,4,5,5,7);ctx.stroke();assert.deepEqual(JSON.parse(JSON.stringify(recorder.ops[0].paths[0].v)),[[14,26],[22,41]]);assert.deepEqual(JSON.parse(JSON.stringify(recorder.ops[0].paths[0].o[0])),[2,0]);
 ctx.save();ctx.translate(100,0);ctx.restore();ctx.beginPath();ctx.rect(0,0,4,5);ctx.fill();assert.deepEqual(JSON.parse(JSON.stringify(recorder.ops[1].paths[0].v[0])),[12,20]);
 let tested=0;for(const key of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade'])for(const geometry of ['signature','orbit','slices','wave','flow','facet','ribbon','blocks','ring','burst','cut','rays','none']){

@@ -1,9 +1,8 @@
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert/strict');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),scope={structuredClone};vm.createContext(scope);
 const read=name=>fs.readFileSync(path.join(root,'src',name),'utf8');
-for(const file of ['ae-canvas-recorder.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js'])load(scope,'src/'+file);
-load(scope,'src/studio-geometry.js','src/exploration-full-scene.js');
+load(scope,'src/ae-canvas-recorder.js',...designModules);
 const names=['district','tuner','arcade'];
 const plain=value=>JSON.parse(JSON.stringify(value));
 const base={ringStyle:'signature',introProgress:1,transparent:true,grid:false,pattern:'none',floor:false,shadow:false};
@@ -23,8 +22,8 @@ function finite(ops,w,h,label){
 }
 let cases=0,maxOps=0;
 for(const key of names){
-  assert.ok(scope.urbanLanguagePalette(key,false));assert.ok(scope.urbanLanguagePalette(key,true));
-  assert.notDeepEqual(plain(scope.urbanLanguagePalette(key,false)),plain(scope.urbanLanguagePalette(key,true)),key+' has light and dark palettes');
+  assert.ok(scope.designPalette(key,false));assert.ok(scope.designPalette(key,true));
+  assert.notDeepEqual(plain(scope.designPalette(key,false)),plain(scope.designPalette(key,true)),key+' has light and dark palettes');
   const original=record(key);maxOps=Math.max(maxOps,original.length);
   assert.ok(original.length>0&&original.length<=100,key+' signature fits the native AE geometry budget');
   for(const t of [0,.137,1.3,8.5,12,24])assert.deepEqual(topology(record(key,t)),topology(original),key+' maintains fixed path topology through the entire cycle');
@@ -35,7 +34,7 @@ for(const key of names){
   const withPaper=record(key,1,{transparent:false});
   assert.equal(withPaper.length,original.length+1,key+' opaque output adds exactly one paper layer');
   assert.deepEqual(withPaper.slice(1),original,key+' transparency preserves all artwork');
-  assert.equal(withPaper[0].color,scope.urbanLanguagePalette(key,false).paper,key+' opaque output uses its own paper');
+  assert.equal(withPaper[0].color,scope.designPalette(key,false).paper,key+' opaque output uses its own paper');
   assert.ok(record(key,1,{accent:'#129acf'}).some(op=>op.color==='#129acf'),key+' custom accent reaches vector geometry');
   for(const pattern of ['dots','grid','mesh','ripple']){
     const one=record(key,1,{grid:true,pattern,ringTime:2.7,gridMotion:.4});
@@ -60,6 +59,10 @@ for(const key of names){
     assert.deepEqual(plain(rec.ops),original,key+' shadow settings preserve vector topology');
   }
 }
-assert.equal(scope.paintUrbanLanguage(null,1920,1080,0,'unknown',{}),false,'unknown schemes continue through the existing dispatcher');
-assert.equal(scope.paintUrbanLanguage(null,1920,1080,0,'district',{ringStyle:'ring'}),false,'alternate rings continue through the existing dispatcher');
+// Unknown schemes and other geometry styles fall back to the shared scene, in the design's own colours.
+const viaDispatcher=(key,settings)=>{const rec=scope.createAECanvasRecorder();scope.paintExploration(rec.ctx,1920,1080,0,key,settings);return plain(rec.ops)};
+const viaShared=(key,settings)=>{const rec=scope.createAECanvasRecorder();scope.paintSharedScene(rec.ctx,1920,1080,0,settings,{},scope.designPalette(key,false));return plain(rec.ops)};
+assert.deepEqual(viaDispatcher('unknown',{}),viaShared('unknown',{}),'unknown schemes continue through the shared scene');
+assert.deepEqual(viaDispatcher('district',{ringStyle:'ring'}),viaShared('district',{ringStyle:'ring'}),'alternate rings continue through the shared scene');
+assert.notDeepEqual(viaDispatcher('district',{ringStyle:'ring'}),viaDispatcher('district',{}),'the signature is the design\'s own');
 console.log(`PASS: ${cases} urban composition fixtures; ${names.join('/')} fixed topology, independent animation clocks, light/dark, transparency, custom accents/shadows and portrait/swapped limits; largest signature ${maxOps}/100 ops.`);

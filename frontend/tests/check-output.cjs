@@ -1,5 +1,5 @@
 const fs=require('fs');
-const {load,moduleScript}=require('./support/module-script.cjs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const root=__dirname+'/..';
@@ -148,7 +148,7 @@ assert.equal(vm.runInContext("studioOutputConfig(state,'html').start",storyEdito
 assert.equal(vm.runInContext("studioOutputConfig(state,'html').playback",storyEditor),'complete');
 assert.equal(vm.runInContext("studioOutputConfig(state,'obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
-for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])load(scope,'src/'+file);
+load(scope,...designModules);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){
   for(const transparent of [false,true]){
     const fills=[];
