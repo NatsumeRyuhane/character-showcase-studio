@@ -103,9 +103,10 @@ Issue、PR 标题和描述、提交说明都使用中文。
 
 ## 给开发者
 
-日常使用根目录的启动器即可（`start.cmd` / `./start.sh`，需要 Python 3.9+ 与 Node.js 18+）。如需直接调用构建工具，在 `frontend/` 中运行：
+日常使用根目录的启动器即可（`start.cmd` / `./start.sh`，需要 Python 3.9+ 与 Node.js 22.12+）。如需直接调用构建工具，在 `frontend/` 中运行：
 
 ```sh
+npm ci                  # 安装构建依赖（首次和依赖更新后）
 node tools/build.mjs    # 构建
 node tools/check.mjs    # 自动检查（构建后运行）
 node tools/server.mjs   # 本机预览 http://127.0.0.1:8768/

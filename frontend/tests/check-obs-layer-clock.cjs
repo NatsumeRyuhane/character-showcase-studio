@@ -1,6 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path');
+const {load,moduleScript}=require('./support/module-script.cjs');
 const root=path.join(__dirname,'..'),scope={};vm.createContext(scope);
-for(const file of ['runtime/crt-motion.js','src/timeline.js','src/obs-layer-sync.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),scope,{filename:file});
+for(const file of ['runtime/crt-motion.js','src/timeline.ts','src/obs-layer-sync.js'])load(scope,file);
 const plain=x=>JSON.parse(JSON.stringify(x)),near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 const n=scope.studioNarrativeSettings({introStyle:'story',showDuration:12}),intro=scope.studioStoryDuration(n);
 const clock={mode:'intro',elapsed:1,playing:true,timestampMs:1000};

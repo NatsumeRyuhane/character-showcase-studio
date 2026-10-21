@@ -1,0 +1,22 @@
+{
+  // Type checking only; Vite does the transpiling. The remaining JavaScript modules
+  // are allowed but not checked, so they can move to TypeScript one at a time.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    // Imports name the .ts file, which Vite and Vitest resolve as written.
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["src", "runtime/**/*.ts", "tests/unit"]
+}

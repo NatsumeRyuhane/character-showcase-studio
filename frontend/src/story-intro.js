@@ -1,3 +1,7 @@
+import { currentSeries, images, state } from './studio-session.js';
+import { applyStudioStoryTypography } from './studio-text.js';
+import { studioTypographyCopy, studioTypographyValue } from './typography.ts';
+
 // Seekable opening overlays. Every effect is painted from the shot's local time.
 function studioPaintStoryEffect(ctx,w,h,options={}){
   ctx.clearRect(0,0,w,h);
@@ -30,7 +34,7 @@ function studioPaintStoryEffect(ctx,w,h,options={}){
   }
   ctx.restore();
 }
-function mountStudioStoryIntro(view){
+export function mountStudioStoryIntro(view){
   const layer=document.createElement('div');layer.className='story-intro';layer.setAttribute('aria-label','双镜头片头');
   for(const role of ['character','author']){
     const shot=document.createElement('section');shot.className='story-shot';shot.dataset.storyRole=role;
@@ -40,7 +44,7 @@ function mountStudioStoryIntro(view){
   const flash=document.createElement('div');flash.className='story-flash';layer.append(flash);
   view.art.append(layer);view.storyLayer=layer;view.storyShots=[...layer.querySelectorAll('.story-shot')].map(el=>({el,image:el.querySelector('img')}));
 }
-function drawStudioStoryIntro(view,pose){
+export function drawStudioStoryIntro(view,pose){
   const layer=view.storyLayer;if(!layer)return;
   const story=pose.story,n=state.narrative,active=!!story?.active;
   layer.style.display=active?'block':'none';layer.style.visibility=active?'visible':'hidden';layer.setAttribute('aria-hidden',String(!active));

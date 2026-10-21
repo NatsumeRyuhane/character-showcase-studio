@@ -1,8 +1,12 @@
+import { studioAdvanceTime, studioShowDuration, studioTotalDuration } from './timeline.ts';
+import { createMotionClock } from './motion-clock.ts';
+import { root, setMotionClock, state } from './studio-session.js';
+
 // All three OBS sources sample one clock. Reloading / reactivating one source
 // catches it up to the others instead of replaying its own opening.
 let studioSharedLayerClock=null;
-const studioLayerConfig=globalThis.studioOutput?.sync?globalThis.studioOutput:null;
-function mountStudioLayerSync(){
+export const studioLayerConfig=globalThis.studioOutput?.sync?globalThis.studioOutput:null;
+export function mountStudioLayerSync(){
   if(!studioLayerConfig)return;
   const config=studioLayerConfig;
   root.dataset.outputLayer=config.layer;
@@ -28,11 +32,11 @@ function studioLayerClockPose(clock,now,intro,narrative,speed){
   const time=studioAdvanceTime(base,elapsed,intro,narrative),total=studioTotalDuration(intro,narrative),finished=narrative.outroEnabled&&time>=total;
   return {time,motionTime:finished?total:base+elapsed,playing:clock.playing&&!finished};
 }
-function studioApplyLayerClock(){
+export function studioApplyLayerClock(){
   if(!studioLayerConfig)return false;
   const clock=studioSharedLayerClock;
   if(!clock){state.playing=false;return true;}
   const pose=studioLayerClockPose(clock,Date.now(),state.introDuration,state.narrative,state.speed);
   state.time=pose.time;state.playing=pose.playing;
-  motionClock=createMotionClock(pose.motionTime,state.variants,state.edges);return true;
+  setMotionClock(createMotionClock(pose.motionTime,state.variants,state.edges));return true;
 }

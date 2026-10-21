@@ -1,12 +1,12 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {load}=require('./support/module-script.cjs'),{outputHostConstants}=require('./support/output-host.cjs');
 const root=path.join(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const decode=value=>value.replace(/&quot;/g,'"').replace(/&gt;/g,'>').replace(/&lt;/g,'<').replace(/&amp;/g,'&');
 const built=read('dist/index.html'),frameTemplate=decode(built.match(/\bdata-srcdoc="([^"]*)"/)[1]),policy=decode(built.match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)[1]);
 let downloaded=null;
 const scope={TextEncoder,Blob,crypto:{randomUUID:()=> 'obs-layer-test-0001'},document:{getElementById:id=>id==='codex-visualization'?{dataset:{srcdoc:frameTemplate}}:null,querySelector:()=>({content:policy})},studioZip:files=>files,studioDownload:(files,filename)=>{downloaded={files,filename}}};
 vm.createContext(scope);
-const packages=read('runtime/export-packages.js').replace('__STUDIO_AE_TEMPLATE__',()=>JSON.stringify('QA AE template')).replace('__STUDIO_ASSET_NOTICES__',()=>JSON.stringify('QA notices')).replace('__STUDIO_OBS_LAYER_SERVER__',()=>JSON.stringify(read('runtime/obs-layer-server.mjs'))).replace('__STUDIO_OBS_LAYER_CONTROL__',()=>JSON.stringify(read('runtime/obs-layer-control.html')));
-vm.runInContext(read('runtime/obs-layer-host.js')+'\n'+packages+'\n'+read('runtime/studio-output-host.js'),scope);
+Object.assign(scope,outputHostConstants());load(scope,'runtime/obs-layer-host.ts','runtime/export-packages.ts','runtime/studio-output-host.ts');scope.mountStudioOutputHost();
 const state={design:'character-explorations',version:6,name:'OBS Layer QA',ratio:'landscape',frame:'horizontal'},base={kind:'obs',state,config:{width:3840,fit:'contain',start:'intro',transparent:false,includeCharacters:false}},sync={key:'obs-layer-test-0001',endpoint:'/__studio_clock'};
 const build=config=>scope.buildStudioOutputDocument(frameTemplate,{...base,config:{...base.config,...config}},policy);
 const child=result=>decode(result.html.match(/\bdata-srcdoc="([^"]*)"/)[1]);

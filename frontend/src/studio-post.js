@@ -1,3 +1,6 @@
+import { studioStoryDuration } from './timeline.ts';
+import { motionClock, reduced, state } from './studio-session.js';
+
 // One optical surface for every scene. Borders stay outside this surface;
 // images, native text and geometry all pass through the same optical filter.
 function studioPostSceneWeight(time,intro,n){
@@ -17,7 +20,7 @@ function studioPostSceneWeight(time,intro,n){
   for(const event of events){value+=(event.on-before)*ease((time-event.start)/n.postFade);before=event.on;}
   return Math.max(0,Math.min(1,value));
 }
-function mountStudioPostProcessing(view){
+export function mountStudioPostProcessing(view){
   const viewport=document.createElement('div');viewport.className='studio-post-viewport';
   const surface=document.createElement('div');surface.className='studio-post-surface';
   // These elements keep their own size containers, so existing cqw/cqh layouts
@@ -98,7 +101,7 @@ function studioPaintPostOptics(ctx,w,h,o){
   if(['crt','film'].includes(o.effect)){const v=ctx.createRadialGradient(960,540,280,960,540,1120);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(.5,'rgba(0,0,0,0)');v.addColorStop(1,`rgba(0,0,0,${s*(o.effect==='crt'?.43:.28)})`);fill(v);}
   ctx.restore();
 }
-function drawStudioPostProcessing(view,pose){
+export function drawStudioPostProcessing(view,pose){
   const p=view.post;if(!p)return;
   p.foreground.style.opacity=(1-pose.outro)*(pose.story?pose.story.main:1);
   p.foreground.style.visibility=pose.outro>=1?'hidden':'visible';

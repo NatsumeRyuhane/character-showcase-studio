@@ -1,10 +1,11 @@
 const fs=require('fs');
+const {load,moduleScript,designModules}=require('./support/module-script.cjs');
 const vm=require('vm');
 const assert=require('assert/strict');
 const root=__dirname+'/..';
 const scope={TextEncoder,document:{getElementById:()=>null,querySelector:()=>null}};
 vm.createContext(scope);
-vm.runInContext(fs.readFileSync(root+'/runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(root+'/src/timeline.js','utf8')+'\n'+fs.readFileSync(root+'/runtime/studio-output-host.js','utf8'),scope);
+load(scope,'runtime/crt-motion.js','src/timeline.ts','runtime/obs-layer-host.ts','runtime/studio-output-host.ts');
 const run=source=>vm.runInContext(source,scope);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 for(const duration of [0,1,4.5,8,30]){
@@ -49,7 +50,7 @@ for(const [name,markup]of [['output',result.html],['frame',frame]])for(const mat
   if(/type="application\/json"/.test(match[1]))continue;
   new vm.Script(match[2],{filename:name+'-'+scripts++});
 }
-assert.ok(scripts>=9);
+assert.ok(scripts>=4);
 payload.config.includeCharacters=true;
 const included=build(payload);assert.ok(included.html.includes('data:image/png'));
 const includedGlobals=JSON.parse(decode(included.html.match(/\bdata-srcdoc="([^"]*)"/)[1]).match(/id="codex-visualization-widget-state">([\s\S]*?)<\/script>/)[1]);
@@ -70,15 +71,12 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // Use the actual editor defaults, output-payload function and restore path. An
 // expanded thirteen-scheme document can exceed the host budget even though its
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
-const logic=fs.readFileSync(root+'/src/exploration-full-logic.js','utf8');
-const prefix=fs.readFileSync(root+'/src/studio-text.js','utf8')+'\n'+logic.slice(logic.indexOf('\n')+1,logic.indexOf('const template='))
-  .replace('/* TIMELINE_FUNCTIONS */',fs.readFileSync(root+'/runtime/crt-motion.js','utf8')+'\n'+fs.readFileSync(root+'/src/timeline.js','utf8'))
-  .replace('/* MOTION_FUNCTIONS */',fs.readFileSync(root+'/src/motion-clock.js','utf8'))
-  .replace('/* VARIANT_CODEC */',fs.readFileSync(root+'/src/variant-codec.js','utf8'));
-const outputLogic=fs.readFileSync(root+'/src/studio-output.js','utf8'),payloadStart=outputLogic.indexOf('function htmlPayload('),payloadEnd=outputLogic.indexOf('\n  async function exportDesign',payloadStart);
-assert.ok(payloadStart>=0&&payloadEnd>payloadStart,'production output-payload function exists');
+// The session module's imports share the VM context, standing in for the module graph.
+const prefix=['src/typography.ts','src/studio-text.js','runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/variant-codec.ts','src/designs/catalog.ts','src/studio-state.ts','src/output-payload.ts','src/studio-session.js'].map(moduleScript).join('\n');
+// The production payload, with each fixture's own config: the host's config handling is tested separately.
+const payloadSource="function htmlPayload(kind){return {...studioOutputPayload(state,images,kind),config:config(kind)}}";
 function editorFixture(widgetState,globals={},reducedMotion=false){
-  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState}}};
+  const app={...globals,document:{getElementById:()=>({})},matchMedia:()=>({matches:reducedMotion}),window:{openai:{widgetState},addEventListener(){}}};
   vm.createContext(app);vm.runInContext(prefix,app);return app;
 }
 const editor=editorFixture();
@@ -96,7 +94,7 @@ for(const v of Object.values(state.variants)){
  for(const key of Object.keys(v.geometryBySeries))v.geometryBySeries[key]='signature';
 }
 function config(){return {width:1920,start:'intro',transparent:false,includeCharacters:false,fit:'contain'}}
-${outputLogic.slice(payloadStart,payloadEnd)}
+${payloadSource}
 `,editor);
 const expanded=JSON.parse(vm.runInContext('JSON.stringify(state)',editor));
 const expandedBytes=Buffer.byteLength(JSON.stringify(expanded),'utf8');let compactBytes=0;
@@ -120,7 +118,7 @@ assert.equal(JSON.parse(vm.runInContext('JSON.stringify(state)',editor)).variant
 // opt-in boundary; packaging-only removes just the two dedicated poster shots.
 const storyEditor=editorFixture();
 const storySettings={introStyle:'story',characterShotEnabled:true,authorShotEnabled:true,characterShotDuration:3.125,authorShotDuration:2.375,storyTransitionDuration:.625,characterCorner:'br-tl',authorCorner:'bl-tr',characterEffect:'holo',authorEffect:'crt',characterEffectStrength:.45,authorEffectStrength:.65,characterEffectSpeed:1.2,authorEffectSpeed:.8,storyPackagingOnly:false,storyFlash:true,characterScale:1.2,authorScale:1.4,characterX:33,characterY:65,authorX:72,authorY:38};
-vm.runInContext(`state.narrative=studioNarrativeSettings(${JSON.stringify(storySettings)});state.introDuration=studioStoryDuration(state.narrative);state.time=1.125;Object.assign(images,${JSON.stringify(payload.images)});function config(){return {width:1920,start:state.output.start,transparent:false,includeCharacters:state.output.includeCharacters,fit:'contain'}}\n${outputLogic.slice(payloadStart,payloadEnd)}`,storyEditor);
+vm.runInContext(`state.narrative=studioNarrativeSettings(${JSON.stringify(storySettings)});state.introDuration=studioStoryDuration(state.narrative);state.time=1.125;Object.assign(images,${JSON.stringify(payload.images)});function config(){return {width:1920,start:state.output.start,transparent:false,includeCharacters:state.output.includeCharacters,fit:'contain'}}\n${payloadSource}`,storyEditor);
 for(const kind of ['html','obs'])for(const includeCharacters of [false,true])for(const storyPackagingOnly of [false,true])for(const start of ['intro','show']){
   vm.runInContext(`state.output.includeCharacters=${includeCharacters};state.output.start='${start}';state.narrative.storyPackagingOnly=${storyPackagingOnly}`,storyEditor);
   const compact=vm.runInContext(`htmlPayload('${kind}')`,storyEditor),keys=['barcode','logo','qr',...(includeCharacters?['model','portrait']:[]),...(includeCharacters&&!storyPackagingOnly?['introCharacter','introAuthor']:[])].sort();
@@ -144,14 +142,12 @@ assert.equal(vm.runInContext('state.narrative.outroTrigger',completeApp),'auto')
 vm.runInContext('for(let i=0;i<2000;i++)state.time=studioAdvanceTime(state.time,.02,state.introDuration,state.narrative)',completeApp);
 assert.equal(vm.runInContext('studioPhase(state.time,state.introDuration,state.narrative)',completeApp),'outro');
 // Exercise the actual config producer, rather than the fixture's mock config.
-const configSource=outputLogic.slice(outputLogic.indexOf('function config('),outputLogic.indexOf('  function downloadLabel'));
-vm.runInContext("function dimensions(){return [1920,1080]}"+configSource,storyEditor);
 vm.runInContext("state.output.start='show'",storyEditor);
-assert.equal(vm.runInContext("config('html').start",storyEditor),'intro');
-assert.equal(vm.runInContext("config('html').playback",storyEditor),'complete');
-assert.equal(vm.runInContext("config('obs').start",storyEditor),'show');
+assert.equal(vm.runInContext("studioOutputConfig(state,'html').start",storyEditor),'intro');
+assert.equal(vm.runInContext("studioOutputConfig(state,'html').playback",storyEditor),'complete');
+assert.equal(vm.runInContext("studioOutputConfig(state,'obs').start",storyEditor),'show');
 // Transparent output must clear the canvas without repainting its paper fill.
-for(const file of ['studio-geometry.js','urban-language-scene.js','design-language-scene.js','dual-language-scene.js','exploration-full-scene.js'])vm.runInContext(fs.readFileSync(root+'/src/'+file,'utf8'),scope);
+load(scope,...designModules);
 for(const variant of ['couture','brutalist','cloud','plush','play','sticker','orbit','poster','wave','dual','district','tuner','arcade']){
   for(const transparent of [false,true]){
     const fills=[];

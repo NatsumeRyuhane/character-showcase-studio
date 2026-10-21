@@ -1,6 +1,6 @@
 // Canvas paths recorded as AE-native vector vertices in composition coordinates.
 // Lighting gradients become their middle colour; original artwork stays in HTML.
-function createAECanvasRecorder(){
+export function createAECanvasRecorder(){
   let m=[1,0,0,1,0,0],paths=[],path=null,introTransform=null,introOpacity=null,introRotation=0;const stack=[],ops=[];
   const round=x=>Math.round(x*100)/100,pt=(x,y)=>[round(m[0]*x+m[2]*y+m[4]),round(m[1]*x+m[3]*y+m[5])];
   const ctx={globalAlpha:1,fillStyle:'#000000',strokeStyle:'#000000',lineWidth:1,lineCap:'butt',lineJoin:'miter',shadowBlur:0,shadowOffsetX:0,shadowOffsetY:0,shadowColor:'transparent'};
