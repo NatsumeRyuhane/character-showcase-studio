@@ -33,6 +33,11 @@ export interface SharedLook {
 
 const classicKinds = ['facet', 'ribbon', 'blocks', 'ring', 'burst', 'cut', 'rays'];
 
+/** CSS colours of the designs drawn by the shared scene. The canvas uses the same paper, but its own, softer ink. */
+export function sharedArtColors(dark: boolean) {
+  return { paper: dark ? '#141b20' : '#eff1e8', ink: dark ? '#f3f0e5' : '#212a24' };
+}
+
 export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings | undefined, look: SharedLook, languagePalette: Palette | null) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
   const input = settings || {};
@@ -49,7 +54,8 @@ export function paintSharedScene(ctx: StudioCanvas, w: number, h: number, t: num
   const cx = w * .5 + (finalCx - w * .5) * intro, cy = h * .48 + (finalCy - h * .48) * intro;
   const r = (portrait ? Math.min(w * .43, h * .26) : h * centre[2]) * clamp(num(input.ringScale, 1.1), .6, 2.4) * (1 + s2 * .008) * (1 + .44 * (1 - intro));
   const accent = hexOr(input.accent, '#bceb45');
-  const bg = languagePalette ? languagePalette.paper : dark ? '#141b20' : look.lightPaper || '#eff1e8';
+  const sharedPaper = sharedArtColors(dark).paper;
+  const bg = languagePalette ? languagePalette.paper : dark ? sharedPaper : look.lightPaper || sharedPaper;
   const fg = languagePalette ? languagePalette.ink : dark ? '#e4ede2' : '#26382e';
   const weight = .66 + .34 * intensity;
   const shadowColor = hexOr(input.shadowColor, '#24302c');

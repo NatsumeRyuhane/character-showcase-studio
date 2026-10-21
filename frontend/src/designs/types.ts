@@ -12,6 +12,11 @@ export interface Palette {
   muted: string;
 }
 export type PaletteColors = readonly [paper: string, ink: string, muted: string];
+/** The artwork's CSS colours, `--paper` and `--ink`. */
+export interface ArtColors {
+  paper: string;
+  ink: string;
+}
 
 /**
  * What the painters draw on: the editor's canvas context, or the AE export's recorder
@@ -73,6 +78,8 @@ export interface Design {
   readonly key: DesignKey;
   /** Colours of the language and urban designs. The others use the shared scene's colours and have none. */
   palette?(dark: boolean): Palette;
+  /** CSS colours of a design without a palette; the shared scene's by default (designArtColors in index.ts). */
+  artColors?(dark: boolean): ArtColors;
   /** The design's own artwork, for the `signature` geometry, or for every geometry if `ownsEveryGeometry`. */
   readonly paint?: Painter;
   readonly ownsEveryGeometry?: boolean;

@@ -4,11 +4,13 @@
 import { clamp, hexOr, num, rgba } from './kit.ts';
 import type { Design, Fill, Point, SceneSettings, StudioCanvas } from './types.ts';
 
+const dualColors = (dark: boolean) => (dark ? { paper: '#171e1b', ink: '#eef0df', muted: '#9ba995' } : { paper: '#eeefdf', ink: '#232b24', muted: '#78816a' });
+
 function paintDual(ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
   const input = settings || {};
   const dark = input.background === 'dark', portrait = !!input.portrait, swapped = !!input.swapped;
-  const paper = dark ? '#171e1b' : '#eeefdf', ink = dark ? '#eef0df' : '#232b24', muted = dark ? '#9ba995' : '#78816a';
+  const { paper, ink, muted } = dualColors(dark);
   const accent = hexOr(input.accent, '#bceb45');
   const shadowColor = hexOr(input.shadowColor, '#24302c');
   const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12;
@@ -205,4 +207,4 @@ function paintDual(ctx: StudioCanvas, w: number, h: number, t: number | undefine
   ctx.restore(); ctx.restore();
 }
 
-export const dualDesign: Design = { key: 'dual', paint: paintDual, ownsEveryGeometry: true };
+export const dualDesign: Design = { key: 'dual', paint: paintDual, ownsEveryGeometry: true, artColors: dualColors };

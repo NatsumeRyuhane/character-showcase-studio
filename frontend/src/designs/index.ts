@@ -10,10 +10,10 @@ import { orbitDesign } from './orbit.ts';
 import { playDesign } from './play.ts';
 import { plushDesign } from './plush.ts';
 import { posterDesign } from './poster.ts';
-import { paintSharedScene } from './shared-scene.ts';
+import { paintSharedScene, sharedArtColors } from './shared-scene.ts';
 import { stickerDesign } from './sticker.ts';
 import { tunerDesign } from './tuner.ts';
-import type { Design, Palette, SceneSettings, StudioCanvas } from './types.ts';
+import type { ArtColors, Design, Palette, SceneSettings, StudioCanvas } from './types.ts';
 import { waveDesign } from './wave.ts';
 
 export const designs: Readonly<Record<DesignKey, Design>> = {
@@ -39,6 +39,11 @@ function designOf(key: string): Design | undefined {
 /** A language or urban design's colours, or null for the designs that use the shared scene's colours. */
 export function designPalette(key: string, dark: boolean): Palette | null {
   return designOf(key)?.palette?.(dark) || null;
+}
+
+/** The artwork's CSS colours: the design's palette, its own art colours, or the shared scene's. */
+export function designArtColors(key: string, dark: boolean): ArtColors {
+  return designPalette(key, dark) || designOf(key)?.artColors?.(dark) || sharedArtColors(dark);
 }
 
 /** Paints a design's canvas artwork for one frame. The result depends only on the arguments. */
