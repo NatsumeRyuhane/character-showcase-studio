@@ -4,7 +4,7 @@ This file is for AI coding agents (Codex, Claude Code and others) working in thi
 
 ## The project
 
-Character Showcase Studio is a browser editor for animated character showcase screens. It exports a standalone HTML page, OBS browser-source packages, and editable After Effects templates. It is one self-contained HTML page, built with Vite from the ES modules in `frontend/`, with no backend. A staged rewrite to Vite + React + TypeScript is in progress ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)). It is live at https://nekokaii.com/showcase-generator.
+Character Showcase Studio is a browser editor for animated character showcase screens. It exports a standalone HTML page, OBS browser-source packages, and editable After Effects templates. It is one self-contained HTML page, built with Vite from the TypeScript and JavaScript modules in `frontend/`, with a React editor UI and no backend. It is live at https://nekokaii.com/showcase-generator.
 
 | Read | When |
 | --- | --- |
@@ -93,8 +93,6 @@ If `gh` reports an authentication error inside a sandboxed agent environment, th
 
    Use the commit types below for `<type>`. One branch per task, and never reuse someone else's branch.
 
-   **Exception: the frontend rewrite (#3).** Its work collects on the integration branch `refactor/frontend-rewrite` (draft PR #4), which merges into `main` once, at the end. Each phase or step branches from `origin/refactor/frontend-rewrite` instead (for example `refactor/frontend-rewrite-phase-2`), and its PR targets `refactor/frontend-rewrite`, not `main`.
-
 ### Do not commit directly to `main`
 
 `main` is the shared, reviewed version, and the live site is deployed from it. Work there skips review and can collide with collaborators. GitHub does not block it in this repo, so **you** are the safeguard.
@@ -150,11 +148,11 @@ Never bundle unrelated changes in one commit.
 
 ## Code rules
 
-- **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; its controls are React components in `frontend/src/editor/`, while the artwork and its paint loop are plain modules; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used. New tests are Vitest tests in `frontend/tests/unit/`, found automatically; the older `frontend/tests/check-*.cjs` scripts run only if listed in `frontend/tools/check.mjs` (see [build-and-test.md](docs/dev/build-and-test.md#tests)). Paths in `docs/dev/` are relative to `frontend/`.
+- **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; its controls are React components in `frontend/src/editor/`, the canvas artwork is one module per design in `frontend/src/designs/`, and the shared editor state lives in `frontend/src/studio-session.js`; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used. New tests are Vitest tests in `frontend/tests/unit/`, found automatically; the older `frontend/tests/check-*.cjs` scripts run only if listed in `frontend/tools/check.mjs` (see [build-and-test.md](docs/dev/build-and-test.md#tests)). Paths in `docs/dev/` are relative to `frontend/`.
 - **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
 - **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.
 - **Storage is keyed by page path.** Moving or renaming the served page loses users' saved settings unless you add a migration.
-- **Match the surrounding style** for now. The frontend rewrite proceeds in the phases agreed in issue #3; do not start other large refactors or reformat whole files without agreement in an issue.
+- **Write new modules in TypeScript**, readably formatted like `src/designs/` and `src/editor/`. When you substantially change one of the remaining dense JavaScript modules (see [architecture.md](docs/dev/architecture.md#known-structural-debt)), converting it is welcome; otherwise match the surrounding style. Do not start large refactors or reformat whole files without agreement in an issue.
 - Do not add runtime network dependencies, npm packages or frameworks without agreement. The page must keep working offline from `file://`.
 - Do not add official game logos, characters or UI assets. Badges and designs are original artwork.
 

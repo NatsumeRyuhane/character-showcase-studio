@@ -1,4 +1,4 @@
-// Bridges the editor's mutable state to React (rewrite phase 4, issue #3).
+// Bridges the editor's mutable state to React.
 // The session (studio-session.js) owns `state`, and everything mutates it in place. Each sync calls
 // notifyEditor(), and components read the state again through useEditorRevision().
 import { useSyncExternalStore } from 'react';

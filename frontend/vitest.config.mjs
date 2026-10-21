@@ -1,4 +1,4 @@
-// Unit tests (rewrite phase 3, issue #3). See docs/dev/build-and-test.md#unit-tests.
+// Unit tests. See docs/dev/build-and-test.md#unit-tests.
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';

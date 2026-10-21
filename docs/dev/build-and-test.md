@@ -28,7 +28,7 @@ Always run **build, then check**, and commit only when the check prints its fina
 
 ## Tests
 
-There are two kinds of automated tests, and `node tools/check.mjs` runs both. They are moving from the second kind to the first during the rewrite (issue #3, phase 3).
+There are two kinds of automated tests, and `node tools/check.mjs` runs both. Write new tests as unit tests; an older script moves to a unit test when the module it exercises becomes TypeScript.
 
 ### Unit tests
 
@@ -54,7 +54,7 @@ Create it in `src/`, in TypeScript for new code, and import it where it is used.
 
 ## Visual regression tests
 
-`tests/visual/` holds a [Playwright](https://playwright.dev/) screenshot baseline of the preview: every design, landscape and portrait, at four points on the timeline (character shot 1.2 s, creator shot 4 s, show 11 s, outro 18.4 s), plus the swapped layout in the show. That is 10 frames per design, 130 in all, in `tests/visual/__screenshots__/<design>/`. It is the safety net for the rest of the rewrite: a refactor that should not change the picture must leave every frame identical.
+`tests/visual/` holds a [Playwright](https://playwright.dev/) screenshot baseline of the preview: every design, landscape and portrait, at four points on the timeline (character shot 1.2 s, creator shot 4 s, show 11 s, outro 18.4 s), plus the swapped layout in the show. That is 10 frames per design, 130 in all, in `tests/visual/__screenshots__/<design>/`. It is the safety net for refactoring: a change that should not alter the picture must leave every frame identical.
 
 **How a frame is made.** Each test seeds `localStorage` with a saved state, the way a returning user's browser has one, and loads the page. The state is `tests/visual/fixtures/studio-state.json` (a frozen copy of the startup preset, so publishing a new preset does not move the baseline) with the design, ratio, side swap and `time` set, and `playing: false`. A paused state restores with its motion clock rebuilt from `time`, so the frame is a pure function of the state. The tests do not click or seek through the editor UI. Each test screenshots the active design's `.design-art` element and fails on page errors or console warnings.
 

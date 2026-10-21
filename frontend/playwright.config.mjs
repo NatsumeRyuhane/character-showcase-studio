@@ -1,4 +1,4 @@
-// Visual regression baseline (rewrite phase 2, issue #3). See docs/dev/build-and-test.md#visual-regression-tests.
+// Visual regression baseline. See docs/dev/build-and-test.md#visual-regression-tests.
 import { defineConfig } from '@playwright/test';
 
 const port = 8797;
