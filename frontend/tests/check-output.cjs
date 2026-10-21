@@ -72,7 +72,7 @@ assert.equal(landscape.config.width,3840);assert.equal(landscape.config.height,2
 // expanded thirteen-scheme document can exceed the host budget even though its
 // individual fields are valid, so pure HTML/OBS must use the persistence codec.
 // The session module's imports share the VM context, standing in for the module graph.
-const prefix=['src/typography.ts','src/studio-text.js','runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/variant-codec.ts','src/studio-state.ts','src/output-payload.ts','src/studio-session.js'].map(moduleScript).join('\n');
+const prefix=['src/typography.ts','src/studio-text.js','runtime/crt-motion.js','src/timeline.ts','src/motion-clock.ts','src/variant-codec.ts','src/designs/catalog.ts','src/studio-state.ts','src/output-payload.ts','src/studio-session.js'].map(moduleScript).join('\n');
 // The production payload, with each fixture's own config: the host's config handling is tested separately.
 const payloadSource="function htmlPayload(kind){return {...studioOutputPayload(state,images,kind),config:config(kind)}}";
 function editorFixture(widgetState,globals={},reducedMotion=false){

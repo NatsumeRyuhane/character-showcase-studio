@@ -1,11 +1,12 @@
 import { studioIntroDuration, studioNarrativeSettings, studioStoryDuration, studioTotalDuration, type NarrativeSettings } from './timeline.ts';
 import { studioTypographySettings, type TypographySettings } from './typography.ts';
 import { decodeStudioVariants, encodeStudioVariants, type EncodedVariants } from './variant-codec.ts';
+import { designFamilies } from './designs/catalog.ts';
 
 // The editor state: defaults, validation and restore of saved snapshots, and the
 // snapshot the editor saves. See docs/dev/state-and-timing.md.
 
-export type DesignKey = 'couture' | 'brutalist' | 'cloud' | 'plush' | 'play' | 'sticker' | 'orbit' | 'poster' | 'wave' | 'dual' | 'district' | 'tuner' | 'arcade';
+export type DesignKey = keyof typeof designFamilies;
 export type SeriesKey = 'atelier' | 'fur' | 'mini';
 export type EdgeSide = 'top' | 'bottom';
 export type GeometryKey = keyof typeof geometryNames;
@@ -139,8 +140,8 @@ export const seriesDefaults: Readonly<Record<SeriesKey, SeriesEntry>> = {
   fur: { label: 'FUR', prefix: 'FR', serial: '001', caption: '蓬松有形 · 触感想象', subtitle: 'SOFT TEXTURE. BOLD SOUL.' },
   mini: { label: 'MINI', prefix: 'MN', serial: '001', caption: '小小身形 · 大大个性', subtitle: 'SMALL FORM. BIG ENERGY.' },
 };
-/** The designs drawn by the design-language modules (rather than the original exploration painter). */
-export const languageKeys: readonly DesignKey[] = ['couture', 'brutalist', 'cloud', 'plush', 'play', 'sticker', 'district', 'tuner', 'arcade'];
+/** The designs with their own palette and painter: the language and urban families (src/designs/catalog.ts). */
+export const languageKeys: readonly DesignKey[] = (Object.keys(designFamilies) as DesignKey[]).filter(key => designFamilies[key] === 'language' || designFamilies[key] === 'urban');
 
 type VariantOverrides = Partial<Omit<VariantSettings, 'effects' | 'shadows'>> & { effects?: Partial<VariantEffects>; shadows?: Partial<VariantShadows> };
 /** Each design's differences from the shared variant defaults. Key order is the designs' order everywhere. */
