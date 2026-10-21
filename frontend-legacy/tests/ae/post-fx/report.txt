@@ -1,8 +1,0 @@
-DONE none 23 MAIN layers
-DONE polar 23 MAIN layers
-DONE crt 23 MAIN layers
-DONE holo 23 MAIN layers
-DONE bloom 23 MAIN layers
-DONE anamorphic 23 MAIN layers
-DONE prism 23 MAIN layers
-DONE film 23 MAIN layers

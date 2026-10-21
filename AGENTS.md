@@ -151,7 +151,6 @@ Never bundle unrelated changes in one commit.
 ## Code rules
 
 - **The web app lives in `frontend/`.** The editor's code is ES modules in `frontend/src/` (entry `src/main.js`), which Vite bundles; its controls are React components in `frontend/src/editor/`, while the artwork and its paint loop are plain modules; `frontend/runtime/` holds the shell-side scripts and templates that `frontend/tools/build.mjs` assembles around it. Import a new module where it is used. New tests are Vitest tests in `frontend/tests/unit/`, found automatically; the older `frontend/tests/check-*.cjs` scripts run only if listed in `frontend/tools/check.mjs` (see [build-and-test.md](docs/dev/build-and-test.md#tests)). Paths in `docs/dev/` are relative to `frontend/`.
-- **Never edit `frontend-legacy/`.** It is a frozen copy of the frontend from before the rewrite, kept only to compare behaviour, and deleted when the rewrite is done.
 - **Keep the invariants** in [architecture.md](docs/dev/architecture.md#invariants). In particular: timeline poses are pure functions of time; continuous clocks never reset; borders persist; layout happens at logical size; saved state stays within 16 KiB; `tuple-v1` slots are append-only.
 - **Keep the sandbox and the CSPs.** Changing the security boundary is a separate, reviewed task, never a side effect.
 - **Storage is keyed by page path.** Moving or renaming the served page loses users' saved settings unless you add a migration.

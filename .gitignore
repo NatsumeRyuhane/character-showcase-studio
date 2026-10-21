@@ -13,7 +13,6 @@ dist-cloudflare/
 frontend/dist/
 frontend/test-results/
 frontend/playwright-report/
-frontend-legacy/dist/
 .studio/
 __pycache__/
 *.pyc

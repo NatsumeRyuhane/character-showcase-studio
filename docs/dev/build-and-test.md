@@ -83,14 +83,9 @@ Not covered yet: uploaded images (every frame uses the placeholders), the border
 
 - **Frontend:** `npm ci`, build and check on Ubuntu and Windows with Node 22 and 24. The Windows run also confirms the line-ending setup produces a working build.
 - **Frontend visual regression:** the [visual regression tests](#visual-regression-tests) in the pinned Playwright image. On failure, the expected, actual and diff images are uploaded as the `visual-regression-report` artifact.
-- **Legacy frontend:** build and check of the frozen pre-rewrite snapshot in `frontend-legacy/` (see its README), so it stays usable for comparison until the rewrite is done.
 - **Launcher:** the launcher test suite on Ubuntu, macOS and Windows, plus the `start.sh` / `start.cmd` shims (see [launcher.md](launcher.md#tests-and-ci)).
 
 A PR should not be merged with failing CI.
-
-## Comparing with the legacy frontend
-
-Until the rewrite is done, `frontend-legacy/` holds the frontend as it was before it (see its README). It builds and checks the old way (`node tools/build.mjs`, `node tools/check.mjs`, no `npm ci`). Use it to compare behaviour: build both, diff the output of the two checks, and compare the pages in a browser. Serve them on different ports (`node tools/server.mjs 8790` in each folder, with another port for one of them) so your real preview on 8768 keeps its saved settings.
 
 ## Manual verification
 

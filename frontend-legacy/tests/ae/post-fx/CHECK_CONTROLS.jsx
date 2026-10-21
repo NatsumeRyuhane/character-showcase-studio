@@ -1,2 +1,0 @@
-(function(){var root=File($.fileName).parent;$.global.STUDIO_AE_QA=true;$.evalFile(File(root.fsName+'/holo.jsx'));var report=[];try{var main=$.global.STUDIO_AE_RESULT.main,fx=main.layer('CONTROLS').property('ADBE Effect Parade');for(var i=1;i<=fx.numProperties;i++)report.push(fx.property(i).name);}catch(e){report.push(String(e));}var f=File(root.fsName+'/controls.txt');f.encoding='UTF-8';f.open('w');f.write(report.join('\n'));f.close();app.quit();})();
-

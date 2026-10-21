@@ -11,7 +11,6 @@ Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [bu
 | Path | Contents |
 | --- | --- |
 | `frontend/` | The web app: `src/`, `runtime/`, `assets/`, `vendor/`, `tests/`, `tools/`, `package.json`, `THIRD-PARTY-NOTICES.md`. The build writes to `frontend/dist/`, which is gitignored. |
-| `frontend-legacy/` | Frozen copy of `frontend/` from before the rewrite, kept only to compare behaviour; never edited, deleted when the rewrite is done (see its README) |
 | `deploy/launcher/` | The local [launcher](launcher.md); `start.sh` / `start.cmd` at the root call it |
 | `deploy/cloudflare/` | Wrangler config, the Worker, and the deploy build step |
 | `docs/` | `user/` (Chinese), `dev/` (English), `qa/`, `CHANGELOG.md` |

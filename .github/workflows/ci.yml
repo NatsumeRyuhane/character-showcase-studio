@@ -69,22 +69,6 @@ jobs:
             frontend/test-results/
           retention-days: 14
 
-  # Frozen pre-rewrite snapshot, kept for comparison until the rewrite is done (frontend-legacy/README.md).
-  frontend-legacy:
-    name: Legacy frontend build and check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Build
-        working-directory: frontend-legacy
-        run: node tools/build.mjs
-      - name: Check
-        working-directory: frontend-legacy
-        run: node tools/check.mjs
-
   launcher:
     name: Launcher (${{ matrix.os }}, Python ${{ matrix.python }})
     runs-on: ${{ matrix.os }}
