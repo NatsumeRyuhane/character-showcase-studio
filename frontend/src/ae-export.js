@@ -2,7 +2,8 @@ import { studioShowDuration } from './timeline.ts';
 import { createMotionClock } from './motion-clock.ts';
 import assets from './badge-assets.json';
 import { paintExploration } from './exploration-full-scene.js';
-import { currentSeries, draw, images, measure, motionClock, setMotionClock, state, workspace } from './exploration-full-logic.js';
+import { currentSeries, draw, images, measure, motionClock, setMotionClock, state } from './exploration-full-logic.js';
+import { refreshStudioPreview } from './studio-preview.js';
 import { scaleStudioAEScene, studioReferenceSize } from './export-layout.js';
 import { createAECanvasRecorder } from './ae-canvas-recorder.js';
 import { captureStudioAEGeometry } from './ae-geometry-motion.js';
@@ -97,7 +98,7 @@ export async function collectStudioAEScene(view,options){
     if(captured.geometry.length<captured.total)warnings.push('细密纤维已简化：保留 '+captured.geometry.length+' 组可编辑主形状。');
     scene.geometry=captured.geometry.map(op=>({...op,color:rgba(op.color)}));
     if(v.effects.gradient!=='none'||v.effects.grain||v.effects.vignette)warnings.push('背景渐变、暗角与颗粒未映射；可在 AE 中继续添加效果。');
-  }finally{art.style.cssText=saved.style;state.time=saved.time;state.playing=saved.playing;setMotionClock(saved.clock);v.textMotion=saved.motion;measure(view);draw(view);workspace.sync()}
+  }finally{art.style.cssText=saved.style;state.time=saved.time;state.playing=saved.playing;setMotionClock(saved.clock);v.textMotion=saved.motion;measure(view);draw(view);refreshStudioPreview()}
   function assetsForAE(id){return ['vrcft','liltoon','poiyomi'].includes(id)?assets[id]?.dataUri:null}
   // Rasterize only graphic marks; all copy, badge surfaces and main geometry stay native.
   for(const job of iconJobs){

@@ -32,7 +32,7 @@ for (const [name, markup] of [['shell', document], ['frame', frame]]) {
     executableScripts++;
   }
 }
-assert.ok(executableScripts >= 9, 'all embedded executable scripts were inspected');
+assert.ok(executableScripts >= 5, 'all embedded executable scripts were inspected');
 assert.ok(document.includes('sandbox="allow-scripts"'), 'sandbox retained');
 assert.ok(document.includes('Content-Security-Policy'), 'CSP retained');
 assert.equal([...fragment.matchAll(/<section\b[^>]*\bdata-variant=/g)].length, 13, 'all 13 designs included');

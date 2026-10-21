@@ -11,7 +11,7 @@ export default defineConfig(async () => ({
   define: await outputHostDefines(root),
   test: {
     // Only the unit tests: tests/visual holds Playwright specs, tests/*.cjs the older vm-based checks.
-    include: ['tests/unit/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.{ts,tsx}'],
     environment: 'node',
   },
 }));

@@ -18,10 +18,6 @@ def save(relative, url):
     sources[relative] = url
     print(relative, target.stat().st_size)
 
-save('vendor/floating-ui-core.min.js', 'https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js')
-save('vendor/floating-ui-dom.min.js', 'https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js')
-save('vendor/lucide.js', 'https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js')
-save('vendor/FLOATING-UI-LICENSE.txt', 'https://unpkg.com/@floating-ui/core@1.7.3/LICENSE')
 save('vendor/LUCIDE-LICENSE.txt', 'https://unpkg.com/lucide@1.17.0/LICENSE')
 save('vendor/JSBARCODE-LICENSE.txt', 'https://raw.githubusercontent.com/lindell/JsBarcode/v3.12.1/MIT-LICENSE.txt')
 save('vendor/QRCODE-LICENSE.txt', 'https://raw.githubusercontent.com/kazuhikoarase/qrcode-generator/master/LICENSE')
