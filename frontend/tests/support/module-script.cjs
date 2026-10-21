@@ -61,7 +61,7 @@ function load(scope, ...files) {
 }
 
 // The design modules (src/designs/), in an order where each one's dependencies load first.
-const designModules = ['kit', 'series-geometry', 'shared-scene', 'language', 'urban',
+const designModules = ['kit', 'series-geometry', 'shared-scene', 'ring-scene', 'language', 'urban',
   'couture', 'brutalist', 'cloud', 'plush', 'play', 'sticker', 'district', 'tuner', 'arcade', 'orbit', 'poster', 'wave', 'dual', 'index']
   .map(name => `src/designs/${name}.ts`);
 

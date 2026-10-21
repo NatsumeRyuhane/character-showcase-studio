@@ -3,6 +3,7 @@
 // Every path is presentation geometry, kept away from the model's central silhouette.
 import type { DesignKey } from '../studio-state.ts';
 import { clamp, hexOr, num, paletteOf, rgba } from './kit.ts';
+import { ringLayout, ringShapes } from './ring-scene.ts';
 import type { Design, Fill, PaletteColors, Point, SceneSettings, StudioCanvas } from './types.ts';
 
 /** What a language design's hooks draw with. `signature` runs centred on the ring, mirrored when swapped. */
@@ -72,35 +73,17 @@ export function languageDesign(spec: LanguageDesignSpec): Design {
 function paintLanguage(spec: LanguageDesignSpec, ctx: StudioCanvas, w: number, h: number, t: number | undefined, settings: SceneSettings) {
   if (!ctx || !(w > 0) || !(h > 0)) return;
   const input = settings || {};
-  const dark = input.background === 'dark', portrait = !!input.portrait, swapped = !!input.swapped;
+  const { dark, portrait, swapped, side, a, sa, ca, s2, ga, gm, intro, finalCx, finalCy, cx, cy, r, unit, strength, opacity, cut, shadowEnabled, shadowStrength, shadowDepth } = ringLayout(input, w, h, t);
   const [paper, ink, muted] = dark ? spec.palette.dark : spec.palette.light;
   const accent = hexOr(input.accent, spec.accent);
   const shadowColor = hexOr(input.shadowColor, '#282c31');
-  // Background and geometry receive independent continuous clocks. A paused ring
-  // must not stop the ambient grid, and neither clock resets at the intro boundary.
-  const a = input.motion === false ? 0 : Math.PI * 2 * num(input.ringTime, num(t, 0)) / 12, sa = Math.sin(a), ca = Math.cos(a), s2 = Math.sin(2 * a);
-  const ga = input.motion === false || input.gridMoving === false ? 0 : Math.PI * 2 * num(t, 0) / 12, gm = clamp(num(input.gridMotion, .14), 0, .5);
-  const intro = clamp(num(input.introProgress, 1));
-  const side = swapped ? -1 : 1;
-  const finalCx = w * (portrait ? .52 : swapped ? .285 : .715) + num(input.px, 0) * w * .007;
-  const finalCy = h * (portrait ? (swapped ? .34 : .56) : .49) + num(input.py, 0) * h * .005;
-  const cx = w * .5 + (finalCx - w * .5) * intro, cy = h * .48 + (finalCy - h * .48) * intro;
-  const r = (portrait ? Math.min(w * .35, h * .26) : h * .38) * clamp(num(input.ringScale, 1.15), .6, 2.4) * (1 + .44 * (1 - intro));
-  const unit = Math.min(w, h), strength = clamp(num(input.geometryStrength, 1), .5, 1.5);
-  const opacity = clamp(num(input.geometryOpacity, 1), .3, 1), cut = clamp(num(input.cutStrength, .75));
-  const shadowEnabled = input.shadow !== false && num(input.shadowStrength, .8) > 0 && num(input.shadowDepth, 1) > 0;
-  const shadowStrength = clamp(num(input.shadowStrength, .8), 0, 1.5), shadowDepth = clamp(num(input.shadowDepth, 1), 0, 2);
+  const { poly, roundedPath } = ringShapes(ctx);
 
   function line(points: Point[], color: Fill, width: number, alpha = 1, cap: CanvasLineCap = 'round') {
     if (points.length < 2) return;
     ctx.save(); ctx.globalAlpha *= alpha; ctx.lineWidth = width; ctx.lineCap = cap; ctx.lineJoin = 'round'; ctx.strokeStyle = color; ctx.beginPath();
     points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
     ctx.stroke(); ctx.restore();
-  }
-  function poly(points: Point[], color: Fill, alpha = 1) {
-    ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.beginPath();
-    points.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
-    ctx.closePath(); ctx.fill(); ctx.restore();
   }
   function disc(x: number, y: number, radius: number, color: Fill, alpha = 1) {
     ctx.save(); ctx.globalAlpha *= alpha; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, Math.max(.01, radius), 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -125,13 +108,6 @@ function paintLanguage(spec: LanguageDesignSpec, ctx: StudioCanvas, w: number, h
       ctx.lineTo(Math.cos(b) * (rx - thickness), Math.sin(b) * (ry - thickness));
     }
     ctx.closePath(); ctx.fill(); ctx.restore();
-  }
-  function roundedPath(x: number, y: number, width: number, height: number, radius: number) {
-    const rr = Math.min(radius, width * .5, height * .5);
-    ctx.beginPath(); ctx.moveTo(x + rr, y); ctx.lineTo(x + width - rr, y); ctx.quadraticCurveTo(x + width, y, x + width, y + rr);
-    ctx.lineTo(x + width, y + height - rr); ctx.quadraticCurveTo(x + width, y + height, x + width - rr, y + height);
-    ctx.lineTo(x + rr, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - rr);
-    ctx.lineTo(x, y + rr); ctx.quadraticCurveTo(x, y, x + rr, y); ctx.closePath();
   }
   function roundRect(x: number, y: number, width: number, height: number, radius: number, color: Fill, alpha = 1, strokeWidth = 0) {
     ctx.save(); ctx.globalAlpha *= alpha; roundedPath(x, y, width, height, radius);
