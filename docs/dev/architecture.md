@@ -2,7 +2,7 @@
 
 Character Showcase Studio is a browser editor for animated character showcase screens. The editor UI and its content are Chinese. Users pick one of 13 visual designs, fill in character and brand content, tune motion and effects, and export the result as a standalone HTML page, an OBS browser-source package, or an editable After Effects template.
 
-This document describes the code **as it is today**, after the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling), phase 2 (a Playwright screenshot baseline, see [build-and-test.md](build-and-test.md#visual-regression-tests)), phase 3 (the pure logic as typed TypeScript modules with Vitest unit tests), phase 4 (the editor UI as React components, without the Codex widget's UI kit) and phase 5 (one module per design, and the editor's old main module split into session, views and app modules) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
+This document describes the code **as it is today**, after the staged frontend rewrite ([issue #3](https://github.com/nekokaii/character-showcase-studio/issues/3)): phase 1 (ES modules, Vite, TypeScript tooling), phase 2 (a Playwright screenshot baseline, used as the rewrite's safety net and removed after it), phase 3 (the pure logic as typed TypeScript modules with Vitest unit tests), phase 4 (the editor UI as React components, without the Codex widget's UI kit) and phase 5 (one module per design, and the editor's old main module split into session, views and app modules) are done. Read it before moving or splitting modules: several invariants below are easy to break silently.
 
 Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [build-and-test.md](build-and-test.md), [deploy.md](deploy.md).
 
@@ -11,7 +11,6 @@ Related: [state-and-timing.md](state-and-timing.md), [export.md](export.md), [bu
 | Path | Contents |
 | --- | --- |
 | `frontend/` | The web app: `src/`, `runtime/`, `assets/`, `vendor/`, `tests/`, `tools/`, `package.json`, `THIRD-PARTY-NOTICES.md`. The build writes to `frontend/dist/`, which is gitignored. |
-| `frontend-legacy/` | Frozen copy of `frontend/` from before the rewrite, kept only to compare behaviour; never edited, deleted when the rewrite is done (see its README) |
 | `deploy/launcher/` | The local [launcher](launcher.md); `start.sh` / `start.cmd` at the root call it |
 | `deploy/cloudflare/` | Wrangler config, the Worker, and the deploy build step |
 | `docs/` | `user/` (Chinese), `dev/` (English), `qa/`, `CHANGELOG.md` |
@@ -145,7 +144,7 @@ The urban designs (`district.ts`, `tuner.ts`, `arcade.ts`) are the most recent e
 - Add a `section[data-design]` to the template. The design picker lists every section, with the urban family in its own group.
 - Add typography and layout rules for landscape, portrait and swapped layouts.
 - Keep path topology fixed and record `studioIntroTransform`, so the AE export keeps continuous motion separate from editable transitions.
-- Extend the tests: `tests/unit/designs.test.ts` checks every key has a module that matches its family; `check-urban-designs.cjs` covers topology, clocks, transparency, palettes and ratios; `tools/check.mjs` asserts the design count; and the screenshot baseline needs the new design's frames (see [build-and-test.md](build-and-test.md#visual-regression-tests)).
+- Extend the tests: `tests/unit/designs.test.ts` checks every key has a module that matches its family; `check-urban-designs.cjs` covers topology, clocks, transparency, palettes and ratios; and `tools/check.mjs` asserts the design count.
 
 Design-specific layout logic exists too. For example, `fitPosterCopy` in `studio-views.js` pushes the taglines below the skewed name block for designs with `copyBelowTitle`. It projects the name and its pseudo-elements through their CSS transforms in un-animated layout coordinates, adding margins for shadow and motion. AE capture goes through the same `measure` path.
 
@@ -155,7 +154,7 @@ Design-specific layout logic exists too. For example, `fitPosterCopy` in `studio
 
 ## Invariants
 
-Keep these when changing or restructuring code. Most have regression tests in `tests/`, and the screenshot baseline in `tests/visual/` catches changes to the rendered frames.
+Keep these when changing or restructuring code. Most have regression tests in `tests/`; what the page looks like is checked by hand (see [build-and-test.md](build-and-test.md#manual-verification)).
 
 **Motion and timing**
 - Narrative animation is a **pure function of time**. Seeking, pausing, replaying and changing speed must reproduce the same frame. Never drive transitions with one-shot CSS animations or event sequences.

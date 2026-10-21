@@ -1,5 +1,5 @@
 // The typography settings are unit-tested in tests/unit/typography.test.ts. This script
-// exercises the DOM styling, which still reads the editor's shared state (phase 4).
+// exercises the DOM styling, which reads the editor's shared state (studio-session.js).
 const vm=require('vm'),assert=require('assert/strict');
 const {load}=require('./support/module-script.cjs');
 const scope={};vm.createContext(scope);load(scope,'src/typography.ts','src/studio-text.js');

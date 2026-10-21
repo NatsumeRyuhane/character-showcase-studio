@@ -1,5 +1,5 @@
 // The narrative timeline itself is unit-tested in tests/unit/timeline.test.ts. This script
-// exercises the production renderer, which still needs the editor's shared state (phase 4).
+// exercises the production renderer, which reads the editor's shared state (studio-session.js).
 const vm=require('vm'),assert=require('assert/strict');
 const {load,moduleScript}=require('./support/module-script.cjs');
 const scope={};vm.createContext(scope);load(scope,'runtime/crt-motion.js','src/timeline.ts');

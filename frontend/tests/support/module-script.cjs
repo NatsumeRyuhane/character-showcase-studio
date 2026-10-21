@@ -12,8 +12,8 @@
 //   helpers with the same name in two modules do not collide. JavaScript files share
 //   one scope, as they did when the build concatenated them.
 // Only these forms are supported, at the start of a line; anything else throws.
-// Scripts move to Vitest (tests/unit/) as their modules are converted in the
-// frontend rewrite (issue #3); this loader goes once none of them needs it.
+// Scripts move to Vitest (tests/unit/) as their modules are converted to
+// TypeScript; this loader goes once none of them needs it.
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');

@@ -1,6 +1,6 @@
 {
-  // Type checking only; Vite does the transpiling. JavaScript is allowed but not
-  // yet checked, so modules can move to TypeScript one at a time (issue #3).
+  // Type checking only; Vite does the transpiling. The remaining JavaScript modules
+  // are allowed but not checked, so they can move to TypeScript one at a time.
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
