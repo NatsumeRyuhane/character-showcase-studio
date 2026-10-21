@@ -4,7 +4,7 @@
 
 Node.js 22.12 or newer, with npm (it ships with Node.js). Run every command below from `frontend/`.
 
-Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. React and React DOM are bundled into the page; the other dependencies (Vite, TypeScript, Vitest, jsdom, Playwright) are development tools only. The built page loads nothing.
+Install the build dependencies with `npm ci` once, and again whenever `package-lock.json` changes. It needs the network. The [launcher](launcher.md) does this automatically before every build that needs it. React, React DOM and React DOM's runtime dependency `scheduler` are bundled into the page; the other dependencies (Vite, TypeScript, Vitest, jsdom, Playwright) are development tools only. The built page loads nothing.
 
 ## Commands
 
@@ -56,7 +56,7 @@ Create it in `src/`, in TypeScript for new code, and import it where it is used.
 
 `tests/visual/` holds a [Playwright](https://playwright.dev/) screenshot baseline of the preview: every design, landscape and portrait, at four points on the timeline (character shot 1.2 s, creator shot 4 s, show 11 s, outro 18.4 s), plus the swapped layout in the show. That is 10 frames per design, 130 in all, in `tests/visual/__screenshots__/<design>/`. It is the safety net for the rest of the rewrite: a refactor that should not change the picture must leave every frame identical.
 
-**How a frame is made.** Each test seeds `localStorage` with a saved state, the way a returning user's browser has one, and loads the page. The state is `tests/visual/fixtures/studio-state.json` (a frozen copy of the startup preset, so publishing a new preset does not move the baseline) with the design, ratio, side swap and `time` set, and `playing: false`. A paused state restores with its motion clock rebuilt from `time`, so the frame is a pure function of the state. The tests do not click or seek through the editor UI, which phase 4 replaces. Each test screenshots the active design's `.design-art` element and fails on page errors or console warnings.
+**How a frame is made.** Each test seeds `localStorage` with a saved state, the way a returning user's browser has one, and loads the page. The state is `tests/visual/fixtures/studio-state.json` (a frozen copy of the startup preset, so publishing a new preset does not move the baseline) with the design, ratio, side swap and `time` set, and `playing: false`. A paused state restores with its motion clock rebuilt from `time`, so the frame is a pure function of the state. The tests do not click or seek through the editor UI. Each test screenshots the active design's `.design-art` element and fails on page errors or console warnings.
 
 Rules the harness relies on:
 
